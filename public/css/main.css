@@ -1,0 +1,17 @@
+.v-application--wrap {
+    min-height: initial !important;
+}
+
+.extension-side-bar {
+    height: 100%;
+    width: 400px;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    z-index: 90000;
+    border: none;
+}
+
+.extension-hidden {
+    display: none !important;
+}

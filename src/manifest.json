@@ -1,0 +1,37 @@
+{
+  "manifest_version": 2,
+  "name": "__MSG_extName__",
+  "homepage_url": "http://localhost:8080/",
+  "description": "A Vue Browser Extension",
+  "default_locale": "en",
+  "permissions": [
+    "activeTab",
+    "<all_urls>",
+    "*://*/*"
+  ],
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "background": {
+    "scripts": [
+      "js/background.js"
+    ],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "exclude_globs": [ 
+        "http://trustnet.csail.mit.edu",
+        "https://trustnet.csail.mit.edu"
+       ],
+      "js": ["js/content-script.js"],
+      "css": ["css/main.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    "popup.html"
+  ]
+}
