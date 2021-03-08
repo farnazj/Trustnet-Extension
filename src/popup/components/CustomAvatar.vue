@@ -17,7 +17,7 @@
 
 <script>
 import innerAvatar from '../components/InnerAvatar'
-import utils from '../services/utils'
+import utils from '@/lib/utils'
 import { mapState } from 'vuex';
 
 export default {

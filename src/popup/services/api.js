@@ -1,7 +1,7 @@
 import axios from 'axios'
-import store from '@/store'
+import store from '../store'
 import router from '../router'
-import consts from './constants'
+import consts from '@/lib/constants'
 
 //&& err.config && !err.config.__isRetryRequest
 const instance = axios.create({
