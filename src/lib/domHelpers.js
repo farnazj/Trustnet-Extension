@@ -1,4 +1,5 @@
 import utils from '@/lib/utils'
+import insertedAppRouter from '@/router'
 
 function getElementsContainingText(text) {
 
@@ -32,6 +33,13 @@ function addAltTitleNodeToHeadline(altTitle) {
     newEl.addEventListener('click', function(ev) {
         ev.preventDefault();
 
+    insertedAppRouter.push({
+        name: 'customTitles',
+        params: { 
+            titleId: altTitle.id
+        }
+    })
+
         // browser.runtime.sendMessage({
         //     type: 'direct_to_custom_titles',
         //     data: {
@@ -47,7 +55,7 @@ function addAltTitleNodeToHeadline(altTitle) {
 
 function acceptInputOnHeadline (headlineContainer) {
     headlineContainer.setAttribute('data-headline-id', Math.random().toString(36).substring(2, 15));
-    headlineContainer.addEventListener('click', this.openCustomTitlesDialog )
+    headlineContainer.addEventListener('click', openCustomTitlesDialog )
     headlineContainer.classList.add('headline-clickable');
 }
 
@@ -132,6 +140,16 @@ function htmlDecode(input) {
     return doc.documentElement.textContent;
 }
 
+
+function openCustomTitlesDialog(ev) {
+    browser.runtime.sendMessage({
+        type: 'direct_to_custom_titles',
+        data: {
+            titleText: ev.target.innerText,
+            titleElementId: ev.target.getAttribute('data-headline-id')
+        }
+    })
+}
 
 function identifyPotentialTitles() {
     let elResults = [];

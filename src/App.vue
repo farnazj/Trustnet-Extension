@@ -23,6 +23,7 @@ export default {
             this.setTitlesFetched(true);
         })
     }
+    this.getUser();
   },
   computed: {
     ...mapState('titles', [
@@ -35,6 +36,9 @@ export default {
       'setUpTitles',
       'setTitlesDialogVisibility',
       'setTitlesFetched'
+    ]),
+    ...mapActions('auth', [
+      'getUser'
     ])
   }
 };

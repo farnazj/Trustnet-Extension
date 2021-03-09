@@ -18,6 +18,8 @@ export default {
         this.fetchFollows();
     if (!this.trustedSources.length)
         this.fetchTrusteds();
+    
+    this.fetchFollowers();
   }, 
   computed: {
     ...mapState('relatedSources', [
@@ -33,7 +35,8 @@ export default {
   methods: {
     ...mapActions('relatedSources', [
       'fetchFollows',
-      'fetchTrusteds'
+      'fetchTrusteds',
+      'fetchFollowers'
     ])
   }
 }

@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import customAvatar from '../components/CustomAvatar'
+import customAvatar from '@/components/CustomAvatar'
 import { mapState, mapGetters } from 'vuex'
 
 export default {

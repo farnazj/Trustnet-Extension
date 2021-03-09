@@ -18,7 +18,6 @@
 <script>
 import innerAvatar from '../components/InnerAvatar'
 import utils from '@/lib/utils'
-import { mapState } from 'vuex';
 
 export default {
   components: {
@@ -47,10 +46,7 @@ export default {
     },
     isTrusted: function() {
       return utils.isTrusted(this.user);
-    },
-    ...mapState('relatedSources', [
-      'trustedSources'
-    ])
+    }
   },
   methods: {
     goToPage: function(event) {

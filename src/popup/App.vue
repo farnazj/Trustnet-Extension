@@ -7,14 +7,24 @@
 <script>
 import titleServices from './services/titleServices'
 import sourceServices from './services/sourceServices'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'popupApp',
   components: { },
   created() {
     console.log('popup app got created')
+    let thisRef = this;
+
     browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-      if (message.type == 'get_title_hash_matches') {
+
+      if (message.type == 'get_user') {
+        
+         return new Promise((resolve, reject) => {
+          resolve(thisRef.user);
+        })
+      }
+      else if (message.type == 'get_title_hash_matches') {
         return new Promise((resolve, reject) => {
           titleServices.getTitleHashMatches(message.data)
           .then(response => {
@@ -70,7 +80,32 @@ export default {
         })
 
       }
+      else if (message.type == 'get_follows') {
+        return new Promise((resolve, reject) => {
+          resolve(this.followedSources);
+        })
+      }
+      else if (message.type == 'get_trusteds') {
+        return new Promise((resolve, reject) => {
+          resolve(this.trustedSources);
+        })
+      }
+      else if (message.type == 'get_followers') {
+        return new Promise((resolve, reject) => {
+          resolve(this.followers);
+        })
+      }
     })
+  },
+  computed: {
+    ...mapState('relatedSources', [
+      'followedSources',
+      'trustedSources',
+      'followers'
+    ]),
+    ...mapGetters('auth', [
+      'user'
+    ])
   }
 }
 </script>

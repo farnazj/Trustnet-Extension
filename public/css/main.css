@@ -16,6 +16,21 @@
     display: none !important;
 }
 
+.extension-dialog {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0px; 
+    z-index: 999999;
+}
+
+.body-no-scroll {
+    overflow: hidden !important;
+}
+
+.headline-clickable {
+    cursor: pointer;
+}
 
 .new-alt-headline {
     cursor: pointer;

@@ -32,7 +32,11 @@ export default {
         
         if (!replaceMode)
           state.titles.push(...titles);
-    }
+    },
+
+    set_titles_fetched_status: (state, payload) => {
+        state.titlesFetched = payload;
+    } 
   },
   actions: {
     hashPageContent: (context, payload) => {
@@ -114,7 +118,6 @@ export default {
           if (allProms.length) {
             Promise.all(allProms)
             .then(() => {
-                console.log('hereeee', standaloneTitlesArr)
                 resolve(standaloneTitlesArr);
             })
           }
@@ -147,7 +150,7 @@ export default {
             })
     
         })
-        },
+    },
   
 
     setUpTitles: (context, payload) => {
@@ -171,6 +174,13 @@ export default {
           })
         
         })
-      },
+    },
+
+    setTitlesFetched: (context, payload) => {
+        return new Promise((resolve, reject) => {
+          context.commit('set_titles_fetched_status', payload);
+          resolve();
+        })
+    }
   }
 }

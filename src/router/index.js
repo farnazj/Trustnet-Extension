@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
+import CustomTitles from '@/views/CustomTitles'
 
 Vue.use(VueRouter)
 
@@ -9,6 +10,15 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/custom-titles/:titleId',
+    name: 'customTitles',
+    props: true,
+    component: CustomTitles,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/about',
