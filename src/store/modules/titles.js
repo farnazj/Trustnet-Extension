@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import utils from '@/lib/utils'
 import domHelpers from '@/lib/domHelpers'
 import consts from '@/lib/constants'
@@ -66,7 +67,6 @@ export default {
           })
           .then(resp => {
               let candidateTitles = resp;
-              console.log(resp, 'yoooo')
               resolve(candidateTitles);
           })
           .catch(err => {
@@ -74,6 +74,24 @@ export default {
             reject();
           })
         })
+    },
+
+    arrangeCustomTitles: (context, payload) => {
+        return new Promise((resolve, reject) => {
+          browser.runtime.sendMessage({
+              type: 'arrange_custom_titles',
+              data: payload.resTitles
+          })
+          .then(resp => {
+              resolve(resp);
+          })
+          .catch(err => {
+            console.log(err)
+            reject();
+          })
+  
+        })
+     
     },
 
     sortCustomTitles: (context, payload) => {
@@ -84,16 +102,19 @@ export default {
   
           standaloneTitlesArr.forEach((candidateTitle, index) => {
             if (typeof candidateTitle.StandaloneCustomTitles !== 'undefined') {
-              allProms.push(context.dispatch('arrangeCustomTitles', { resTitles: candidateTitle.StandaloneCustomTitles })
-              .then(customTitleObjects => {
-                standaloneTitlesArr[index].sortedCustomTitles = customTitleObjects.slice().sort(utils.compareTitles);
-              }))
+                allProms.push(context.dispatch('arrangeCustomTitles', { 
+                  resTitles: candidateTitle.StandaloneCustomTitles
+                })
+                .then(customTitleObjects => {
+                    standaloneTitlesArr[index].sortedCustomTitles = customTitleObjects.slice().sort(utils.compareTitles);
+                }))
             }
           })
   
           if (allProms.length) {
             Promise.all(allProms)
             .then(() => {
+                console.log('hereeee', standaloneTitlesArr)
                 resolve(standaloneTitlesArr);
             })
           }
@@ -121,7 +142,7 @@ export default {
             .then(() => {
                 context.commit('populate_titles', titlesFoundOnPage);
                 
-                //   contentScriptHelpers.identifyPotentialTitles();
+                domHelpers.identifyPotentialTitles();
                 resolve();
             })
     

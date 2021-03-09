@@ -127,7 +127,46 @@ function findAndReplaceTitle(title, remove) {
 }
 
 
+function htmlDecode(input) {
+    let doc = new DOMParser().parseFromString(input, "text/html");
+    return doc.documentElement.textContent;
+}
+
+
+function identifyPotentialTitles() {
+    let elResults = [];
+    try {
+        let ogTitle = htmlDecode(document.querySelector('meta[property="og:title"]').getAttribute('content'));
+        elResults = getElementsContainingText(ogTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+        console.log(elResults)
+    }
+    catch(err) {
+        console.log('in og:title, error is', err)
+    }
+
+    try {
+        if (!elResults.length) {
+            let twitterTitle = htmlDecode(document.querySelector('meta[name="twitter:title"]').getAttribute('content'));
+            elResults = getElementsContainingText(twitterTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+            console.log(elResults)
+        }
+    }
+    catch(err) {
+        console.log('in twitter:title, error is', err)
+    }
+
+    if (!elResults.length) {
+        elResults = document.querySelectorAll('h1');
+    }
+
+    elResults.forEach(heading => {            
+        acceptInputOnHeadline(heading)
+    })
+
+    // observer.observe(targetNode, config);
+}
 
 export default {
-    findAndReplaceTitle
+    findAndReplaceTitle,
+    identifyPotentialTitles
 }

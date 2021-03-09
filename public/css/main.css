@@ -15,3 +15,15 @@
 .extension-hidden {
     display: none !important;
 }
+
+
+.new-alt-headline {
+    cursor: pointer;
+    text-decoration-style: dashed;
+    text-decoration-line: underline;
+    color: #9E9D24;
+}
+
+.headline-modified {
+    font-size: 70%;
+}
