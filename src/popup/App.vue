@@ -5,6 +5,8 @@
 </template>
 
 <script>
+
+import authServices from './services/authServices'
 import titleServices from './services/titleServices'
 import sourceServices from './services/sourceServices'
 import { mapState, mapGetters, mapActions } from 'vuex'
@@ -87,7 +89,6 @@ export default {
           browser.tabs.query({ active: true, currentWindow: true })
           .then(tabs => {
             let tab = tabs[0];
-            thisRef.incrementCounter();
             if (tab.url.substr(0, tab.url.lastIndexOf('#')) == document.referrer) {
          
               titleServices.postCustomTitle(message.data.reqBody)
@@ -187,14 +188,6 @@ export default {
     ]),
     ...mapGetters('auth', [
       'user'
-    ]),
-    ...mapState('dummy', [
-      'counter'
-    ])
-  },
-  methods: {
-    ...mapActions('dummy', [
-      'incrementCounter'
     ])
   }
 }

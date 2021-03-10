@@ -6,35 +6,49 @@ import vuetify from '@/plugins/vuetify';
 
 console.log('Hello from the content-script')
 
-let prevIframe = document.querySelector('iframe[data-sth="customPopupIframe"]');
-let iframe;
-// if (prevIframe === null) {
-    iframe = document.createElement('iframe');
-    iframe.classList.add('extension-side-bar');
-    iframe.setAttribute('src', chrome.extension.getURL("popup.html"));
-    iframe.setAttribute('data-sth', 'customPopupIframe')
-    document.body.appendChild(iframe);
-// }
+// let prevIframe = document.querySelector('iframe[data-sth="customPopupIframe"]');
+// let iframe;
+// // if (prevIframe === null) {
+//     iframe = document.createElement('iframe');
+//     iframe.classList.add('extension-side-bar');
+//     iframe.setAttribute('src', chrome.extension.getURL("popup.html"));
+//     iframe.setAttribute('data-sth', 'customPopupIframe')
+//     document.body.appendChild(iframe);
+// // }
+
+browser.runtime.sendMessage({
+    type: 'get_user'
+})
+.then(authUser => {
+
+    console.log(authUser, 'here is authUser')
+    if (authUser)
+        localStorage.setItem('token', JSON.stringify(authUser));
+
+    console.log(JSON.stringify(localStorage.getItem('token')), 'is it set')
+
+    const app = document.createElement('div');
+    app.setAttribute('id', 'vueApp');
+    document.body.prepend(app);
+
+    /* eslint-disable no-new */
+    new Vue({
+        el: '#vueApp',
+        store,
+        router,
+        vuetify,
+        render: h => h(insertedApp),
+    });
+})
 
 
 
 
 browser.runtime.onMessage.addListener( (msgObj, sender, sendResponse) => {
-    if (msgObj.type == 'close_sidebar') {
-        iframe.classList.add('extension-hidden');
-    }
-    if (msgObj.type == 'inject_inpage_vue_app') {
-        const app = document.createElement('div');
-        app.setAttribute('id', 'vueApp');
-        document.body.prepend(app);
-
-        /* eslint-disable no-new */
-        new Vue({
-            el: '#vueApp',
-            store,
-            router,
-            vuetify,
-            render: h => h(insertedApp),
-        });
-    }
+    // if (msgObj.type == 'close_sidebar') {
+    //     iframe.classList.add('extension-hidden');
+    // }
+    // if (msgObj.type == 'inject_inpage_vue_app') {
+        
+    // }
 })

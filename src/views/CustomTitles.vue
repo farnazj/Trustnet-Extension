@@ -153,7 +153,7 @@ import titleHistory from '@/components/TitleHistory'
 
 import timeHelpers from '@/mixins/timeHelpers'
 // import titleServices from '@/services/titleServices'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import { mdiWindowClose, mdiPencil, mdiTrashCanOutline, mdiCheck,
     mdiCloseCircleOutline, mdiThumbUpOutline, mdiThumbUp } from '@mdi/js';
 
@@ -200,6 +200,7 @@ export default {
     },
     props: ['titleId', 'titleText', 'titleElementId'],
     created() {
+        console.log('tuye custom titles created', this.user)
     },
     computed: {
 
@@ -220,7 +221,7 @@ export default {
             else
                 return null;
         },
-        ...mapState('auth', [
+        ...mapGetters('auth', [
             'user'
         ]),
         ...mapState('titles', [
@@ -313,8 +314,8 @@ export default {
         this.showDeleteDialog = false;
 
         if (this.edit && this.delete.selectedTitle.lastVersion.setId == this.edit.setId) {
-            let index = this.associatedStandaloneTitle.StandaloneCustomTitles.findIndex(customTitle => 
-                customTitle.setId == this.edit.setId);
+            let index = this.associatedStandaloneTitle.sortedCustomTitles.findIndex(customTitle => 
+                customTitle.lastVersion.setId == this.edit.setId);
             this.$refs.editTitleForm[index].resetValidation();
             this.resetEdits();
         }
@@ -348,13 +349,8 @@ export default {
     },
     saveEdits: function() {
 
-        //TODO: fix
-        let index = this.associatedStandaloneTitle.StandaloneCustomTitles.findIndex(customTitle => 
-            customTitle.setId == this.edit.setId);
-        console.log(this.associatedStandaloneTitle.StandaloneCustomTitles)
-        
-        console.log(this.associatedStandaloneTitle.PostId, this.edit.setId, this.edit.text)
-        console.log(this.$refs, 'refs', index)
+        let index = this.associatedStandaloneTitle.sortedCustomTitles.findIndex(customTitle => 
+            customTitle.lastVersion.setId == this.edit.setId);
 
         if (this.$refs.editTitleForm[index].validate()) {
 

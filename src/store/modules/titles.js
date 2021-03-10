@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import utils from '@/lib/utils'
+import utils from '@/services/utils'
 import domHelpers from '@/lib/domHelpers'
-import consts from '@/lib/constants'
+import consts from '@/services/constants'
 
 export default {
   namespaced: true,

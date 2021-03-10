@@ -17,7 +17,7 @@
 
 <script>
 import innerAvatar from '../components/InnerAvatar'
-import utils from '@/lib/utils'
+import utils from '@/services/utils'
 
 export default {
   components: {

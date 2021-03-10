@@ -1,5 +1,5 @@
-import authServices from '../../services/authServices'
-import sourceServices from '../../services/sourceServices'
+import authServices from '../../../services/authServices'
+import sourceServices from '../../../services/sourceServices'
 
 export default {
   namespaced: true,
@@ -47,9 +47,7 @@ export default {
     },
 
     update_user(state, user) {
-      console.log('setting token')
       localStorage.setItem('token', JSON.stringify(user));
-      console.log('getting it back', localStorage.getItem('token'))
       state.token = Object.assign({}, user);
     }
   },

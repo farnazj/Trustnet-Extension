@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapActions } from 'vuex'
 
 export default {
   name: 'insertedApp',
@@ -17,25 +17,16 @@ export default {
     //
   }),
   created() {
-    if ( !this.titles.length && !this.titlesFetched ) {
-        this.setUpTitles()
-        .then( () => {
-            this.setTitlesFetched(true);
-        })
-    }
-    this.getUser();
+    this.getUser()
+    .then(authUser => {
+      if (!authUser) {
+        this.$router.push({ name: 'Login' });
+      }
+    });
   },
   computed: {
-    ...mapState('titles', [
-      'titles',
-      'titlesFetched'
-    ])
   },
   methods: {
-    ...mapActions('titles', [
-      'setUpTitles',
-      'setTitlesFetched'
-    ]),
     ...mapActions('auth', [
       'getUser'
     ])

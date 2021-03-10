@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
-import CustomTitles from '@/views/CustomTitles'
+import CustomTitles from '@/views/CustomTitles.vue'
+import Login from '@/views/Login.vue'
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -9,7 +11,15 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
   },
   {
     path: '/custom-titles/:titleId',
@@ -42,10 +52,18 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log('to is', to, 'from is ', from, '*********')
+  console.log('az koja be koja', to, from, store.getters['auth/isLoggedIn'], JSON.stringify(localStorage.getItem('token')))
+  if(to.matched.some(record => record.meta.requiresAuth)) {
+    if (localStorage.getItem('token')) {
+      next();
+      window.scrollTo(0, 0);
+      return;
+    }
+    else
+      next('/login');
+  } else {
     next();
-  
+  }
 })
-
 
 export default router;

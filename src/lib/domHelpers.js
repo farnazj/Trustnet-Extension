@@ -1,4 +1,4 @@
-import utils from '@/lib/utils'
+import utils from '@/services/utils'
 import insertedAppRouter from '@/router'
 import store from '@/store'
 

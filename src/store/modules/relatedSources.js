@@ -1,4 +1,4 @@
-
+import utils from '@/services/utils'
 export default {
   namespaced: true,
   state: {
@@ -32,18 +32,17 @@ export default {
   },
   mutations: {
 
-    /*
-    no need to sort here because these have already been sorted in the popup's
-    store and here we simply retain a copy.
-    */
     populate_follows: (state, sources) => {
-      state.followedSources = sources;
+        sources.sort(utils.compareSources);
+        state.followedSources = sources;
     },
     populate_trusteds: (state, sources) => {
-      state.trustedSources = sources;
+        sources.sort(utils.compareSources);
+        state.trustedSources = sources;
     },
     populate_followers: (state, sources) => {
-      state.followers = sources;
+        sources.sort(utils.compareSources);
+        state.followers = sources;
     }
 
   },
@@ -56,6 +55,7 @@ export default {
             type: 'get_follows'
         })
         .then(response => {
+            console.log('here is what we got', response)
             context.commit('populate_follows', response);
             resolve();
         })
@@ -93,6 +93,7 @@ export default {
             type: 'get_followers'
         })
         .then(response => {
+            console.log('followers respo', response)
             context.commit('populate_followers', response);
             resolve();
         })

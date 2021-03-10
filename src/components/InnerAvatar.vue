@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import consts from '@/lib/constants'
+import consts from '@/services/constants'
 
 export default {
   props: {
