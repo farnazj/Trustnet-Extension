@@ -200,10 +200,6 @@ export default {
     },
     props: ['titleId', 'titleText', 'titleElementId'],
     created() {
-        // browser.tabs.query({ active: true, currentWindow: true })
-        // .then( tabs => {
-        //     browser.tabs.sendMessage(tabs[0].id, { type: "open_custom_titles" });
-        // })
     },
     computed: {
 
@@ -230,11 +226,7 @@ export default {
         ...mapState('titles', [
             'titles',
             'titlesDialogVisible'
-        ]),
-        // ...mapState('pageDetails', [
-        //     'url',
-        //     'identifiedHeadline'
-        // ])
+        ])
     },
     methods: {
         returnToHome: function() {
@@ -249,37 +241,45 @@ export default {
 
                 let pageIndentifiedTitle = this.titleId ? this.associatedStandaloneTitle.text :
                     this.titleText;
-                // titleServices.postCustomTitle({ 
-                //     postId: this.associatedStandaloneTitle ? this.associatedStandaloneTitle.PostId : null,
-                //     postUrl: this.url,
-                //     customTitleText: this.newTitle,
-                //     pageIndentifiedTitle: pageIndentifiedTitle })
-                // .then(res => {
-                //     this.newTitle = '';
-                //     this.$refs.newTitleForm.resetValidation();
-                //     this.addTitleToPage({
-                //         hash: res.data.data.hash,
-                //         titleElementId: this.titleElementId
-                //     })
-                //     .then(() => {
-                //         this.$router.push({ name: 'customTitles',  
-                //             params: { 
-                //                 titleId: res.data.data.id
-                //             }
-                //         })
-                //         .catch(err => {
-                //             console.log(err);
-                //         })
-                //     })
-                // })
-                // .catch(err => {
-                //     console.log(err)
-                //     this.alertMessage = err.response.data.message;
-                //     this.alert = true;
-                // })
-                // .finally(() => {
-                //     this.postBtnDisabled = false;
-                // })
+                
+                browser.runtime.sendMessage({
+                    type: 'post_new_title',
+                    data: {
+                        reqBody: {
+                            postId: this.associatedStandaloneTitle ? this.associatedStandaloneTitle.PostId : null,
+                            postUrl: this.url,
+                            customTitleText: this.newTitle,
+                            pageIndentifiedTitle: pageIndentifiedTitle
+                        }
+                    }
+                })
+                .then(res => {
+                    this.newTitle = '';
+                    this.$refs.newTitleForm.resetValidation();
+                    this.addTitleToPage({
+                        hash: res.data.data.hash,
+                        titleElementId: this.titleElementId
+                    })
+                    .then(() => {
+                        this.$router.push({ name: 'customTitles',  
+                            params: { 
+                                titleId: res.data.data.id
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                    this.alertMessage = err.response.data.message;
+                    this.alert = true;
+                })
+                .finally(() => {
+                    this.postBtnDisabled = false;
+                })
+            
             }
         },
     changeEndorsement: function(titleObj, arrIndex, endorsementVal) {
@@ -350,23 +350,31 @@ export default {
 
         if (this.$refs.editTitleForm[index].validate()) {
 
-            // titleServices.editCustomTitle({
-            //     standaloneTitleId: this.associatedStandaloneTitle.id,
-            //     setId: this.edit.setId
-            // }, { text: this.edit.text })
-            // .then(res => {
+            browser.runtime.sendMessage({
+                type: 'edit_title',
+                data: {
+                    reqParams: {
+                        standaloneTitleId: this.associatedStandaloneTitle.id,
+                        setId: this.edit.setId
+                    },
+                    reqBody: {
+                        text: this.edit.text 
+                    }
+                }
+            })
+            .then(res => {
 
-            //     this.resetEdits();
-            //     this.$refs.editTitleForm[index].resetValidation();
-            //     //   this.fetchPostTitles();
-            //     this.modifyCustomTitleInPage({
-            //         standaloneTitleId: this.associatedStandaloneTitle.id
-            //     })
-            // })
-            // .catch(err => {
-            //     this.alertMessage = err.response.data.message;
-            //     this.alert = true;
-            // })
+                this.resetEdits();
+                this.$refs.editTitleForm[index].resetValidation();
+                this.modifyCustomTitleInPage({
+                    standaloneTitleId: this.associatedStandaloneTitle.id
+                })
+            })
+            .catch(err => {
+                this.alertMessage = err.response.data.message;
+                this.alert = true;
+            })
+      
         }
 
     },
@@ -397,10 +405,8 @@ export default {
 </script>
 <style>
 html {
-    position: fixed;
     width: 100vw;
     height: 100vh;
     top: 0px; 
-    z-index: 999999;
 }
 </style>

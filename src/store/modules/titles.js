@@ -36,6 +36,11 @@ export default {
           state.titles.push(...titles);
     },
 
+    remove_from_titles: (state, titleToDelete) => {
+        let index = state.titles.findIndex(title => title.id == titleToDelete.id);
+        state.titles.splice(index, 1);
+    },
+
     set_titles_fetched_status: (state, payload) => {
         state.titlesFetched = payload;
     } 
@@ -84,17 +89,17 @@ export default {
 
     arrangeCustomTitles: (context, payload) => {
         return new Promise((resolve, reject) => {
-          browser.runtime.sendMessage({
-              type: 'arrange_custom_titles',
-              data: payload.resTitles
-          })
-          .then(resp => {
-              resolve(resp);
-          })
-          .catch(err => {
-            console.log(err)
-            reject();
-          })
+            browser.runtime.sendMessage({
+                type: 'arrange_custom_titles',
+                data: payload.resTitles
+            })
+            .then(resp => {
+                resolve(resp);
+            })
+            .catch(err => {
+                console.log(err)
+                reject();
+            })
   
         })
      
@@ -176,6 +181,65 @@ export default {
           })
         
         })
+    },
+
+    modifyCustomTitleInPage: (context, payload) => {
+        return new Promise((resolve, reject) => {
+            browser.runtime.sendMessage({
+                type: 'get_custom_titles_of_standalone_title',
+                data: {
+                    reqBody: {
+                        standaloneTitleId: payload.standaloneTitleId
+                    }
+                }
+            })
+            .then(res => {
+                let candidateTitle = res.data; //an instance of StandaloneTitle
+                context.dispatch('sortCustomTitles', [candidateTitle])
+                .then(standaloneTitlesArr => {
+
+                    if (standaloneTitlesArr.length) {
+                        context.dispatch('findTitlesOnPage', { 
+                            candidateTitlesWSortedCustomTitles: standaloneTitlesArr
+                        })
+                        .then(res => {
+                            resolve()
+                        })
+                    }
+                    else {
+                        let titleToRemove = context.state.titles.find(title => title.id == payload.standaloneTitleId);
+                        context.dispatch('removeTitleFromPage', {
+                            title: titleToRemove
+                        })
+                        .then(() => {
+                            resolve()
+                        })
+                    }
+                    
+                })
+            
+            })
+            .catch(err => {
+                console.log(err)
+                reject();
+            })
+
+        })
+    },
+
+
+    removeTitleFromPage: (context, payload) => {
+        return new Promise((resolve, reject) => {
+          browser.tabs.query({ active: true, currentWindow: true })
+          .then( tabs => {
+  
+            let replacementCount = domHelpers.findAndReplaceTitle(payload.title, true);            
+            context.commit('remove_from_titles', payload.title)
+            resolve();
+            
+          })
+        })
+  
     },
 
     setTitlesFetched: (context, payload) => {

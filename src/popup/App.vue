@@ -80,6 +80,46 @@ export default {
         })
 
       }
+      else if (message.type == 'post_new_title') {
+        return new Promise((resolve, reject) => {
+
+          titleServices.postCustomTitle(message.data.reqBody)
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err);
+          })
+        })
+      }
+      else if (message.type == 'edit_title') {
+        return new Promise((resolve, reject) => {
+          titleServices.editCustomTitle(message.data.reqParams, message.data.reqBody)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err);
+          })
+        })
+      }
+      else if (message.type == 'get_custom_titles_of_standalone_title') {
+        return new Promise((resolve, reject) => {
+            let activityUserName = thisRef.$store.getters['auth/user'].userName;
+            let customTitleReqHeaders = {
+            activityusername: activityUserName
+            };
+        
+            titleServices.getCustomTitlesOfstandaloneTitle(message.data.reqBody,
+            customTitleReqHeaders)
+            .then(res => {
+              resolve(res);
+            })
+            .catch(err => {
+              reject(err);
+            })
+        })
+      }
       else if (message.type == 'get_follows') {
         return new Promise((resolve, reject) => {
           resolve(this.followedSources);
