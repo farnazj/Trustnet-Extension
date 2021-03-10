@@ -227,6 +227,9 @@ export default {
         ...mapState('titles', [
             'titles',
             'titlesDialogVisible'
+        ]),
+        ...mapState('pageDetails', [
+            'url'
         ])
     },
     methods: {
@@ -287,19 +290,33 @@ export default {
             }
         },
     changeEndorsement: function(titleObj, arrIndex, endorsementVal) {
-    //   titleServices.setEndorsementStatus({
-    //     setId: titleObj.lastVersion.setId
-    //   },
-    //   {
-    //     endorse_status: endorsementVal
-    //   })
-    //   .then(res => {
-    //     titleServices.hasUserEndorsedTitle({ setId: titleObj.lastVersion.setId })
-    //     .then(res => {
-    //       titleObj['userEndorsed'] = res.data;
-    //     //   this.fetchPostTitles();
-    //     })
-    //   })
+
+        browser.runtime.sendMessage({
+            type: 'set_endorsement_status',
+            data: {
+                params: {
+                    setId: titleObj.lastVersion.setId
+                },
+                reqBody: {
+                    endorse_status: endorsementVal
+                }
+            }
+        })
+        .then(() => {
+            browser.runtime.sendMessage({
+                type: 'has_user_endorsed_title',
+                data: {
+                    params: {
+                        setId: titleObj.lastVersion.setId
+                    }
+                }
+            })
+            .then(res => {
+              titleObj['userEndorsed'] = res.data;
+              console.log(titleObj['userEndorsed'], 'tahesh')
+            //   this.fetchPostTitles();
+            })
+        })
     },
     startDelete: function(titleObj) {
       this.delete.selectedTitle = titleObj;

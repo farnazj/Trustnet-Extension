@@ -177,5 +177,29 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     })
   
   }
+  else if (request.type == 'set_endorsement_status') {
+    return new Promise((resolve, reject) => {
+      console.log('mire ke endorse kone', request.data.params, request.data.reqBody)
+      titleServices.setEndorsementStatus(request.data.params, request.data.reqBody)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
+      })
+    })
+  }
+  else if (request.type == 'has_user_endorsed_title') {
+    return new Promise((resolve, reject) => {
+
+      titleServices.hasUserEndorsedTitle(request.data.params)
+      .then(res => {
+        resolve(res)
+      })
+      .catch(err => {
+        reject(err);
+      })
+    })
+  }
 
 })

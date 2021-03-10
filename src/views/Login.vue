@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import setupHelpers from '@/mixins/setupHelpers';
 import customToolbar from '@/components/CustomToolbar'
 
 export default {
@@ -91,6 +92,7 @@ export default {
       'password': password
     })
     .then(() => {
+      this.fetchTitlesAndRelationships();
       this.$router.push({ name: 'home' });
     })
     .catch(err => {
@@ -104,7 +106,8 @@ export default {
     goToPasswordReset: function() {
       this.$router.push({ name: 'forgotPassword' });
     }
-  }
+  },
+  mixins: [setupHelpers]
 }
 
 </script>
