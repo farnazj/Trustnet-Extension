@@ -51,7 +51,7 @@ export default {
   methods: {
     goToPage: function(event) {
       event.stopPropagation();
-      this.$router.push({ name: 'profile', params: { username: this.user.userName } });
+      // this.$router.push({ name: 'profile', params: { username: this.user.userName } });
     }
   }
 

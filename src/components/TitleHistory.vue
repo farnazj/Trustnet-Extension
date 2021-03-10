@@ -26,7 +26,7 @@
           </v-row>
 
           <template v-for="titleObj in titleHistory">
-            <v-row no-gutters :key="titleObj.id" align="center" class="py-1">
+            <v-row no-gutters :key="`row-${titleObj.id}`" align="center" class="py-1">
              <v-col cols="12">
                <p class="grey--text text--darken-3 mb-1">
                  {{titleObj.text}}
@@ -37,7 +37,7 @@
                </span>
              </v-col>
            </v-row>
-           <v-divider></v-divider>
+           <v-divider :key="`divider-${titleObj.id}`"></v-divider>
 
           </template>
 

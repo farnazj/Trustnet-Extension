@@ -16,7 +16,9 @@ export default {
     }
   },
   mutations: {
-
+    set_titles_dialog_visibility: (state, visibility) => {
+        state.titlesDialogVisible = visibility;
+    },
 
     populate_titles: (state, titles) => {
         let replaceMode = false;
@@ -181,6 +183,11 @@ export default {
           context.commit('set_titles_fetched_status', payload);
           resolve();
         })
+    },
+
+    setTitlesDialogVisibility: (context, payload) => {
+        context.commit('set_titles_dialog_visibility', payload);
     }
+  
   }
 }

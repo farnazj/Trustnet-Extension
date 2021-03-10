@@ -1,5 +1,6 @@
 import utils from '@/lib/utils'
 import insertedAppRouter from '@/router'
+import store from '@/store'
 
 function getElementsContainingText(text) {
 
@@ -32,20 +33,19 @@ function addAltTitleNodeToHeadline(altTitle) {
     newEl.classList.add('new-alt-headline', `title-${altTitle.id}`);
     newEl.addEventListener('click', function(ev) {
         ev.preventDefault();
+        console.log('chi shodeee????')
 
-    insertedAppRouter.push({
-        name: 'customTitles',
-        params: { 
-            titleId: altTitle.id
-        }
-    })
+        store.dispatch('titles/setTitlesDialogVisibility', true)
+        .then(() => {
+            insertedAppRouter.push({
+                name: 'customTitles',
+                params: { 
+                    titleId: altTitle.id
+                }
+            })
+        })
 
-        // browser.runtime.sendMessage({
-        //     type: 'direct_to_custom_titles',
-        //     data: {
-        //         titleId: altTitle.id
-        //     }
-        // })
+        
     })
 
     newEl.appendChild(document.createTextNode(altTitle.sortedCustomTitles[0]['lastVersion'].text + ' '));
@@ -55,7 +55,18 @@ function addAltTitleNodeToHeadline(altTitle) {
 
 function acceptInputOnHeadline (headlineContainer) {
     headlineContainer.setAttribute('data-headline-id', Math.random().toString(36).substring(2, 15));
-    headlineContainer.addEventListener('click', openCustomTitlesDialog )
+    headlineContainer.addEventListener('click', function (ev) {
+        store.dispatch('titles/setTitlesDialogVisibility', true)
+        .then(() => {
+            insertedAppRouter.push({
+                name: 'customTitles',
+                params: { 
+                    titleText: ev.target.innerText,
+                    titleElementId: ev.target.getAttribute('data-headline-id')
+                }
+            })
+        })
+    } )
     headlineContainer.classList.add('headline-clickable');
 }
 
@@ -142,13 +153,17 @@ function htmlDecode(input) {
 
 
 function openCustomTitlesDialog(ev) {
-    browser.runtime.sendMessage({
-        type: 'direct_to_custom_titles',
-        data: {
-            titleText: ev.target.innerText,
-            titleElementId: ev.target.getAttribute('data-headline-id')
-        }
-    })
+    console.log('click shod rush((((())))))')
+
+  
+
+    // browser.runtime.sendMessage({
+    //     type: 'direct_to_custom_titles',
+    //     data: {
+    //         titleText: ev.target.innerText,
+    //         titleElementId: ev.target.getAttribute('data-headline-id')
+    //     }
+    // })
 }
 
 function identifyPotentialTitles() {

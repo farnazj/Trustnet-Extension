@@ -58,7 +58,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if(to.matched.some(record => record.meta.requiresAuth)) {
     console.log(localStorage.getItem('token'))
-    console.log('does it require auth', store.getters['auth/user'] )
+    console.log('does it require auth', store.getters['auth/user'], 'to', to, 'from', from )
     if (store.getters['auth/isLoggedIn']) {
       next();
       window.scrollTo(0, 0);

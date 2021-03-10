@@ -24,9 +24,9 @@
     z-index: 999999;
 }
 
-.body-no-scroll {
+/* .body-no-scroll {
     overflow: hidden !important;
-}
+} */
 
 .headline-clickable {
     cursor: pointer;

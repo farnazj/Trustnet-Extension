@@ -34,7 +34,6 @@ export default {
   methods: {
     ...mapActions('titles', [
       'setUpTitles',
-      'setTitlesDialogVisibility',
       'setTitlesFetched'
     ]),
     ...mapActions('auth', [

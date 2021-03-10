@@ -21,7 +21,7 @@
          </v-col>
          <v-col cols="1">
            <v-row no-gutters justify="end">
-             <v-icon @click="returnToHome">clear</v-icon>
+             <v-icon @click="returnToHome">{{icons.clear}}</v-icon>
            </v-row>
          </v-col>
        </v-row>
@@ -79,11 +79,11 @@
                     <v-col cols="1">
                         <v-icon @click="changeEndorsement(titleObj, index, false)"
                         v-if="titleObj.userEndorsed" color="primary" small class="xs-icon-font cursor-pointer">
-                            fas fa-thumbs-up
+                            {{icons.thumbUpFilled}}
                         </v-icon>
                         <v-icon @click="changeEndorsement(titleObj, index, true)" v-else
                         color="primary" small class="xs-icon-font cursor-pointer">
-                            far fa-thumbs-up
+                            {{icons.thumbUpOutline}}
                         </v-icon>
                     </v-col>
 
@@ -94,7 +94,7 @@
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-show="!edit.on || edit.setId != titleObj.lastVersion.setId" x-small outlined
                                     @click="startEdit(titleObj)" v-on="on" color="green lighten-1" class="mr-2">
-                                    <v-icon small>edit</v-icon>
+                                    <v-icon small>{{icons.edit}}</v-icon>
                                     </v-btn>
                                 </template>
                                 <span>Edit</span>
@@ -104,7 +104,7 @@
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-show="edit.on && edit.setId == titleObj.lastVersion.setId" x-small outlined
                                     @click="resetEdits" v-on="on" color="red lighten-1" class="mr-1">
-                                    <v-icon small>cancel</v-icon>
+                                    <v-icon small>{{icons.cancel}}</v-icon>
                                     </v-btn>
                                 </template>
                                 <span>Cancel edit</span>
@@ -114,7 +114,7 @@
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-show="edit.on && edit.setId == titleObj.lastVersion.setId" x-small outlined
                                     @click="saveEdits" v-on="on" color="green lighten-1" class="mr-3">
-                                    <v-icon small class="xs-icon-font">check</v-icon>
+                                    <v-icon small class="xs-icon-font">{{icons.check}}</v-icon>
                                     </v-btn>
                                 </template>
                                 <span>Save edit</span>
@@ -124,7 +124,7 @@
                                 <template v-slot:activator="{ on }">
                                     <v-btn x-small outlined @click="startDelete(titleObj)" v-on="on"
                                     color="red lighten-1">
-                                    <v-icon small class="xs-icon-font">delete</v-icon>
+                                    <v-icon small class="xs-icon-font">{{icons.delete}}</v-icon>
                                     </v-btn>
                                 </template>
                                 <span>Delete</span>
@@ -154,6 +154,8 @@ import titleHistory from '@/components/TitleHistory'
 import timeHelpers from '@/mixins/timeHelpers'
 // import titleServices from '@/services/titleServices'
 import { mapState, mapActions } from 'vuex'
+import { mdiWindowClose, mdiPencil, mdiTrashCanOutline, mdiCheck,
+    mdiCloseCircleOutline, mdiThumbUpOutline, mdiThumbUp } from '@mdi/js';
 
 export default {
     components: {
@@ -183,7 +185,17 @@ export default {
                 ]
             },
             alert: false,
-            alertMessage: ''
+            alertMessage: '',
+            icons: {
+                clear: mdiWindowClose,
+                edit: mdiPencil,
+                delete: mdiTrashCanOutline,
+                check: mdiCheck,
+                cancel: mdiCloseCircleOutline,
+                thumbUpOutline: mdiThumbUpOutline,
+                thumbUpFilled: mdiThumbUp
+            }
+            
         }
     },
     props: ['titleId', 'titleText', 'titleElementId'],
@@ -226,13 +238,9 @@ export default {
     },
     methods: {
         returnToHome: function() {
-             browser.tabs.query({ active: true, currentWindow: true })
-            .then( tabs => {
-               
-                this.setTitlesDialogVisibility(false);
-                this.$router.push({ name: 'home' });
-            
-            })
+   
+            this.setTitlesDialogVisibility(false);
+            this.$router.push({ name: 'home' });
             
         },
         postNewTitle: function() {
@@ -387,3 +395,12 @@ export default {
     mixins: [timeHelpers]
 }
 </script>
+<style>
+html {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0px; 
+    z-index: 999999;
+}
+</style>
