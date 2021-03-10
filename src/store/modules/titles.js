@@ -230,16 +230,46 @@ export default {
 
     removeTitleFromPage: (context, payload) => {
         return new Promise((resolve, reject) => {
-          browser.tabs.query({ active: true, currentWindow: true })
-          .then( tabs => {
-  
-            let replacementCount = domHelpers.findAndReplaceTitle(payload.title, true);            
-            context.commit('remove_from_titles', payload.title)
-            resolve();
+      
+        let replacementCount = domHelpers.findAndReplaceTitle(payload.title, true);
+        console.log('going to remove from titles', payload.title)           
+        context.commit('remove_from_titles', payload.title)
+        resolve();
             
-          })
         })
   
+    },
+
+
+    /*
+    This function is called from the CustomTitles view and adds the newly created custom
+    title to the page (for a headline that did not have custom titles before).
+    or to post an edit. It requests the full StandaloneTitle with its associated CustomTitle 
+    and CustomTitle Endorsers from the server using the title hash, and adds them to the page. 
+    */
+    addTitleToPage: (context, payload) => {
+
+        return new Promise((resolve, reject) => {
+
+        if (payload.titleElementId) {
+            domHelpers.removeEventListenerFromTitle(payload.titleElementId);
+        }
+        
+        context.dispatch('getTitleMatches', { titlehashes: [payload.hash] })
+        .then(candidateTitles => {
+            context.dispatch('sortCustomTitles', candidateTitles)
+            .then(standaloneTitlesArr => {
+                context.dispatch('findTitlesOnPage', { 
+                candidateTitlesWSortedCustomTitles: standaloneTitlesArr
+                })
+                .then(res => {
+                    resolve()
+                })
+            })
+            
+        })
+
+        })
     },
 
     setTitlesFetched: (context, payload) => {

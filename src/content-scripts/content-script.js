@@ -6,10 +6,17 @@ import vuetify from '@/plugins/vuetify';
 
 console.log('Hello from the content-script')
 
-let iframe = document.createElement('iframe');
-iframe.classList.add('extension-side-bar');
-iframe.src = chrome.extension.getURL("popup.html")
-document.body.appendChild(iframe);
+let prevIframe = document.querySelector('iframe[data-sth="customPopupIframe"]');
+let iframe;
+// if (prevIframe === null) {
+    iframe = document.createElement('iframe');
+    iframe.classList.add('extension-side-bar');
+    iframe.setAttribute('src', chrome.extension.getURL("popup.html"));
+    iframe.setAttribute('data-sth', 'customPopupIframe')
+    document.body.appendChild(iframe);
+// }
+
+
 
 
 browser.runtime.onMessage.addListener( (msgObj, sender, sendResponse) => {

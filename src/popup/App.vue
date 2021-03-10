@@ -7,7 +7,7 @@
 <script>
 import titleServices from './services/titleServices'
 import sourceServices from './services/sourceServices'
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'popupApp',
@@ -15,6 +15,7 @@ export default {
   created() {
     console.log('popup app got created')
     let thisRef = this;
+     
 
     browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
@@ -82,25 +83,45 @@ export default {
       }
       else if (message.type == 'post_new_title') {
         return new Promise((resolve, reject) => {
-
-          titleServices.postCustomTitle(message.data.reqBody)
-          .then(res => {
-            resolve(res);
-          })
-          .catch(err => {
-            reject(err);
+        console.log('got called')
+          browser.tabs.query({ active: true, currentWindow: true })
+          .then(tabs => {
+            let tab = tabs[0];
+            thisRef.incrementCounter();
+            if (tab.url.substr(0, tab.url.lastIndexOf('#')) == document.referrer) {
+         
+              titleServices.postCustomTitle(message.data.reqBody)
+              .then(res => {
+                console.log('here is the resp', res)
+                resolve(res);
+              })
+              .catch(err => {
+                reject(err);
+              })
+             
+            }
+            
           })
         })
+   
       }
       else if (message.type == 'edit_title') {
         return new Promise((resolve, reject) => {
-          titleServices.editCustomTitle(message.data.reqParams, message.data.reqBody)
-          .then(res => {
-            resolve(res)
-          })
-          .catch(err => {
-            reject(err);
-          })
+
+          browser.tabs.query({ active: true, currentWindow: true })
+          .then(tabs => {
+            let tab = tabs[0];
+            if (tab.url.substr(0, tab.url.lastIndexOf('#')) == document.referrer) {
+    
+              titleServices.editCustomTitle(message.data.reqParams, message.data.reqBody)
+              .then(res => {
+                resolve(res)
+              })
+              .catch(err => {
+                reject(err);
+              })
+          }})
+
         })
       }
       else if (message.type == 'get_custom_titles_of_standalone_title') {
@@ -120,6 +141,25 @@ export default {
             })
         })
       }
+      else if (message.type == 'delete_title') {
+        return new Promise((resolve, reject) => {
+
+          browser.tabs.query({ active: true, currentWindow: true })
+          .then(tabs => {
+          let tab = tabs[0];
+          if (tab.url.substr(0, tab.url.lastIndexOf('#')) == document.referrer) {
+    
+            titleServices.deleteCustomTitle(message.data.reqBody)
+            .then(res => {
+              console.log('got the response', res)
+              resolve(res);
+            })
+            .catch(err => {
+              reject(err);
+            })
+          }})
+        })
+      }
       else if (message.type == 'get_follows') {
         return new Promise((resolve, reject) => {
           resolve(this.followedSources);
@@ -136,6 +176,8 @@ export default {
         })
       }
     })
+
+
   },
   computed: {
     ...mapState('relatedSources', [
@@ -145,6 +187,14 @@ export default {
     ]),
     ...mapGetters('auth', [
       'user'
+    ]),
+    ...mapState('dummy', [
+      'counter'
+    ])
+  },
+  methods: {
+    ...mapActions('dummy', [
+      'incrementCounter'
     ])
   }
 }

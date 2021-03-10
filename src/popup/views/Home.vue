@@ -10,6 +10,7 @@ export default {
   created() {
     browser.tabs.query({ active: true, currentWindow: true })
     .then( tabs => {
+      console.log('fjdklafjdaljfhaga')
         browser.tabs.sendMessage(tabs[0].id, { type: 'close_sidebar' });
         browser.tabs.sendMessage(tabs[0].id, { type: 'inject_inpage_vue_app' });
     })

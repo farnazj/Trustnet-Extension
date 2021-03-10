@@ -12,7 +12,7 @@
       @close="cancelDelete" @confirm="proceedDelete">
       </delete-dialog>
 
-      <v-card max-height="50vh" class="pa-1" >
+      <v-card max-height="50vh"  class="pa-1 custom-titles-container-card" >
        <v-row no-gutters align="center">
          <v-col cols="11">
            <v-row no-gutters justify="start">
@@ -241,6 +241,8 @@ export default {
 
                 let pageIndentifiedTitle = this.titleId ? this.associatedStandaloneTitle.text :
                     this.titleText;
+
+                console.log('yo you yo ')
                 
                 browser.runtime.sendMessage({
                     type: 'post_new_title',
@@ -254,6 +256,7 @@ export default {
                     }
                 })
                 .then(res => {
+                    console.log('got response back', res)
                     this.newTitle = '';
                     this.$refs.newTitleForm.resetValidation();
                     this.addTitleToPage({
@@ -261,14 +264,14 @@ export default {
                         titleElementId: this.titleElementId
                     })
                     .then(() => {
-                        this.$router.push({ name: 'customTitles',  
-                            params: { 
-                                titleId: res.data.data.id
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        })
+                        // this.$router.push({ name: 'customTitles',  
+                        //     params: { 
+                        //         titleId: res.data.data.id
+                        //     }
+                        // })
+                        // .catch(err => {
+                        //     console.log(err);
+                        // })
                     })
                 })
                 .catch(err => {
@@ -307,31 +310,34 @@ export default {
     },
     proceedDelete: function() {
 
-      this.showDeleteDialog = false;
+        this.showDeleteDialog = false;
 
-      if (this.edit && this.delete.selectedTitle.lastVersion.setId == this.edit.setId) {
-        let index = this.associatedStandaloneTitle.StandaloneCustomTitles.findIndex(customTitle => 
-            customTitle.setId == this.edit.setId);
-        this.$refs.editTitleForm[index].resetValidation();
-        this.resetEdits();
-      }
+        if (this.edit && this.delete.selectedTitle.lastVersion.setId == this.edit.setId) {
+            let index = this.associatedStandaloneTitle.StandaloneCustomTitles.findIndex(customTitle => 
+                customTitle.setId == this.edit.setId);
+            this.$refs.editTitleForm[index].resetValidation();
+            this.resetEdits();
+        }
 
-    //   titleServices.deleteCustomTitle({
-    //     standaloneTitleId: this.associatedStandaloneTitle.id,
-    //     setId: this.delete.selectedTitle.lastVersion.setId
-    //   })
-    //   .then(res => {
-    //     this.delete.selectedTitle = null;
-    //     // this.fetchPostTitles();
-    //     this.modifyCustomTitleInPage({
-    //         standaloneTitleId: this.associatedStandaloneTitle.id
-    //     })
-        
-    //   })
-    //   .catch(err => {
-    //     this.alertMessage = err.response.data.message;
-    //     this.alert = true;
-    //   })
+        browser.runtime.sendMessage({
+            type: 'delete_title',
+            data: {
+                reqBody: {
+                    standaloneTitleId: this.associatedStandaloneTitle.id,
+                    setId: this.delete.selectedTitle.lastVersion.setId
+                }
+            }
+        })
+        .then(res => {
+            this.delete.selectedTitle = null;
+            this.modifyCustomTitleInPage({
+                standaloneTitleId: this.associatedStandaloneTitle.id
+            })
+        })
+        .catch(err => {
+            this.alertMessage = err.response.data.message;
+            this.alert = true;
+        })
 
     },
     startEdit: function(title) {
@@ -342,11 +348,13 @@ export default {
     },
     saveEdits: function() {
 
+        //TODO: fix
         let index = this.associatedStandaloneTitle.StandaloneCustomTitles.findIndex(customTitle => 
             customTitle.setId == this.edit.setId);
+        console.log(this.associatedStandaloneTitle.StandaloneCustomTitles)
         
         console.log(this.associatedStandaloneTitle.PostId, this.edit.setId, this.edit.text)
-        console.log(this.$refs)
+        console.log(this.$refs, 'refs', index)
 
         if (this.$refs.editTitleForm[index].validate()) {
 
@@ -363,7 +371,6 @@ export default {
                 }
             })
             .then(res => {
-
                 this.resetEdits();
                 this.$refs.editTitleForm[index].resetValidation();
                 this.modifyCustomTitleInPage({
@@ -408,5 +415,9 @@ html {
     width: 100vw;
     height: 100vh;
     top: 0px; 
+}
+
+.custom-titles-container-card {
+    overflow: auto;
 }
 </style>

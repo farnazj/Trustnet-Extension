@@ -79,10 +79,6 @@ export default {
   },
   created() {
     console.log('login got created')
-    // browser.tabs.query({ active: true, currentWindow: true })
-    // .then( tabs => {
-    //   browser.tabs.sendMessage(tabs[0].id, { type: "open_sidebar" })
-    // })
   },
   methods: {
    login: function() {
@@ -117,6 +113,7 @@ export default {
 .login-style {
     position: fixed;
     width: 400px;
+    height: 100vh;
     right: 0px;
     z-index: 99999;
 }

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import auth from './modules/auth'
 import relatedSources from './modules/relatedSources'
+import dummy from './modules/dummy'
 
 Vue.use(Vuex)
 
@@ -14,6 +15,7 @@ export default new Vuex.Store({
   },
   modules: {
     auth,
-    relatedSources
+    relatedSources,
+    dummy
   }
 })

@@ -55,18 +55,7 @@ function addAltTitleNodeToHeadline(altTitle) {
 
 function acceptInputOnHeadline (headlineContainer) {
     headlineContainer.setAttribute('data-headline-id', Math.random().toString(36).substring(2, 15));
-    headlineContainer.addEventListener('click', function (ev) {
-        store.dispatch('titles/setTitlesDialogVisibility', true)
-        .then(() => {
-            insertedAppRouter.push({
-                name: 'customTitles',
-                params: { 
-                    titleText: ev.target.innerText,
-                    titleElementId: ev.target.getAttribute('data-headline-id')
-                }
-            })
-        })
-    } )
+    headlineContainer.addEventListener('click', openCustomTitlesDialog)
     headlineContainer.classList.add('headline-clickable');
 }
 
@@ -153,17 +142,22 @@ function htmlDecode(input) {
 
 
 function openCustomTitlesDialog(ev) {
-    console.log('click shod rush((((())))))')
+    store.dispatch('titles/setTitlesDialogVisibility', true)
+    .then(() => {
+        insertedAppRouter.push({
+            name: 'customTitles',
+            params: { 
+                titleText: ev.target.innerText,
+                titleElementId: ev.target.getAttribute('data-headline-id')
+            }
+        })
+    })
+}
 
-  
-
-    // browser.runtime.sendMessage({
-    //     type: 'direct_to_custom_titles',
-    //     data: {
-    //         titleText: ev.target.innerText,
-    //         titleElementId: ev.target.getAttribute('data-headline-id')
-    //     }
-    // })
+function removeEventListenerFromTitle(headlineId) {
+    let heading = document.querySelector(`[data-headline-id="${headlineId}"]`);
+    heading.removeEventListener('click', openCustomTitlesDialog);
+    heading.classList.remove('headline-clickable');
 }
 
 function identifyPotentialTitles() {
@@ -201,5 +195,6 @@ function identifyPotentialTitles() {
 
 export default {
     findAndReplaceTitle,
-    identifyPotentialTitles
+    identifyPotentialTitles,
+    removeEventListenerFromTitle
 }

@@ -19,7 +19,6 @@ function hashCode(s) {
   function isTrusted(source) {
 
     let trustedIds = store.getters['relatedSources/trustedIds'];
-    console.log('trusted ids', trustedIds)
   
     if (trustedIds.includes(source.id))
       return true;
