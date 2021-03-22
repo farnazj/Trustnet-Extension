@@ -24,8 +24,9 @@
     {
       "matches": ["*://*/*"],
       "exclude_globs": [ 
-        "http://trustnet.csail.mit.edu",
-        "https://trustnet.csail.mit.edu"
+        "http://trustnet.csail.mit.edu/*",
+        "https://trustnet.csail.mit.edu/*",
+        "https://github.com/*"
        ],
       "js": ["js/content-script.js"],
       "css": ["css/main.css"]
