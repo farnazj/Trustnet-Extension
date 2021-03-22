@@ -35,16 +35,18 @@ function addAltTitleNodeToHeadline(altTitle) {
         ev.preventDefault();
         console.log('chi shodeee????')
 
-        store.dispatch('titles/setTitlesDialogVisibility', true)
+        Promise.all([
+            store.dispatch('titles/setDisplayedTitle', { 
+                titleId: altTitle.id,
+                titleText: altTitle.text
+            }),
+            store.dispatch('titles/setTitlesDialogVisibility', true)
+        ])
         .then(() => {
             insertedAppRouter.push({
-                name: 'customTitles',
-                params: { 
-                    titleId: altTitle.id
-                }
-            })
+                name: 'customTitles'
+            })  
         })
-
         
     })
 
@@ -142,14 +144,16 @@ function htmlDecode(input) {
 
 
 function openCustomTitlesDialog(ev) {
-    store.dispatch('titles/setTitlesDialogVisibility', true)
+    Promise.all([
+        store.dispatch('titles/setTitlesDialogVisibility', true),
+        store.dispatch('titles/setDisplayedTitle', { 
+            titleText: ev.target.innerText,
+            titleElementId: ev.target.getAttribute('data-headline-id') 
+        })
+    ])
     .then(() => {
         insertedAppRouter.push({
-            name: 'customTitles',
-            params: { 
-                titleText: ev.target.innerText,
-                titleElementId: ev.target.getAttribute('data-headline-id')
-            }
+            name: 'customTitles'
         })
     })
 }

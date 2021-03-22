@@ -6,7 +6,7 @@
 
 <script>
 import setupHelpers from '@/mixins/setupHelpers';
-import {  mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'insertedApp',

@@ -198,9 +198,9 @@ export default {
             
         }
     },
-    props: ['titleId', 'titleText', 'titleElementId'],
+    
     created() {
-        console.log('tuye custom titles created', this.user)
+        console.log('in custom titles created', this.user)
     },
     computed: {
 
@@ -214,9 +214,9 @@ export default {
         },
         associatedStandaloneTitle: function() {
 
-            if (this.titleId){
-                console.log(this.titles.find(title => title.id == this.titleId))
-                return this.titles.find(title => title.id == this.titleId);
+            if (this.displayedTitle.titleId){
+                console.log('standalone title is ', this.titles.find(title => title.id == this.displayedTitle.titleId))
+                return this.titles.find(title => title.id == this.displayedTitle.titleId);
             }
             else
                 return null;
@@ -226,7 +226,8 @@ export default {
         ]),
         ...mapState('titles', [
             'titles',
-            'titlesDialogVisible'
+            'titlesDialogVisible',
+            'displayedTitle'
         ]),
         ...mapState('pageDetails', [
             'url'
@@ -243,10 +244,10 @@ export default {
             if (this.$refs.newTitleForm.validate()) {
                 this.postBtnDisabled = true;
 
-                let pageIndentifiedTitle = this.titleId ? this.associatedStandaloneTitle.text :
-                    this.titleText;
+                let pageIndentifiedTitle = this.displayedTitle.titleId && this.associatedStandaloneTitle ? 
+                    this.associatedStandaloneTitle.text : this.displayedTitle.titleText;
 
-                console.log('yo you yo ')
+                let thisRef = this;
                 
                 browser.runtime.sendMessage({
                     type: 'post_new_title',
@@ -261,30 +262,26 @@ export default {
                 })
                 .then(res => {
                     console.log('got response back', res)
-                    this.newTitle = '';
-                    this.$refs.newTitleForm.resetValidation();
-                    this.addTitleToPage({
+                    thisRef.newTitle = '';
+                    thisRef.$refs.newTitleForm.resetValidation();
+                    thisRef.addTitleToPage({
                         hash: res.data.data.hash,
-                        titleElementId: this.titleElementId
+                        titleElementId: thisRef.displayedTitle.titleElementId
                     })
                     .then(() => {
-                        // this.$router.push({ name: 'customTitles',  
-                        //     params: { 
-                        //         titleId: res.data.data.id
-                        //     }
-                        // })
-                        // .catch(err => {
-                        //     console.log(err);
-                        // })
+                        thisRef.setDisplayedTitle({ 
+                            titleId: res.data.data.id,
+                            titleText: res.data.data.text
+                        })
                     })
                 })
                 .catch(err => {
                     console.log(err)
-                    this.alertMessage = err.response.data.message;
-                    this.alert = true;
+                    thisRef.alertMessage = err.response.data.message;
+                    thisRef.alert = true;
                 })
                 .finally(() => {
-                    this.postBtnDisabled = false;
+                    thisRef.postBtnDisabled = false;
                 })
             
             }
@@ -412,7 +409,8 @@ export default {
     ...mapActions('titles', [
         'setTitlesDialogVisibility',
         'addTitleToPage',
-        'modifyCustomTitleInPage'
+        'modifyCustomTitleInPage',
+        'setDisplayedTitle'
     ])
 
     },

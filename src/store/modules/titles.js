@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import utils from '@/services/utils'
 import domHelpers from '@/lib/domHelpers'
-import consts from '@/services/constants'
+import consts from '@/lib/constants'
 
 export default {
   namespaced: true,
@@ -12,7 +12,12 @@ export default {
       historyVisiblity: false,
       titleHistory: [],
       historyOwner: {},
-      titlesFetched: false
+      titlesFetched: false,
+      displayedTitle: {
+          titleId: null,
+          titleText: '',
+          titleElementId: null
+      }
     }
   },
   mutations: {
@@ -22,18 +27,21 @@ export default {
 
     populate_titles: (state, titles) => {
         let replaceMode = false;
-  
+        let index;
         if (titles.length == 1) {
           
-          let index = state.titles.findIndex(title => title.id == titles[0].id);
+          index = state.titles.findIndex(title => title.id == titles[0].id);
           if (index !== -1 ) {
             Vue.set(state.titles, index, titles[0]);
             replaceMode = true;
           }
         }
-        
-        if (!replaceMode)
+        console.log('index chi shod', index)
+
+        if (!replaceMode || index === -1)
           state.titles.push(...titles);
+        
+          console.log('titles chi shod', state.titles)
     },
 
     remove_from_titles: (state, titleToDelete) => {
@@ -43,7 +51,12 @@ export default {
 
     set_titles_fetched_status: (state, payload) => {
         state.titlesFetched = payload;
-    } 
+    },
+    
+    set_displayed_title: (state, payload) => {
+        state.displayedTitle = Object.assign({}, payload);
+        console.log(state.displayedTitle, 'jadid')
+    }
   },
   actions: {
     hashPageContent: (context, payload) => {
@@ -280,7 +293,17 @@ export default {
     },
 
     setTitlesDialogVisibility: (context, payload) => {
-        context.commit('set_titles_dialog_visibility', payload);
+        return new Promise((resolve, reject) => {
+            context.commit('set_titles_dialog_visibility', payload);
+            resolve();
+        })
+    },
+
+    setDisplayedTitle: (context, payload) => {
+        return new Promise((resolve, reject) => {
+            context.commit('set_displayed_title', payload);
+            resolve();
+        })
     }
   
   }
