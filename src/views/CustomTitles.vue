@@ -26,7 +26,7 @@
          </v-col>
        </v-row>
 
-       <v-divider></v-divider>
+       <v-divider class="my-1"></v-divider>
 
        <v-row no-gutters class="pa-1">
          <v-col cols="12">

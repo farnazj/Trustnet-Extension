@@ -9,6 +9,7 @@ export default {
     fetchTitlesAndRelationships() {
 
       this.setUpPageUrl();
+      this.setUpObserver();
 
       if (!this.followedSources.length)
           this.fetchFollows();
@@ -35,6 +36,9 @@ export default {
     ]),
     ...mapActions('pageDetails', [
       'setUpPageUrl'
+    ]),
+    ...mapActions('pageObserver', [
+        'setUpObserver'
     ])
   },
   computed: {

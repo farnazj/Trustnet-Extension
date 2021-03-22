@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import utils from '@/services/utils'
+import generalUtils  from '@/lib/generalUtils'
 import domHelpers from '@/lib/domHelpers'
 import consts from '@/lib/constants'
 
@@ -71,7 +72,7 @@ export default {
                         let strPortion = str.substr(i, consts.LENGTH_TO_HASH);
             
                         if (strPortion.length >= consts.LENGTH_TO_HASH) {     
-                            allHashes.push(utils.hashCode(utils.uncurlify(strPortion)));
+                            allHashes.push(utils.hashCode(generalUtils.uncurlify(strPortion)));
                         }
                     }
                 }
@@ -173,7 +174,7 @@ export default {
     },
   
 
-    setUpTitles: (context, payload) => {
+    setUpTitles: (context) => {
         return new Promise((resolve, reject) => {
   
           let docInnerText = document.body.innerText;
@@ -186,7 +187,8 @@ export default {
                     .then(standaloneTitlesArr => {
                         context.dispatch('findTitlesOnPage', { candidateTitlesWSortedCustomTitles: standaloneTitlesArr })
                         .then(res => {
-                        resolve();
+                            context.dispatch('pageObserver/reconnectObserver', {}, {root: true});
+                            resolve();
                         })
                     })
               

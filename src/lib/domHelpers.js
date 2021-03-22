@@ -1,4 +1,4 @@
-import utils from '@/services/utils'
+import generalUtils from '@/lib/generalUtils'
 import insertedAppRouter from '@/router'
 import store from '@/store'
 import Fuse from 'fuse.js'
@@ -7,7 +7,7 @@ import consts from '@/lib/constants'
 function getElementsContainingText(text) {
 
     let xpath, query;
-    let uncurlifiedText = utils.uncurlify(text);
+    let uncurlifiedText = generalUtils.uncurlify(text);
 
     let results = [];
 
@@ -35,7 +35,6 @@ function addAltTitleNodeToHeadline(altTitle) {
     newEl.classList.add('new-alt-headline', `title-${altTitle.id}`);
     newEl.addEventListener('click', function(ev) {
         ev.preventDefault();
-        console.log('chi shodeee????')
 
         Promise.all([
             store.dispatch('titles/setDisplayedTitle', { 
@@ -58,9 +57,12 @@ function addAltTitleNodeToHeadline(altTitle) {
 
 
 function acceptInputOnHeadline (headlineContainer) {
-    headlineContainer.setAttribute('data-headline-id', Math.random().toString(36).substring(2, 15));
-    headlineContainer.addEventListener('click', openCustomTitlesDialog)
-    headlineContainer.classList.add('headline-clickable');
+    if (headlineContainer.getAttribute('data-headline-id') === null) {
+
+        headlineContainer.setAttribute('data-headline-id', Math.random().toString(36).substring(2, 15));
+        headlineContainer.addEventListener('click', openCustomTitlesDialog)
+        headlineContainer.classList.add('headline-clickable');
+    }
 }
 
 function getFuzzyTextSimilarToHeading(serverReturnedTitleText) {
@@ -72,7 +74,7 @@ function getFuzzyTextSimilarToHeading(serverReturnedTitleText) {
     }
    
     const fuse = new Fuse(pageContent, options)
-    let uncurlifiedText = utils.uncurlify(serverReturnedTitleText);
+    let uncurlifiedText = generalUtils.uncurlify(serverReturnedTitleText);
 
     let texts = uncurlifiedText != serverReturnedTitleText ? [uncurlifiedText, serverReturnedTitleText] : [serverReturnedTitleText];
     
@@ -101,6 +103,7 @@ function findAndReplaceTitle(title, remove) {
     let nonScriptResultsCount = 0;
 
     // observer.disconnect();
+    store.dispatch('pageObserver/disconnectObserver');
 
     results.forEach(el => {
         if (el.nodeName != 'SCRIPT') {
@@ -159,6 +162,8 @@ function findAndReplaceTitle(title, remove) {
         }
     })
     // globalHelper.observer.observe(Helper.getObserverConfigs[0], Helper.getObserverConfigs[1]);
+    store.dispatch('pageObserver/reconnectObserver');
+
     return nonScriptResultsCount;
 }
 
@@ -170,6 +175,7 @@ function htmlDecode(input) {
 
 
 function openCustomTitlesDialog(ev) {
+    ev.preventDefault();
     Promise.all([
         store.dispatch('titles/setTitlesDialogVisibility', true),
         store.dispatch('titles/setDisplayedTitle', { 
@@ -185,6 +191,7 @@ function openCustomTitlesDialog(ev) {
 }
 
 function removeEventListenerFromTitle(headlineId) {
+    console.log(headlineId, 'headline id')
     let heading = document.querySelector(`[data-headline-id="${headlineId}"]`);
     heading.removeEventListener('click', openCustomTitlesDialog);
     heading.classList.remove('headline-clickable');
@@ -221,6 +228,7 @@ function identifyPotentialTitles() {
     })
 
     // observer.observe(targetNode, config);
+    store.dispatch('pageObserver/reconnectObserver');
 }
 
 export default {
