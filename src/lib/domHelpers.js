@@ -72,7 +72,7 @@ function getFuzzyTextSimilarToHeading(serverReturnedTitleText) {
     }
    
     const fuse = new Fuse(pageContent, options)
-    let uncurlifiedText = uncurlify(serverReturnedTitleText);
+    let uncurlifiedText = utils.uncurlify(serverReturnedTitleText);
 
     let texts = uncurlifiedText != serverReturnedTitleText ? [uncurlifiedText, serverReturnedTitleText] : [serverReturnedTitleText];
     

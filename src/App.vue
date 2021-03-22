@@ -25,6 +25,7 @@ export default {
       }
       else {
         this.fetchTitlesAndRelationships();
+        // this.$router.push({ name: 'Home' })
       }
     });
   },

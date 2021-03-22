@@ -2,7 +2,7 @@
   <v-container fluid class="login-style pa-0">
     <custom-toolbar></custom-toolbar>
 
-    <v-row class="pt-12 full-height" justify="center" align="center" no-gutters fill-height>
+    <v-row class="pt-0 full-height" justify="center" align="center" no-gutters fill-height>
       <v-col cols="12">
         <v-alert v-model="alert" type="error">
           {{alertMessage}}

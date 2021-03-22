@@ -59,9 +59,7 @@ export default {
             if (authUser) {
                 context.commit('update_user', authUser);
             }
-            
             resolve(authUser);
-            
        })
        .catch(err => {
          reject(err);
