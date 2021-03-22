@@ -1,6 +1,8 @@
 import utils from '@/services/utils'
 import insertedAppRouter from '@/router'
 import store from '@/store'
+import Fuse from 'fuse.js'
+import consts from '@/lib/constants'
 
 function getElementsContainingText(text) {
 
@@ -61,16 +63,40 @@ function acceptInputOnHeadline (headlineContainer) {
     headlineContainer.classList.add('headline-clickable');
 }
 
+function getFuzzyTextSimilarToHeading(serverReturnedTitleText) {
+
+    let pageContent = document.body.innerText.split('\n');
+    const options = {
+        includeScore: true,
+        distance: 150
+    }
+   
+    const fuse = new Fuse(pageContent, options)
+    let uncurlifiedText = uncurlify(serverReturnedTitleText);
+
+    let texts = uncurlifiedText != serverReturnedTitleText ? [uncurlifiedText, serverReturnedTitleText] : [serverReturnedTitleText];
+    
+    let finalResults = [], tempResults = [];
+    for (let text of texts) {
+        tempResults = fuse.search(text);
+        if (!finalResults.includes(tempResults[0]))
+            finalResults.push(tempResults[0]);
+    }
+    
+    console.log('fuzzy search all results were', tempResults, consts.FUZZY_SCORE_THRESHOLD, finalResults[0])
+    return finalResults[0].score <= consts.FUZZY_SCORE_THRESHOLD ? finalResults[0].item : null;
+}
+
 function findAndReplaceTitle(title, remove) {
     let results = getElementsContainingText(title.text);
     results = results.filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
 
     console.log('results of els', results)
-    // if (!results.length) {
-    //     let similarText = getFuzzyTextSimilarToHeading(title.text);
-    //     if (similarText)
-    //         results = getElementsContainingText(similarText);
-    // }
+    if (!results.length) {
+        let similarText = getFuzzyTextSimilarToHeading(title.text);
+        if (similarText)
+            results = getElementsContainingText(similarText);
+    }
 
     let nonScriptResultsCount = 0;
 

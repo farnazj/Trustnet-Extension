@@ -1,5 +1,5 @@
 <template>
-    <v-app-bar dense fixed color="lime lighten-1">
+    <v-toolbar dense fixed color="lime lighten-1">
 
       <v-toolbar-title @click="goToPage('Home')" class="headline text-uppercase cursor-pointer">
         <span class="font-weight-light">Trustnet</span>
@@ -44,7 +44,7 @@
          <v-btn @click="goToPage('About')" text>About</v-btn>
       </template>
 
-    </v-app-bar>
+    </v-toolbar>
 </template>
 
 <script>
@@ -104,4 +104,5 @@ export default {
 .center-aligned {
     align-items: center;
 }
+
 </style>

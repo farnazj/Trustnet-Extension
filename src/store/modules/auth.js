@@ -56,23 +56,8 @@ export default {
         })
         .then(authUser => {
             console.log('gereftim', authUser, 'auth user ine')
-            // let proms = [];
             if (authUser) {
                 context.commit('update_user', authUser);
-
-                // proms.push(context.dispatch('titles/setUpTitles', {}, { root: true })
-                // .then( () => {
-                //     context.dispatch('titles/setTitlesFetched', true, { root: true });
-                // }));
-
-                // proms.push(...[
-                //     context.dispatch('relatedSources/fetchFollows',{}, { root: true }),
-                //     context.dispatch('relatedSources/fetchTrusteds',{}, { root: true }),
-                //     context.dispatch('relatedSources/fetchFollowers',{}, { root: true })
-                // ]);
-                
-                // proms.push(context.dispatch('pageDetails/setUpPageUrl', {}, { root: true }));
-                
             }
             
             resolve(authUser);

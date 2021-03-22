@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="login-style">
+  <v-container fluid class="login-style pa-0">
     <custom-toolbar></custom-toolbar>
 
     <v-row class="pt-12 full-height" justify="center" align="center" no-gutters fill-height>

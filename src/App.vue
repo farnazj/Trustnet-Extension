@@ -20,6 +20,7 @@ export default {
     this.getUser()
     .then(authUser => {
       if (!authUser) {
+        this.logout();
         this.$router.push({ name: 'Login' });
       }
       else {
@@ -29,7 +30,8 @@ export default {
   },
   methods: {
     ...mapActions('auth', [
-      'getUser'
+      'getUser',
+      'logout'
     ])
   },
   mixins: [setupHelpers]
