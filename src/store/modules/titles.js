@@ -18,6 +18,11 @@ export default {
           titleId: null,
           titleText: '',
           titleElementId: null
+      },
+      titleEndorsersState: {
+          endorsersVisibility: false,
+          selectedStandaloneTitleId: null,
+          selectedCustomTitleId: null
       }
     }
   },
@@ -56,7 +61,21 @@ export default {
     
     set_displayed_title: (state, payload) => {
         state.displayedTitle = Object.assign({}, payload);
-        console.log(state.displayedTitle, 'jadid')
+    },
+
+    set_endorsers_visibility: (state, payload) => {
+        let newObj = state.titleEndorsersState;
+        newObj.endorsersVisibility = payload;
+        state.titleEndorsersState = Object.assign({}, newObj);
+        console.log('visibility', state.titleEndorsersState)
+    },
+
+    set_endorsers_title_id: (state, payload) => {
+        let newObj = state.titleEndorsersState;
+        newObj.selectedStandaloneTitleId = payload.selectedStandaloneTitleId;
+        newObj.selectedCustomTitleId = payload.selectedCustomTitleId;
+
+        state.titleEndorsersState = Object.assign({}, newObj);
     }
   },
   actions: {
@@ -132,6 +151,10 @@ export default {
                 })
                 .then(customTitleObjects => {
                     standaloneTitlesArr[index].sortedCustomTitles = customTitleObjects.slice().sort(utils.compareTitles);
+                    standaloneTitlesArr[index].sortedCustomTitles.forEach( (customTitle, customTitleIndex) => {
+                        console.log(customTitle)
+                        standaloneTitlesArr[index].sortedCustomTitles[customTitleIndex].sortedEndorsers = customTitle.lastVersion.Endorsers.slice().sort(utils.compareSources);
+                    })
                 }))
             }
           })
@@ -304,6 +327,20 @@ export default {
     setDisplayedTitle: (context, payload) => {
         return new Promise((resolve, reject) => {
             context.commit('set_displayed_title', payload);
+            resolve();
+        })
+    },
+
+    setEndorsersVisibility: (context, payload) => {
+        return new Promise((resolve, reject) => {
+            context.commit('set_endorsers_visibility', payload);
+            resolve();
+        })
+    },
+
+    setEndorsersTitleIds: (context, payload) => {
+        return new Promise((resolve, reject) => {
+            context.commit('set_endorsers_title_id', payload);
             resolve();
         })
     }

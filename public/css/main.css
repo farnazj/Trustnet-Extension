@@ -46,3 +46,7 @@
 .v-badge__badge {
     inset: calc(100% - 10px) auto auto calc(100% - 10px) !important;
 }
+
+.interactable {
+    cursor: pointer;
+}

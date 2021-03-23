@@ -1,5 +1,5 @@
 <template>
-<v-dialog v-model="dialogVisible" width="400px">
+<v-dialog v-model="dialogVisible" max-width="500px">
      <!-- <v-slide-x-reverse-transition> -->
       <v-snackbar v-model="alert" top>
         {{ alertMessage }}
@@ -12,7 +12,14 @@
       @close="cancelDelete" @confirm="proceedDelete">
       </delete-dialog>
 
-      <v-card max-height="50vh"  class="pa-1 custom-titles-container-card" >
+
+    <v-row no-gutters>
+        <v-col>
+
+        
+    <v-slide-x-reverse-transition>
+
+      <v-card max-height="50vh" class="pa-1 custom-titles-container-card" max-width="500">
        <v-row no-gutters align="center">
          <v-col cols="11">
            <v-row no-gutters justify="start">
@@ -56,8 +63,8 @@
                 <v-row no-gutters align="center" class="py-1" :key="`meta-info-${index}`">
                     <custom-avatar :user="titleObj.author" :clickEnabled="true"></custom-avatar>
                     <span class="ml-2 caption grey--text text--darken-3"> {{timeElapsed(titleObj.lastVersion.createdAt)}} </span>
-                    <span v-if="titleObj.history.length" class="ml-2 caption grey--text text--darken-1 cursor-pointer"
-                        @click.stop="showHistory(titleObj)">Edited</span>
+                    <span v-if="titleObj.history.length" class="ml-2 caption grey--text text--darken-1 cursor-pointer">Edited</span>
+                        <!-- @click.stop="showHistory(titleObj)">Edited</span> -->
                 </v-row>
 
                 <v-row no-gutters class="mt-1" :key="`title-text-${index}`">
@@ -87,7 +94,18 @@
                         </v-icon>
                     </v-col>
 
-                    <v-col cols="11" v-if="titleObj.author.id == user.id">
+                    <v-col cols="5">
+                        <v-row no-gutters v-if="titleObj.sortedEndorsers.length" @click.stop="showEndorsers(titleObj)" class="interactable">
+                            <template v-for="(endorser, endorserIndex) in titleObj.sortedEndorsers.slice(0, endorsersOnCard)">
+                                <custom-avatar :user="endorser" :size="25" :clickEnabled="true" :key="`endorser-${endorserIndex}`"
+                                class="mr-2"></custom-avatar>
+                            </template>
+                            <span v-if="titleObj.sortedEndorsers.length > endorsersOnCard" 
+                                :class="{'mr-2': $vuetify.breakpoint.smAndDown}" >...</span>
+                        </v-row>
+                    </v-col>
+
+                    <v-col cols="6" v-if="titleObj.author.id == user.id">
 
                         <v-row justify="end" no-gutters>
                             <v-tooltip bottom :open-on-hover="true" open-delay="500">
@@ -141,16 +159,21 @@
 
             </v-card-text>
         </v-card>
-        <title-history namespace="farnaz"></title-history>
-    <!-- </v-slide-x-reverse-transition> -->
+            </v-slide-x-reverse-transition>
+            </v-col>
+        
+    
+        <title-endorsers ></title-endorsers>
+        </v-row>
+
     </v-dialog>
 </template>
 
 <script>
 import customAvatar from '@/components/CustomAvatar'
 import deleteConfirmationDialog from '@/components/DeleteConfirmationDialog'
-import titleHistory from '@/components/TitleHistory'
-
+// import titleHistory from '@/components/TitleHistory'
+import titleEndorsers from '@/components/TitleEndorsers'
 import timeHelpers from '@/mixins/timeHelpers'
 // import titleServices from '@/services/titleServices'
 import { mapState, mapGetters, mapActions } from 'vuex'
@@ -161,7 +184,8 @@ export default {
     components: {
         'custom-avatar': customAvatar,
         'delete-dialog': deleteConfirmationDialog,
-        'title-history': titleHistory
+        // 'title-history': titleHistory,
+        'title-endorsers': titleEndorsers
     },
    data: () => {
        return {
@@ -202,6 +226,10 @@ export default {
     created() {
         console.log('in custom titles created', this.user)
     },
+    beforeRouteLeave (to, from, next) {
+        this.hideContainer();
+        next();
+    },
     computed: {
 
         dialogVisible: {
@@ -220,6 +248,14 @@ export default {
             }
             else
                 return null;
+        },
+        endorsersOnCard: function() {
+            if (this.$vuetify.breakpoint.smAndDown)
+                return 1;
+            else if (this.$vuetify.breakpoint.mdAndDown)
+                return 2;
+            else 
+                return 3;
         },
         ...mapGetters('auth', [
             'user'
@@ -406,11 +442,25 @@ export default {
       this.populateTitleHistory(titleObj);
       this.setHistoryVisiblity(true);
     },
+    showEndorsers: function(titleObj) {
+        let thisRef = this;
+
+        this.setEndorsersTitleIds({
+            selectedStandaloneTitleId: titleObj.lastVersion.StandaloneTitleId,
+            selectedCustomTitleId: titleObj.lastVersion.id
+        })
+        .then(() => {
+            thisRef.setEndorsersVisibility(true);
+        })
+        
+    },
     ...mapActions('titles', [
         'setTitlesDialogVisibility',
         'addTitleToPage',
         'modifyCustomTitleInPage',
-        'setDisplayedTitle'
+        'setDisplayedTitle',
+        'setEndorsersVisibility',
+        'setEndorsersTitleIds'
     ])
 
     },
