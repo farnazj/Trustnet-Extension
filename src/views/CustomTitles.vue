@@ -159,12 +159,11 @@
 
             </v-card-text>
         </v-card>
-            </v-slide-x-reverse-transition>
-            </v-col>
-        
+    </v-slide-x-reverse-transition>
+    </v-col>
     
-        <title-endorsers ></title-endorsers>
-        </v-row>
+<title-endorsers ></title-endorsers>
+</v-row>
 
     </v-dialog>
 </template>
@@ -424,6 +423,7 @@ export default {
                 })
             })
             .catch(err => {
+                console.log(err)
                 this.alertMessage = err.response.data.message;
                 this.alert = true;
             })
@@ -447,7 +447,7 @@ export default {
 
         this.setEndorsersTitleIds({
             selectedStandaloneTitleId: titleObj.lastVersion.StandaloneTitleId,
-            selectedCustomTitleId: titleObj.lastVersion.id
+            selectedCustomTitleSetId: titleObj.lastVersion.setId
         })
         .then(() => {
             thisRef.setEndorsersVisibility(true);

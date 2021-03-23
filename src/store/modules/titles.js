@@ -22,7 +22,7 @@ export default {
       titleEndorsersState: {
           endorsersVisibility: false,
           selectedStandaloneTitleId: null,
-          selectedCustomTitleId: null
+          selectedCustomTitleSetId: null
       }
     }
   },
@@ -67,13 +67,12 @@ export default {
         let newObj = state.titleEndorsersState;
         newObj.endorsersVisibility = payload;
         state.titleEndorsersState = Object.assign({}, newObj);
-        console.log('visibility', state.titleEndorsersState)
     },
 
     set_endorsers_title_id: (state, payload) => {
         let newObj = state.titleEndorsersState;
         newObj.selectedStandaloneTitleId = payload.selectedStandaloneTitleId;
-        newObj.selectedCustomTitleId = payload.selectedCustomTitleId;
+        newObj.selectedCustomTitleSetId = payload.selectedCustomTitleSetId;
 
         state.titleEndorsersState = Object.assign({}, newObj);
     }
