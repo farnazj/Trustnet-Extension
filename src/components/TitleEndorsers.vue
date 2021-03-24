@@ -1,11 +1,11 @@
 <template>
 
 <v-slide-x-reverse-transition v-if="visible">
-  <v-card max-width="240">
+  <v-card max-width="240" max-height="50vh" class="drawer-card">
     <v-row no-gutters class="full-height">
-      <v-col class="drawer-opener" cols="1">
+      <v-col class="drawer-opener interactable" cols="1" @click="hideEndorsers">
         <v-row no-gutters justify="end" align="center" class="fill-height">
-          <v-icon @click="hideEndorsers">{{icons.arrowRight}}</v-icon>
+          <v-icon >{{icons.arrowRight}}</v-icon>
         </v-row>
       </v-col>
 
@@ -13,7 +13,7 @@
 
       <v-col cols="10" class="pa-1">
         <v-row no-gutters justify="start">
-          <p class="pb-0 mb-0 subheading font-weight-regular">Title Endorsers</p>
+          <p class="pb-0 mb-0 subheading font-weight-regular grey--text text--darken-3">Title Endorsers</p>
         </v-row>
 
         <v-divider></v-divider>
@@ -23,7 +23,7 @@
           <v-row  :key="`row-${endorser.id}`" no-gutters justify="start" align="center" class="pa-1">
             <custom-avatar :user="endorser" :clickEnabled="false" :size="25"  class="mr-2">
             </custom-avatar>
-             <span>{{sourceDisplayName(endorser)}}</span>
+             <span class="grey--text text--darken-2">{{sourceDisplayName(endorser)}}</span>
           </v-row>
             <v-divider :key="`divider-${endorser.id}`"></v-divider>
 
@@ -105,5 +105,9 @@ export default {
 
 .full-height{
   height: 100%;
+}
+
+.drawer-card {
+  overflow: auto;
 }
 </style>

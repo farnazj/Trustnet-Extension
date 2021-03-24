@@ -18,7 +18,7 @@
 
             <v-slide-x-reverse-transition>
 
-                <v-card  class="pa-1 custom-titles-container-card" max-width="100%" height="100%">
+                <v-card  class="pa-1 custom-titles-container-card" max-width="100%" max-height="50vh">
                     <v-row no-gutters align="center">
                         <v-col cols="11">
                         <v-row no-gutters justify="start">
@@ -486,6 +486,6 @@ html {
 }
 
 .custom-titles-dialog-container {
-    max-height: 50vh;
+    -max-height: 50vh;
 }
 </style>
