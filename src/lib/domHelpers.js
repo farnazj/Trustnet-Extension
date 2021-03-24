@@ -36,18 +36,15 @@ function addAltTitleNodeToHeadline(altTitle) {
     newEl.addEventListener('click', function(ev) {
         ev.preventDefault();
 
-        Promise.all([
-            store.dispatch('titles/setDisplayedTitle', { 
-                titleId: altTitle.id,
-                titleText: altTitle.text
-            }),
-            store.dispatch('titles/setTitlesDialogVisibility', true)
-        ])
-        .then(() => {
-            insertedAppRouter.push({
-                name: 'customTitles'
-            })  
-        })
+        store.dispatch('titles/setDisplayedTitle', { 
+            titleId: altTitle.id,
+            titleText: altTitle.text
+        });
+        store.dispatch('titles/setTitlesDialogVisibility', true);
+    
+        insertedAppRouter.push({
+            name: 'customTitles'
+        });
         
     })
 
@@ -176,18 +173,16 @@ function htmlDecode(input) {
 
 function openCustomTitlesDialog(ev) {
     ev.preventDefault();
-    Promise.all([
-        store.dispatch('titles/setTitlesDialogVisibility', true),
-        store.dispatch('titles/setDisplayedTitle', { 
-            titleText: ev.target.innerText,
-            titleElementId: ev.target.getAttribute('data-headline-id') 
-        })
-    ])
-    .then(() => {
-        insertedAppRouter.push({
-            name: 'customTitles'
-        })
-    })
+    
+    store.dispatch('titles/setTitlesDialogVisibility', true);
+    store.dispatch('titles/setDisplayedTitle', { 
+        titleText: ev.target.innerText,
+        titleElementId: ev.target.getAttribute('data-headline-id') 
+    });
+
+    insertedAppRouter.push({
+        name: 'customTitles'
+    });
 }
 
 function removeEventListenerFromTitle(headlineId) {

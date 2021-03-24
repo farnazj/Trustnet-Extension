@@ -2,7 +2,7 @@
 
 <v-slide-x-reverse-transition v-if="visible">
   <v-card max-width="240">
-    <v-row no-gutters class="endorsers-rows">
+    <v-row no-gutters class="full-height">
       <v-col class="drawer-opener" cols="1">
         <v-row no-gutters justify="end" align="center" class="fill-height">
           <v-icon @click="hideEndorsers">{{icons.arrowRight}}</v-icon>
@@ -105,7 +105,7 @@ export default {
   max-width: 25px;
 }
 
-.endorsers-rows {
+.full-height{
   height: 100%;
 }
 </style>

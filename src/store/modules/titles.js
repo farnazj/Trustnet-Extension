@@ -10,19 +10,21 @@ export default {
     return {
       titles: [],
       titlesDialogVisible: false,
-      historyVisiblity: false,
-      titleHistory: [],
-      historyOwner: {},
       titlesFetched: false,
       displayedTitle: {
-          titleId: null,
-          titleText: '',
-          titleElementId: null
+        titleId: null,
+        titleText: '',
+        titleElementId: null
       },
       titleEndorsersState: {
-          endorsersVisibility: false,
-          selectedStandaloneTitleId: null,
-          selectedCustomTitleSetId: null
+        endorsersVisibility: false,
+        selectedStandaloneTitleId: null,
+        selectedCustomTitleSetId: null
+      },
+      titleHistoryState: {
+        historyVisibility: false,
+        titleHistory: [],
+        historyOwner: {}
       }
     }
   },
@@ -42,12 +44,9 @@ export default {
             replaceMode = true;
           }
         }
-        console.log('index chi shod', index)
 
         if (!replaceMode || index === -1)
           state.titles.push(...titles);
-        
-          console.log('titles chi shod', state.titles)
     },
 
     remove_from_titles: (state, titleToDelete) => {
@@ -75,6 +74,21 @@ export default {
         newObj.selectedCustomTitleSetId = payload.selectedCustomTitleSetId;
 
         state.titleEndorsersState = Object.assign({}, newObj);
+    },
+
+    set_history_visibility: (state, visiblity) => {
+
+        let newObj = state.titleHistoryState;
+        newObj.historyVisibility = visiblity;
+        state.titleHistoryState = Object.assign({}, newObj);
+    }, 
+
+    populate_title_history: (state, payload) => {
+        let newObj = state.titleHistoryState;
+        newObj.titleHistory = payload.titleHistory;
+        newObj.historyOwner = payload.historyOwner;
+
+        state.titleHistoryState = Object.assign({}, newObj);
     }
   },
   actions: {
@@ -277,7 +291,6 @@ export default {
   
     },
 
-
     /*
     This function is called from the CustomTitles view and adds the newly created custom
     title to the page (for a headline that did not have custom titles before).
@@ -288,60 +301,53 @@ export default {
 
         return new Promise((resolve, reject) => {
 
-        if (payload.titleElementId) {
-            domHelpers.removeEventListenerFromTitle(payload.titleElementId);
-        }
-        
-        context.dispatch('getTitleMatches', { titlehashes: [payload.hash] })
-        .then(candidateTitles => {
-            context.dispatch('sortCustomTitles', candidateTitles)
-            .then(standaloneTitlesArr => {
-                context.dispatch('findTitlesOnPage', { 
-                candidateTitlesWSortedCustomTitles: standaloneTitlesArr
-                })
-                .then(res => {
-                    resolve()
-                })
-            })
+            if (payload.titleElementId) {
+                domHelpers.removeEventListenerFromTitle(payload.titleElementId);
+            }
             
-        })
+            context.dispatch('getTitleMatches', { titlehashes: [payload.hash] })
+            .then(candidateTitles => {
+                context.dispatch('sortCustomTitles', candidateTitles)
+                .then(standaloneTitlesArr => {
+                    context.dispatch('findTitlesOnPage', { 
+                    candidateTitlesWSortedCustomTitles: standaloneTitlesArr
+                    })
+                    .then(res => {
+                        resolve()
+                    })
+                })
+                
+            })
 
         })
     },
 
     setTitlesFetched: (context, payload) => {
-        return new Promise((resolve, reject) => {
-          context.commit('set_titles_fetched_status', payload);
-          resolve();
-        })
+        context.commit('set_titles_fetched_status', payload);  
     },
 
     setTitlesDialogVisibility: (context, payload) => {
-        return new Promise((resolve, reject) => {
-            context.commit('set_titles_dialog_visibility', payload);
-            resolve();
-        })
+        context.commit('set_titles_dialog_visibility', payload);
     },
 
     setDisplayedTitle: (context, payload) => {
-        return new Promise((resolve, reject) => {
-            context.commit('set_displayed_title', payload);
-            resolve();
-        })
+        context.commit('set_displayed_title', payload);  
     },
 
     setEndorsersVisibility: (context, payload) => {
-        return new Promise((resolve, reject) => {
-            context.commit('set_endorsers_visibility', payload);
-            resolve();
-        })
+        context.commit('set_endorsers_visibility', payload);
     },
 
     setEndorsersTitleIds: (context, payload) => {
-        return new Promise((resolve, reject) => {
-            context.commit('set_endorsers_title_id', payload);
-            resolve();
-        })
+        context.commit('set_endorsers_title_id', payload);
+    },
+
+    setHistoryVisibility: (context, payload) => {
+        context.commit('set_history_visibility', payload);
+    },
+
+    populateTitleHistory: (context, payload) => {
+        context.commit('populate_title_history', payload);
     }
   
   }

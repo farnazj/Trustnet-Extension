@@ -1,169 +1,169 @@
 <template>
-<v-dialog v-model="dialogVisible" max-width="500px">
+<v-dialog v-model="dialogVisible" max-width="530px">
      <!-- <v-slide-x-reverse-transition> -->
-      <v-snackbar v-model="alert" top>
+    <v-snackbar v-model="alert" top>
         {{ alertMessage }}
         <v-btn color="blue lighten-1" text @click="snackbar = false">
-          Close
+            Close
         </v-btn>
-      </v-snackbar>
+    </v-snackbar>
 
-      <delete-dialog itemType="title" :showDialog="showDeleteDialog"
-      @close="cancelDelete" @confirm="proceedDelete">
-      </delete-dialog>
+    <delete-dialog itemType="title" :showDialog="showDeleteDialog"
+    @close="cancelDelete" @confirm="proceedDelete">
+    </delete-dialog>
 
 
-    <v-row no-gutters>
+    <v-row no-gutters class="custom-titles-dialog-container">
         <v-col>
 
-        
-    <v-slide-x-reverse-transition>
+            <v-slide-x-reverse-transition>
 
-      <v-card max-height="50vh" class="pa-1 custom-titles-container-card" max-width="500">
-       <v-row no-gutters align="center">
-         <v-col cols="11">
-           <v-row no-gutters justify="start">
-             <p class="pb-0 mb-0 subheading font-weight-regular">Alternative Headline</p>
-           </v-row>
-         </v-col>
-         <v-col cols="1">
-           <v-row no-gutters justify="end">
-             <v-icon @click="returnToHome">{{icons.clear}}</v-icon>
-           </v-row>
-         </v-col>
-       </v-row>
-
-       <v-divider class="my-1"></v-divider>
-
-       <v-row no-gutters class="pa-1">
-         <v-col cols="12">
-           <v-form ref="newTitleForm" lazy-validation>
-             <v-text-field v-model="newTitle" label="Suggest alternative headline"
-             required :rules="formsRules.newTitleRules">
-             </v-text-field>
-          </v-form>
-         </v-col>
-       </v-row>
-
-       <v-card-text class="pa-1">
-
-        <v-row no-gutters justify="end">
-            <v-card-actions >
-              <v-btn :disabled="postBtnDisabled" outlined small color="primary" @click="postNewTitle">Submit</v-btn>
-            </v-card-actions>
-        </v-row>
-
-        <v-divider v-if="associatedStandaloneTitle && 
-            associatedStandaloneTitle.sortedCustomTitles.length"></v-divider>
-        
-        <v-row no-gutters v-if="associatedStandaloneTitle">
-            <v-col cols="12">
-
-            <template v-for="(titleObj, index) in associatedStandaloneTitle.sortedCustomTitles">
-                <v-row no-gutters align="center" class="py-1" :key="`meta-info-${index}`">
-                    <custom-avatar :user="titleObj.author" :clickEnabled="true"></custom-avatar>
-                    <span class="ml-2 caption grey--text text--darken-3"> {{timeElapsed(titleObj.lastVersion.createdAt)}} </span>
-                    <span v-if="titleObj.history.length" class="ml-2 caption grey--text text--darken-1 cursor-pointer">Edited</span>
-                        <!-- @click.stop="showHistory(titleObj)">Edited</span> -->
-                </v-row>
-
-                <v-row no-gutters class="mt-1" :key="`title-text-${index}`">
-                    <v-col cols="12">
-                    <v-form ref="editTitleForm" lazy-validation>
-                        <div v-if="titleObj.author.id == user.id && edit.on && edit.setId == titleObj.lastVersion.setId">
-                        <v-text-field v-model="edit.text" background-color="blue lighten-5"
-                        required :rules="formsRules.titleEditRules">
-                        </v-text-field>
-                        </div>
-                    <div v-else>
-                        <p class="grey--text text--darken-3 mb-1">{{titleObj.lastVersion.text}}</p>
-                    </div>
-                    </v-form>
-                    </v-col>
-                </v-row>
-
-                <v-row no-gutters class="mt-1 mb-1" :key="`title-actions-${index}`">
-                    <v-col cols="1">
-                        <v-icon @click="changeEndorsement(titleObj, index, false)"
-                        v-if="titleObj.userEndorsed" color="primary" small class="xs-icon-font cursor-pointer">
-                            {{icons.thumbUpFilled}}
-                        </v-icon>
-                        <v-icon @click="changeEndorsement(titleObj, index, true)" v-else
-                        color="primary" small class="xs-icon-font cursor-pointer">
-                            {{icons.thumbUpOutline}}
-                        </v-icon>
-                    </v-col>
-
-                    <v-col cols="5">
-                        <v-row no-gutters v-if="titleObj.sortedEndorsers.length" @click.stop="showEndorsers(titleObj)" class="interactable">
-                            <template v-for="(endorser, endorserIndex) in titleObj.sortedEndorsers.slice(0, endorsersOnCard)">
-                                <custom-avatar :user="endorser" :size="25" :clickEnabled="true" :key="`endorser-${endorserIndex}`"
-                                class="mr-2"></custom-avatar>
-                            </template>
-                            <span v-if="titleObj.sortedEndorsers.length > endorsersOnCard" 
-                                :class="{'mr-2': $vuetify.breakpoint.smAndDown}" >...</span>
+                <v-card  class="pa-1 custom-titles-container-card" max-width="100%" height="100%">
+                    <v-row no-gutters align="center">
+                        <v-col cols="11">
+                        <v-row no-gutters justify="start">
+                            <p class="pb-0 mb-0 subheading font-weight-regular">Alternative Headline</p>
                         </v-row>
-                    </v-col>
-
-                    <v-col cols="6" v-if="titleObj.author.id == user.id">
-
-                        <v-row justify="end" no-gutters>
-                            <v-tooltip bottom :open-on-hover="true" open-delay="500">
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-show="!edit.on || edit.setId != titleObj.lastVersion.setId" x-small outlined
-                                    @click="startEdit(titleObj)" v-on="on" color="green lighten-1" class="mr-2">
-                                    <v-icon small>{{icons.edit}}</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Edit</span>
-                            </v-tooltip>
-
-                            <v-tooltip bottom :open-on-hover="true" open-delay="500">
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-show="edit.on && edit.setId == titleObj.lastVersion.setId" x-small outlined
-                                    @click="resetEdits" v-on="on" color="red lighten-1" class="mr-1">
-                                    <v-icon small>{{icons.cancel}}</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Cancel edit</span>
-                            </v-tooltip>
-
-                            <v-tooltip bottom :open-on-hover="true" open-delay="500">
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-show="edit.on && edit.setId == titleObj.lastVersion.setId" x-small outlined
-                                    @click="saveEdits" v-on="on" color="green lighten-1" class="mr-3">
-                                    <v-icon small class="xs-icon-font">{{icons.check}}</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Save edit</span>
-                            </v-tooltip>
-
-                            <v-tooltip bottom :open-on-hover="true" open-delay="500">
-                                <template v-slot:activator="{ on }">
-                                    <v-btn x-small outlined @click="startDelete(titleObj)" v-on="on"
-                                    color="red lighten-1">
-                                    <v-icon small class="xs-icon-font">{{icons.delete}}</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Delete</span>
-                            </v-tooltip>
-
+                        </v-col>
+                        <v-col cols="1">
+                        <v-row no-gutters justify="end">
+                            <v-icon @click="returnToHome">{{icons.clear}}</v-icon>
                         </v-row>
-                    </v-col>
-                </v-row>  
+                        </v-col>
+                    </v-row>
 
-                <v-divider :key="`title-divider-${index}`"></v-divider>
-                </template>
-                </v-col>
-            </v-row>
+                    <v-divider class="my-1"></v-divider>
 
-            </v-card-text>
-        </v-card>
-    </v-slide-x-reverse-transition>
-    </v-col>
+                    <v-row no-gutters class="pa-1">
+                        <v-col cols="12">
+                        <v-form ref="newTitleForm" lazy-validation>
+                            <v-text-field v-model="newTitle" label="Suggest alternative headline"
+                            required :rules="formsRules.newTitleRules">
+                            </v-text-field>
+                        </v-form>
+                        </v-col>
+                    </v-row>
+
+                    <v-card-text class="pa-1">
+
+                        <v-row no-gutters justify="end">
+                            <v-card-actions >
+                            <v-btn :disabled="postBtnDisabled" outlined small color="primary" @click="postNewTitle">Submit</v-btn>
+                            </v-card-actions>
+                        </v-row>
+
+                        <v-divider v-if="associatedStandaloneTitle && 
+                            associatedStandaloneTitle.sortedCustomTitles.length"></v-divider>
+                        
+                        <v-row no-gutters v-if="associatedStandaloneTitle">
+                            <v-col cols="12">
+
+                                <template v-for="(titleObj, index) in associatedStandaloneTitle.sortedCustomTitles">
+                                    <v-row no-gutters align="center" class="py-1" :key="`meta-info-${index}`">
+                                        <custom-avatar :user="titleObj.author" :clickEnabled="true"></custom-avatar>
+                                        <span class="ml-2 caption grey--text text--darken-3"> {{timeElapsed(titleObj.lastVersion.createdAt)}} </span>
+                                        <span v-if="titleObj.history.length" class="ml-2 caption grey--text text--darken-1 interactable"
+                                            @click.stop="showHistory(titleObj)">Edited</span>
+                                    </v-row>
+
+                                    <v-row no-gutters class="mt-1" :key="`title-text-${index}`">
+                                        <v-col cols="12">
+                                        <v-form ref="editTitleForm" lazy-validation>
+                                            <div v-if="titleObj.author.id == user.id && edit.on && edit.setId == titleObj.lastVersion.setId">
+                                            <v-text-field v-model="edit.text" background-color="blue lighten-5"
+                                            required :rules="formsRules.titleEditRules">
+                                            </v-text-field>
+                                            </div>
+                                        <div v-else>
+                                            <p class="grey--text text--darken-3 mb-1">{{titleObj.lastVersion.text}}</p>
+                                        </div>
+                                        </v-form>
+                                        </v-col>
+                                    </v-row>
+
+                                    <v-row no-gutters class="mt-1 mb-1" :key="`title-actions-${index}`">
+                                        <v-col cols="1">
+                                            <v-icon @click="changeEndorsement(titleObj, index, false)"
+                                            v-if="titleObj.userEndorsed" color="primary" small class="xs-icon-font interactable">
+                                                {{icons.thumbUpFilled}}
+                                            </v-icon>
+                                            <v-icon @click="changeEndorsement(titleObj, index, true)" v-else
+                                            color="primary" small class="xs-icon-font interactable">
+                                                {{icons.thumbUpOutline}}
+                                            </v-icon>
+                                        </v-col>
+
+                                        <v-col cols="5">
+                                            <v-row no-gutters v-if="titleObj.sortedEndorsers.length" @click.stop="showEndorsers(titleObj)" class="interactable">
+                                                <template v-for="(endorser, endorserIndex) in titleObj.sortedEndorsers.slice(0, endorsersOnCard)">
+                                                    <custom-avatar :user="endorser" :size="25" :clickEnabled="true" :key="`endorser-${endorserIndex}`"
+                                                    class="mr-2"></custom-avatar>
+                                                </template>
+                                                <span v-if="titleObj.sortedEndorsers.length > endorsersOnCard" 
+                                                    :class="{'mr-2': $vuetify.breakpoint.smAndDown}" >...</span>
+                                            </v-row>
+                                        </v-col>
+
+                                        <v-col cols="6" v-if="titleObj.author.id == user.id">
+
+                                            <v-row justify="end" no-gutters>
+                                                <v-tooltip bottom :open-on-hover="true" open-delay="500">
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-btn v-show="!edit.on || edit.setId != titleObj.lastVersion.setId" x-small outlined
+                                                        @click="startEdit(titleObj)" v-on="on" color="green lighten-1" class="mr-2">
+                                                        <v-icon small>{{icons.edit}}</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>Edit</span>
+                                                </v-tooltip>
+
+                                                <v-tooltip bottom :open-on-hover="true" open-delay="500">
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-btn v-show="edit.on && edit.setId == titleObj.lastVersion.setId" x-small outlined
+                                                        @click="resetEdits" v-on="on" color="red lighten-1" class="mr-1">
+                                                        <v-icon small>{{icons.cancel}}</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>Cancel edit</span>
+                                                </v-tooltip>
+
+                                                <v-tooltip bottom :open-on-hover="true" open-delay="500">
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-btn v-show="edit.on && edit.setId == titleObj.lastVersion.setId" x-small outlined
+                                                        @click="saveEdits" v-on="on" color="green lighten-1" class="mr-3">
+                                                        <v-icon small class="xs-icon-font">{{icons.check}}</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>Save edit</span>
+                                                </v-tooltip>
+
+                                                <v-tooltip bottom :open-on-hover="true" open-delay="500">
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-btn x-small outlined @click="startDelete(titleObj)" v-on="on"
+                                                        color="red lighten-1">
+                                                        <v-icon small class="xs-icon-font">{{icons.delete}}</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>Delete</span>
+                                                </v-tooltip>
+
+                                            </v-row>
+                                        </v-col>
+                                    </v-row>  
+
+                                    <v-divider :key="`title-divider-${index}`"></v-divider>
+                                </template>
+                            </v-col>
+                        </v-row>
+
+                    </v-card-text>
+                </v-card>
+            </v-slide-x-reverse-transition>
+        </v-col>
     
-<title-endorsers ></title-endorsers>
-</v-row>
+        <title-endorsers ></title-endorsers>
+        <title-history></title-history>
+    </v-row>
 
     </v-dialog>
 </template>
@@ -171,7 +171,7 @@
 <script>
 import customAvatar from '@/components/CustomAvatar'
 import deleteConfirmationDialog from '@/components/DeleteConfirmationDialog'
-// import titleHistory from '@/components/TitleHistory'
+import titleHistory from '@/components/TitleHistory'
 import titleEndorsers from '@/components/TitleEndorsers'
 import timeHelpers from '@/mixins/timeHelpers'
 // import titleServices from '@/services/titleServices'
@@ -183,7 +183,7 @@ export default {
     components: {
         'custom-avatar': customAvatar,
         'delete-dialog': deleteConfirmationDialog,
-        // 'title-history': titleHistory,
+        'title-history': titleHistory,
         'title-endorsers': titleEndorsers
     },
    data: () => {
@@ -225,10 +225,10 @@ export default {
     created() {
         console.log('in custom titles created', this.user)
     },
-    beforeRouteLeave (to, from, next) {
-        this.hideContainer();
-        next();
-    },
+    // beforeRouteLeave (to, from, next) {
+    //     this.hideContainer();
+    //     next();
+    // },
     computed: {
 
         dialogVisible: {
@@ -345,8 +345,6 @@ export default {
             })
             .then(res => {
               titleObj['userEndorsed'] = res.data;
-              console.log(titleObj['userEndorsed'], 'tahesh')
-            //   this.fetchPostTitles();
             })
         })
     },
@@ -439,20 +437,22 @@ export default {
     },
     showHistory: function(titleObj) {
 
-      this.populateTitleHistory(titleObj);
-      this.setHistoryVisiblity(true);
+        this.setEndorsersVisibility(false);
+        this.populateTitleHistory({
+            titleHistory: titleObj.history,
+            historyOwner: titleObj.author
+        });
+        this.setHistoryVisibility(true);
     },
     showEndorsers: function(titleObj) {
-        let thisRef = this;
 
+        this.setHistoryVisibility(false);
         this.setEndorsersTitleIds({
             selectedStandaloneTitleId: titleObj.lastVersion.StandaloneTitleId,
             selectedCustomTitleSetId: titleObj.lastVersion.setId
         })
-        .then(() => {
-            thisRef.setEndorsersVisibility(true);
-        })
         
+        this.setEndorsersVisibility(true);
     },
     ...mapActions('titles', [
         'setTitlesDialogVisibility',
@@ -460,7 +460,9 @@ export default {
         'modifyCustomTitleInPage',
         'setDisplayedTitle',
         'setEndorsersVisibility',
-        'setEndorsersTitleIds'
+        'setEndorsersTitleIds',
+        'setHistoryVisibility',
+        'populateTitleHistory'
     ])
 
     },
@@ -480,5 +482,10 @@ html {
 
 .custom-titles-container-card {
     overflow: auto;
+    /* max-height: min(100%, 50vh); */
+}
+
+.custom-titles-dialog-container {
+    max-height: 50vh;
 }
 </style>

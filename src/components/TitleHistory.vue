@@ -1,11 +1,11 @@
 <template>
 
 <v-slide-x-reverse-transition v-if="visible">
-  <v-card max-width="270">
-    <v-row no-gutters >
+  <v-card max-width="240" >
+    <v-row no-gutters class="full-height">
       <v-col class="drawer-opener" cols="1">
         <v-row no-gutters justify="end" align="center" class="fill-height">
-          <v-icon @click="hideHistory">arrow_right</v-icon>
+          <v-icon @click="hideHistory">{{icons.arrowRight}}</v-icon>
         </v-row>
       </v-col>
 
@@ -20,12 +20,12 @@
 
         <v-card-text>
           <v-row no-gutters justify="start" align="center">
-            <custom-avatar :user="historyOwner" :clickEnabled="true" class="mr-2">
+            <custom-avatar :user="titleHistoryState.historyOwner" :clickEnabled="true" :size="25" class="mr-2">
             </custom-avatar>
-             <span>{{sourceDisplayName(historyOwner)}}</span>
+             <span>{{sourceDisplayName(titleHistoryState.historyOwner)}}</span>
           </v-row>
 
-          <template v-for="titleObj in titleHistory">
+          <template v-for="titleObj in titleHistoryState.titleHistory">
             <v-row no-gutters :key="`row-${titleObj.id}`" align="center" class="py-1">
              <v-col cols="12">
                <p class="grey--text text--darken-3 mb-1">
@@ -56,6 +56,7 @@ import customAvatar from '@/components/CustomAvatar'
 import timeHelpers from '@/mixins/timeHelpers'
 import sourceHelpers from '@/mixins/sourceHelpers'
 import { mapState, mapActions } from 'vuex'
+import { mdiMenuRight } from '@mdi/js';
 
 export default {
   components: {
@@ -63,21 +64,23 @@ export default {
   },
   data: () => {
     return {
+      icons: {
+        arrowRight: mdiMenuRight
+      }
     }
   },
   computed: {
     visible: {
       get: function() {
-        return this.historyVisiblity;
+        console.log('inja', this.titleHistoryState)
+        return this.titleHistoryState.historyVisibility;
       },
       set: function(newValue) {
         this.setHistoryVisibility(newValue);
       }
     },
     ...mapState('titles', [
-      'titleHistory',
-      'historyVisibility',
-      'historyOwner'
+      'titleHistoryState'
     ])
   },
   methods: {
@@ -86,7 +89,7 @@ export default {
       this.setHistoryVisibility(false);
     },
     ...mapActions('titles', [
-      'setHistoryVisiblity'
+      'setHistoryVisibility'
     ])
   },
   mixins: [timeHelpers, sourceHelpers]
@@ -100,4 +103,7 @@ export default {
   max-width: 25px;
 }
 
+.full-height{
+  height: 100%;
+}
 </style>
