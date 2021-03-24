@@ -165,7 +165,6 @@ export default {
                 .then(customTitleObjects => {
                     standaloneTitlesArr[index].sortedCustomTitles = customTitleObjects.slice().sort(utils.compareTitles);
                     standaloneTitlesArr[index].sortedCustomTitles.forEach( (customTitle, customTitleIndex) => {
-                        console.log(customTitle)
                         standaloneTitlesArr[index].sortedCustomTitles[customTitleIndex].sortedEndorsers = customTitle.lastVersion.Endorsers.slice().sort(utils.compareSources);
                     })
                 }))

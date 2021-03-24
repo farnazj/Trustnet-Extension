@@ -67,12 +67,10 @@ export default {
       }
     },
     endorserUsers: function() {
-      console.log(this.titles, 'titles what')
       let endorsers = this.titles.find(title => title.id === this.titleEndorsersState.selectedStandaloneTitleId).sortedCustomTitles.find(
         customTitle => customTitle.lastVersion.setId === this.titleEndorsersState.selectedCustomTitleSetId
       ).sortedEndorsers;
 
-      console.log('endorsers', endorsers)
       return endorsers;
     },
     ...mapState('titles', [

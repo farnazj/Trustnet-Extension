@@ -1,5 +1,5 @@
 {
-  "name": "try2",
+  "name": "replace-news-previews",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@mdi/js": "^5.9.55",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "fuse.js": "^6.4.6",
     "moment": "^2.29.1",

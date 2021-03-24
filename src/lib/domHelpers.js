@@ -99,7 +99,6 @@ function findAndReplaceTitle(title, remove) {
 
     let nonScriptResultsCount = 0;
 
-    // observer.disconnect();
     store.dispatch('pageObserver/disconnectObserver');
 
     results.forEach(el => {
@@ -133,6 +132,8 @@ function findAndReplaceTitle(title, remove) {
                         headlineContainer.appendChild(document.createTextNode(headlineContainer.children[0].textContent));
                         headlineContainer.removeChild(headlineContainer.children[0]);
 
+                        console.log('inja darim mirim', headlineContainer)
+
                         acceptInputOnHeadline(headlineContainer)
 
                         /*
@@ -158,7 +159,6 @@ function findAndReplaceTitle(title, remove) {
 
         }
     })
-    // globalHelper.observer.observe(Helper.getObserverConfigs[0], Helper.getObserverConfigs[1]);
     store.dispatch('pageObserver/reconnectObserver');
 
     return nonScriptResultsCount;
@@ -218,11 +218,11 @@ function identifyPotentialTitles() {
         elResults = document.querySelectorAll('h1');
     }
 
-    elResults.forEach(heading => {            
-        acceptInputOnHeadline(heading)
+    elResults.forEach(heading => {
+        if (!heading.classList.contains('headline-modified'))       
+            acceptInputOnHeadline(heading)
     })
 
-    // observer.observe(targetNode, config);
     store.dispatch('pageObserver/reconnectObserver');
 }
 
