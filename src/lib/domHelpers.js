@@ -53,12 +53,40 @@ function addAltTitleNodeToHeadline(altTitle) {
 }
 
 
-function acceptInputOnHeadline (headlineContainer) {
-    if (headlineContainer.getAttribute('data-headline-id') === null) {
+function createEditButton () {
+    const editButton = document.createElement('button');
+    editButton.classList.add('rounded-edit-button');
+    
+    editButton.innerHTML = `
+    <svg style="width:24px;height:24px;margin:0 auto" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
+    </svg>
+    `
+    editButton.addEventListener('click', openCustomTitlesDialog)
+    editButton.classList.add('headline-clickable');
+    return editButton;
+}
 
-        headlineContainer.setAttribute('data-headline-id', Math.random().toString(36).substring(2, 15));
-        headlineContainer.addEventListener('click', openCustomTitlesDialog)
-        headlineContainer.classList.add('headline-clickable');
+function acceptInputOnHeadline (headlineTag) {
+
+    if (headlineTag.getAttribute('data-headline-id') === null) {
+
+        headlineTag.setAttribute('data-headline-id', Math.random().toString(36).substring(2, 15));
+
+        let color = window.getComputedStyle(headlineTag).color;
+
+        let editButton = createEditButton();
+
+        if (generalUtils.isTextLight(color)) {
+            headlineTag.classList.add('title-background-dark');
+            editButton.classList.add('title-background-dark')
+        }   
+        else {
+            headlineTag.classList.add('title-background-light');
+            editButton.classList.add('title-background-light');
+        }
+
+        headlineTag.appendChild(editButton)
     }
 }
 
@@ -118,7 +146,6 @@ function findAndReplaceTitle(title, remove) {
                 newSecondChild.classList.add('headline-modified');
                 newSecondChild.appendChild(document.createTextNode(originalTitle));
 
-
                 el.appendChild(newFirstChild);
                 el.appendChild(newSecondChild);
             }
@@ -132,21 +159,7 @@ function findAndReplaceTitle(title, remove) {
                         headlineContainer.appendChild(document.createTextNode(headlineContainer.children[0].textContent));
                         headlineContainer.removeChild(headlineContainer.children[0]);
 
-                        console.log('inja darim mirim', headlineContainer)
-
                         acceptInputOnHeadline(headlineContainer)
-
-                        /*
-                        manually redirecting to the headline view with the correct params (the dialog that is open now corresponds to a view that has titleId as a param. And that titleId along with its corresponding standaloneTitle has been deleted from the store and no longer exists)
-                        */
-                        // browser.runtime.sendMessage({
-                        //     type: 'direct_to_custom_titles',
-                        //     data: {
-                        //         titleText: headlineContainer.textContent,
-                        //         titleElementId: headlineContainer.getAttribute('data-headline-id'),
-                        //         titleId: null
-                        //     }
-                        // })
 
                     }
                     else {
@@ -172,12 +185,12 @@ function htmlDecode(input) {
 
 
 function openCustomTitlesDialog(ev) {
-    ev.preventDefault();
-    
+    let titleEl =  ev.target.closest('h1');
+
     store.dispatch('titles/setTitlesDialogVisibility', true);
     store.dispatch('titles/setDisplayedTitle', { 
-        titleText: ev.target.innerText,
-        titleElementId: ev.target.getAttribute('data-headline-id') 
+        titleText: titleEl.innerText,
+        titleElementId: titleEl.getAttribute('data-headline-id') 
     });
 
     insertedAppRouter.push({
@@ -186,7 +199,6 @@ function openCustomTitlesDialog(ev) {
 }
 
 function removeEventListenerFromTitle(headlineId) {
-    console.log(headlineId, 'headline id')
     let heading = document.querySelector(`[data-headline-id="${headlineId}"]`);
     heading.removeEventListener('click', openCustomTitlesDialog);
     heading.classList.remove('headline-clickable');
@@ -220,7 +232,7 @@ function identifyPotentialTitles() {
 
     elResults.forEach(heading => {
         if (!heading.classList.contains('headline-modified'))       
-            acceptInputOnHeadline(heading)
+            acceptInputOnHeadline(heading);
     })
 
     store.dispatch('pageObserver/reconnectObserver');

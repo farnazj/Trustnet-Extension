@@ -30,7 +30,7 @@
               </v-row>
 
               <v-row no-gutters>
-                <a href="http://trustnet.csail.mit.edu/forgot-password" target="_blank">Forgot your password?</a>
+                <a href="https://trustnet.csail.mit.edu/forgot-password" target="_blank">Forgot your password?</a>
               </v-row>
 
             </v-container>
@@ -50,7 +50,7 @@
 
             <v-row justify="center" no-gutters>
               <v-card-actions>
-                <v-btn tabindex="4" depressed href="http://trustnet.csail.mit.edu/signup" target="_blank">Go to signup</v-btn>
+                <v-btn tabindex="4" depressed href="https://trustnet.csail.mit.edu/signup" target="_blank">Go to signup</v-btn>
               </v-card-actions>
             </v-row>
 

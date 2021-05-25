@@ -5,7 +5,7 @@
     <v-row no-gutters class="full-height">
       <v-col class="drawer-opener interactable" cols="1" @click="hideHistory">
         <v-row no-gutters justify="end" align="center" class="fill-height">
-          <v-icon >{{icons.arrowRight}}</v-icon>
+          <v-icon @click="hideHistory">{{icons.arrowRight}}</v-icon>
         </v-row>
       </v-col>
 

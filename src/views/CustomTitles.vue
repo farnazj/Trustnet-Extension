@@ -13,7 +13,7 @@
     </delete-dialog>
 
 
-    <v-row no-gutters class="custom-titles-dialog-container">
+    <v-row no-gutters>
         <v-col>
 
             <v-slide-x-reverse-transition>
@@ -483,9 +483,5 @@ html {
 .custom-titles-container-card {
     overflow: auto;
     /* max-height: min(100%, 50vh); */
-}
-
-.custom-titles-dialog-container {
-    -max-height: 50vh;
 }
 </style>

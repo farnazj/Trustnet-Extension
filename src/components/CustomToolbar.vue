@@ -49,7 +49,7 @@
 
 <script>
 import customAvatar from '@/components/CustomAvatar'
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -70,7 +70,6 @@ export default {
   created() {
   },
   computed: {
-
     ...mapGetters('auth', [
      'user',
      'isLoggedIn'
@@ -93,7 +92,6 @@ export default {
    goToPage: function(page) {
    
       this.$router.push({ name: page.toLowerCase() });
-   
    }
  }
 }

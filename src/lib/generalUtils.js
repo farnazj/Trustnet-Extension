@@ -38,8 +38,25 @@ function throttle (callback, limit) {
     }
 }
 
+function isTextLight(rgbText) {
+
+    let rgbArr = rgbText.replace('rgb(', '').replace(')', '').split(',').map(el => el.trim());
+    let r = parseInt(rgbArr[0]);  // extract red
+    let g = parseInt(rgbArr[1]);  // extract green
+    let b = parseInt(rgbArr[2]);  // extract blue
+
+    let luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
+    console.log('luma is', luma)
+
+    if (luma > 128) {
+        return true;
+    }
+    return false;
+}
+
   export default {
       uncurlify,
       debounce,
-      throttle
+      throttle,
+      isTextLight
   }

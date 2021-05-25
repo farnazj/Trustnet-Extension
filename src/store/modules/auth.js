@@ -11,39 +11,38 @@ export default {
     },
     authStatus: (state) => {
         return state.status;
-      },
+     },
     user: (state) => {
-        console.log('inja tuye user', state.token )
 
-        if (Object.entries(state.token).length)
-            return state.token;
-        else {
-            return JSON.parse(localStorage.getItem('token'));
-        }
+      if (Object.entries(state.token).length)
+          return state.token;
+      else {
+          return JSON.parse(localStorage.getItem('token'));
+      }
     }
   },
   mutations: {
     auth_request(state){
-        state.status = 'loading'
+      state.status = 'loading'
     },
 
     auth_success(state) {
-        state.status = 'success';
+      state.status = 'success';
     },
 
     auth_error(state) {
-        state.status = 'error';
+      state.status = 'error';
     },
 
     logout(state) {
-        state.status = '';
-        state.token = '';
-        localStorage.removeItem('token');
+      state.status = '';
+      state.token = '';
+      localStorage.removeItem('token');
     },
 
     update_user(state, user) {
-        localStorage.setItem('token', JSON.stringify(user));
-        state.token = Object.assign({}, user);
+      localStorage.setItem('token', JSON.stringify(user));
+      state.token = Object.assign({}, user);
     }
   },
   actions: {
@@ -68,30 +67,28 @@ export default {
     },
     
     login: (context, user) => {
-        return new Promise((resolve, reject) => {
-            context.commit('auth_request')
-            browser.runtime.sendMessage({
-                type: 'login',
-                data: {
-                    reqBody: user
-                }
-            })
-            .then(resp => {
-                const user = resp.data.user;
-                context.commit('auth_success');
-                context.dispatch('getUser')
-                
-                resolve(resp);
-                
-      
-            })
-            .catch(err => {
-                context.commit('auth_error');
-                reject(err);
-            })
-
-
-        })
+      return new Promise((resolve, reject) => {
+          context.commit('auth_request')
+          browser.runtime.sendMessage({
+              type: 'login',
+              data: {
+                  reqBody: user
+              }
+          })
+          .then(resp => {
+              const user = resp.data.user;
+              context.commit('auth_success');
+              context.dispatch('getUser')
+              
+              resolve(resp);
+              
+    
+          })
+          .catch(err => {
+              context.commit('auth_error');
+              reject(err);
+          })
+      })
     },
 
     logout: ({commit}) => {
