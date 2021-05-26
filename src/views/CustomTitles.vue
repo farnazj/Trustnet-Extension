@@ -18,7 +18,7 @@
 
             <v-slide-x-reverse-transition>
 
-                <v-card  class="pa-1 custom-titles-container-card" max-width="100%" max-height="50vh">
+                <v-card  class="pa-1 custom-titles-container-card" max-width="100%" max-height="50vh" height="100%">
                     <v-row no-gutters align="center">
                         <v-col cols="11">
                         <v-row no-gutters justify="start">

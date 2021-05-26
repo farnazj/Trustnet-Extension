@@ -1,4 +1,4 @@
-.v-application--wrap {
+[data-vuetify] .v-application--wrap {
     min-height: initial !important;
 }
 
@@ -44,7 +44,7 @@
     font-size: 70%;
 }
 
-.v-badge__badge {
+[data-vuetify] .v-badge__badge {
     inset: calc(100% - 10px) auto auto calc(100% - 10px) !important;
 }
 

@@ -27,9 +27,12 @@ browser.runtime.sendMessage({
 
     console.log(JSON.stringify(localStorage.getItem('token')), 'is it set')
 
+    const container = document.createElement('div');
+    container.setAttribute('data-vuetify', '')
     const app = document.createElement('div');
     app.setAttribute('id', 'vueApp');
-    document.body.prepend(app);
+    container.appendChild(app);
+    document.body.prepend(container);
 
     /* eslint-disable no-new */
     new Vue({

@@ -112,7 +112,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .login-style {
     position: fixed;
     width: 400px;
