@@ -6,19 +6,21 @@ import consts from '@/lib/constants'
 
 function getElementsContainingText(text) {
 
+    console.log('text is ',text)
+
     let xpath, query;
     let uncurlifiedText = generalUtils.uncurlify(text);
 
     let results = [];
 
     try {
-        xpath = `//*[contains(text(), "${text}") or contains(text(), "${uncurlifiedText}")]`;
+        xpath = `//*[(ancestor-or-self::h1 or ancestor-or-self::h2 or ancestor-or-self::h3 or ancestor-or-self::h4 or ancestor-or-self::h5 or ancestor-or-self::h6 or ancestor-or-self::a) and (contains(text(), "${text}") or contains(text(), "${uncurlifiedText}"))]`;
         query = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);    
     }
     catch (error) {
-        console.log('error khord', error)
+        console.log('error in xpath because the matching text has double quotes in it', error)
         if (error.name == 'DOMException') {
-            xpath = `//*[contains(text(), '${text}') or contains(text(), '${uncurlifiedText}')]`;
+            xpath = `//*[(ancestor-or-self::h1 or ancestor-or-self::h2 or ancestor-or-self::h3 or ancestor-or-self::h4 or ancestor-or-self::h5 or ancestor-or-self::h6 or ancestor-or-self::a) and (contains(text(), '${text}') or contains(text(), '${uncurlifiedText}'))]`;
             query = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);  
         }
     }
@@ -185,6 +187,7 @@ function htmlDecode(input) {
 
 
 function openCustomTitlesDialog(ev) {
+    ev.preventDefault();
     let titleEl =  ev.target.closest('h1');
 
     store.dispatch('titles/setTitlesDialogVisibility', true);

@@ -52,9 +52,9 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log('az koja be koja', to, from, store.getters['auth/isLoggedIn'], JSON.stringify(localStorage.getItem('token')))
+  console.log('router from where to where', to, from, store.getters['auth/isLoggedIn'], JSON.stringify(localStorage.getItem('trustnetAuthToken')))
   if(to.matched.some(record => record.meta.requiresAuth)) {
-    if (localStorage.getItem('token')) {
+    if (localStorage.getItem('trustnetAuthToken')) {
       next();
       window.scrollTo(0, 0);
       return;

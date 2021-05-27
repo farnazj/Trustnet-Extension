@@ -3,7 +3,7 @@ export default {
   namespaced: true,
   state: {
     status: '',
-    token: JSON.parse(localStorage.getItem('token')) || ''
+    token: JSON.parse(localStorage.getItem('trustnetAuthToken')) || ''
   },
   getters: {
     isLoggedIn: (state) => {
@@ -17,7 +17,7 @@ export default {
       if (Object.entries(state.token).length)
           return state.token;
       else {
-          return JSON.parse(localStorage.getItem('token'));
+          return JSON.parse(localStorage.getItem('trustnetAuthToken'));
       }
     }
   },
@@ -37,11 +37,11 @@ export default {
     logout(state) {
       state.status = '';
       state.token = '';
-      localStorage.removeItem('token');
+      localStorage.removeItem('trustnetAuthToken');
     },
 
     update_user(state, user) {
-      localStorage.setItem('token', JSON.stringify(user));
+      localStorage.setItem('trustnetAuthToken', JSON.stringify(user));
       state.token = Object.assign({}, user);
     }
   },
@@ -54,7 +54,7 @@ export default {
             type: 'get_user'
         })
         .then(authUser => {
-            console.log('gereftim', authUser, 'auth user ine')
+            console.log('got auth user', authUser);
             if (authUser) {
                 context.commit('update_user', authUser);
             }

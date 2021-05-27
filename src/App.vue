@@ -19,6 +19,7 @@ export default {
   created() {
     this.getUser()
     .then(authUser => {
+
       if (!authUser) {
         this.logout();
         this.$router.push({ name: 'Login' });

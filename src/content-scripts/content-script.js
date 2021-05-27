@@ -23,9 +23,7 @@ browser.runtime.sendMessage({
 
     console.log(authUser, 'here is authUser')
     if (authUser)
-        localStorage.setItem('token', JSON.stringify(authUser));
-
-    console.log(JSON.stringify(localStorage.getItem('token')), 'is it set')
+        localStorage.setItem('trustnetAuthToken', JSON.stringify(authUser));
 
     const container = document.createElement('div');
     container.setAttribute('data-vuetify', '')

@@ -99,7 +99,7 @@ export default {
             let allHashes = [];
             let contentArr = content.split(/\r\n|\r|\n|\t/);
             contentArr.forEach( (str) => {
-                if (str.length >= consts.LENGTH_TO_HASH) {
+                if (str.length >= consts.LENGTH_TO_HASH && str.length <= consts.MAX_TITLE_LENGTH) {
                     for (let i = 0 ; i < str.length ; i++) {
                         let strPortion = str.substr(i, consts.LENGTH_TO_HASH);
             
@@ -110,7 +110,7 @@ export default {
                 }
             })
     
-            console.log(allHashes)
+            // console.log(allHashes)
             resolve(allHashes);
         })
     },
