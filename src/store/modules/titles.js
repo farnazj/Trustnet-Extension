@@ -97,9 +97,12 @@ export default {
         
             let content = payload.content;
             let allHashes = [];
-            let contentArr = content.split(/\r\n|\r|\n|\t/);
+            let contentArr = content.split(/\r\n|\r|\n|\t/).filter( x=>
+                x.length <= consts.MAX_TITLE_LENGTH
+            ).map(x => x.toLowerCase());
+            console.log(contentArr)
             contentArr.forEach( (str) => {
-                if (str.length >= consts.LENGTH_TO_HASH && str.length <= consts.MAX_TITLE_LENGTH) {
+                if (str.length >= consts.LENGTH_TO_HASH) {
                     for (let i = 0 ; i < str.length ; i++) {
                         let strPortion = str.substr(i, consts.LENGTH_TO_HASH);
             
@@ -303,6 +306,8 @@ export default {
             if (payload.titleElementId) {
                 domHelpers.removeEventListenerFromTitle(payload.titleElementId);
             }
+
+            console.log('inside add new title', payload)
             
             context.dispatch('getTitleMatches', { titlehashes: [payload.hash] })
             .then(candidateTitles => {

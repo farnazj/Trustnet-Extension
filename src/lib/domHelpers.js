@@ -6,21 +6,35 @@ import consts from '@/lib/constants'
 
 function getElementsContainingText(text) {
 
-    console.log('text is ',text)
+    console.log('text to look for is ',text)
 
     let xpath, query;
-    let uncurlifiedText = generalUtils.uncurlify(text);
+    let uncurlifiedText = generalUtils.uncurlify(text).toLowerCase();
 
     let results = [];
 
     try {
-        xpath = `//*[(ancestor-or-self::h1 or ancestor-or-self::h2 or ancestor-or-self::h3 or ancestor-or-self::h4 or ancestor-or-self::h5 or ancestor-or-self::h6 or ancestor-or-self::a) and (contains(text(), "${text}") or contains(text(), "${uncurlifiedText}"))]`;
+        xpath = `//*[(ancestor-or-self::h1 or ancestor-or-self::h2 or ancestor-or-self::h3 or 
+        ancestor-or-self::h4 or ancestor-or-self::h5 or ancestor-or-self::h6 or ancestor-or-self::a)
+         and ( contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+         "abcdefghijklmnopqrstuvwxyz"), 
+         "${text}") or contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+         "abcdefghijklmnopqrstuvwxyz"), 
+         "${uncurlifiedText}")
+         )]`;
         query = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);    
     }
     catch (error) {
         console.log('error in xpath because the matching text has double quotes in it', error)
         if (error.name == 'DOMException') {
-            xpath = `//*[(ancestor-or-self::h1 or ancestor-or-self::h2 or ancestor-or-self::h3 or ancestor-or-self::h4 or ancestor-or-self::h5 or ancestor-or-self::h6 or ancestor-or-self::a) and (contains(text(), '${text}') or contains(text(), '${uncurlifiedText}'))]`;
+            xpath = `//*[(ancestor-or-self::h1 or ancestor-or-self::h2 or ancestor-or-self::h3 or 
+            ancestor-or-self::h4 or ancestor-or-self::h5 or ancestor-or-self::h6 or ancestor-or-self::a)
+            and ( contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            "abcdefghijklmnopqrstuvwxyz"), 
+            "${text}") or contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            "abcdefghijklmnopqrstuvwxyz"), 
+            "${uncurlifiedText}")
+            )]`;
             query = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);  
         }
     }
@@ -92,9 +106,25 @@ function acceptInputOnHeadline (headlineTag) {
     }
 }
 
-function getFuzzyTextSimilarToHeading(serverReturnedTitleText) {
+function getFuzzyTextSimilarToHeading(serverReturnedTitleText, searchSnippet) {
 
-    let pageContent = document.body.innerText.split('\n');
+    console.log('inside fuzzy search', serverReturnedTitleText, searchSnippet)
+
+    /*
+    By default this function searches the whole content of the document. To not look for the text
+    in long paragraphs, we limit the search to only those leaf nodes with fewer than consts.MAX_TITLE_LENGTH
+    characters. innerText is style aware and the advantage of using it is (e.g., compared to textContent)
+    is that it does not return the content of the hidden elements. However, the text returned by it is
+    affected by CSS styling (e.g., upper/lower case). Therefore, here, we convert the search term as well asarray containing
+    leaf nodes' contents to lowercase and
+    */
+    let pageContent;
+    if (!searchSnippet)
+        pageContent = document.body.innerText.split('\n').filter(x => x.length <= consts.MAX_TITLE_LENGTH).map(el =>
+            el.toLowerCase());
+    else
+        pageContent = [searchSnippet.toLowerCase()];
+
     const options = {
         includeScore: true,
         distance: 150
@@ -104,7 +134,8 @@ function getFuzzyTextSimilarToHeading(serverReturnedTitleText) {
     let uncurlifiedText = generalUtils.uncurlify(serverReturnedTitleText);
 
     let texts = uncurlifiedText != serverReturnedTitleText ? [uncurlifiedText, serverReturnedTitleText] : [serverReturnedTitleText];
-    
+    texts = texts.map(el => el.toLowerCase());
+
     let finalResults = [], tempResults = [];
     for (let text of texts) {
         tempResults = fuse.search(text);
@@ -113,11 +144,12 @@ function getFuzzyTextSimilarToHeading(serverReturnedTitleText) {
     }
     
     console.log('fuzzy search all results were', tempResults, consts.FUZZY_SCORE_THRESHOLD, finalResults[0])
-    return finalResults[0].score <= consts.FUZZY_SCORE_THRESHOLD ? finalResults[0].item : null;
+    return (finalResults[0] && finalResults[0].score <= consts.FUZZY_SCORE_THRESHOLD) ? finalResults[0].item : null;
 }
 
 function findAndReplaceTitle(title, remove) {
     let results = getElementsContainingText(title.text);
+    console.log('inja avalesh', results)
     results = results.filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
 
     console.log('results of els', results)
@@ -152,7 +184,10 @@ function findAndReplaceTitle(title, remove) {
                 el.appendChild(newSecondChild);
             }
             else {
-                //if headline has already been modified, the displayed alt headline either needs to change to another (in case of headline editing or removing), or the alt headline should be removed altogether and the style of the original headline should be restored back to its original state (in case there is no alt headline left for the headline)
+                /*if headline has already been modified, the displayed alt headline either needs to change to another (in case of headline editing or removing),
+                 or the alt headline should be removed altogether and the style of the original headline should be restored back to its original state 
+                 (in case there is no alt headline left for the headline)
+                 */
                 let headlineContainer = el.parentNode;
 
                 if (headlineContainer.children.length == 2) {
@@ -192,7 +227,7 @@ function openCustomTitlesDialog(ev) {
 
     store.dispatch('titles/setTitlesDialogVisibility', true);
     store.dispatch('titles/setDisplayedTitle', { 
-        titleText: titleEl.innerText,
+        titleText: titleEl.textContent.trim(),
         titleElementId: titleEl.getAttribute('data-headline-id') 
     });
 
@@ -211,8 +246,16 @@ function identifyPotentialTitles() {
     let elResults = [];
     try {
         let ogTitle = htmlDecode(document.querySelector('meta[property="og:title"]').getAttribute('content'));
+        console.log('og title is*******', ogTitle)
         elResults = getElementsContainingText(ogTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
-        console.log(elResults)
+        
+        //if the exact ogTitle text was not found, look for text that is similar enough
+        if (!elResults.length) {
+            let similarText = getFuzzyTextSimilarToHeading(ogTitle);
+            elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+        }
+
+        console.log('results of looking for og titles', elResults);
     }
     catch(err) {
         console.log('in og:title, error is', err)
@@ -222,18 +265,44 @@ function identifyPotentialTitles() {
         if (!elResults.length) {
             let twitterTitle = htmlDecode(document.querySelector('meta[name="twitter:title"]').getAttribute('content'));
             elResults = getElementsContainingText(twitterTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
-            console.log(elResults)
+            
+            //if the exact twitter title text was not found, look for text that is similar enough
+            if (!elResults.length) {
+                let similarText = getFuzzyTextSimilarToHeading(twitterTitle);
+                elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+            }
+
+            console.log('results of looking for twitter titles', elResults);
         }
+
     }
     catch(err) {
         console.log('in twitter:title, error is', err)
     }
 
+    /*
+    if og and twitter titles were not found on the page, look for h headings that have texts similar to the document's title
+    */
     if (!elResults.length) {
-        elResults = document.querySelectorAll('h1');
+        let hLevelHeadings = document.querySelectorAll('h1');
+        let docTitle = document.querySelector('title').textContent;
+        console.log('doc title', docTitle, 'h level headings', hLevelHeadings)
+
+        elResults = [...hLevelHeadings].filter(heading => {
+            getFuzzyTextSimilarToHeading(docTitle, heading.textContent) != undefined
+        });
+
+        console.log('headings from document title', elResults, 'what')
     }
 
+    /*
+    If the open graph title and the twitter title (or similar texts to them) weren't found on the page,
+    see if the html's title matches any of the heading elements
+    */
+
+
     elResults.forEach(heading => {
+        console.log(heading.classList)
         if (!heading.classList.contains('headline-modified'))       
             acceptInputOnHeadline(heading);
     })

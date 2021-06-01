@@ -279,6 +279,8 @@ export default {
             if (this.$refs.newTitleForm.validate()) {
                 this.postBtnDisabled = true;
 
+                console.log(this.displayedTitle.titleText)
+
                 let pageIndentifiedTitle = this.displayedTitle.titleId && this.associatedStandaloneTitle ? 
                     this.associatedStandaloneTitle.text : this.displayedTitle.titleText;
 
