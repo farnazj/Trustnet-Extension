@@ -116,7 +116,7 @@ function getFuzzyTextSimilarToHeading(serverReturnedTitleText, searchSnippet) {
     characters. innerText is style aware and the advantage of using it is (e.g., compared to textContent)
     is that it does not return the content of the hidden elements. However, the text returned by it is
     affected by CSS styling (e.g., upper/lower case). Therefore, here, we convert the search term as well asarray containing
-    leaf nodes' contents to lowercase and
+    leaf nodes' contents to lowercase
     */
     let pageContent;
     if (!searchSnippet)
@@ -247,15 +247,19 @@ function identifyPotentialTitles() {
     try {
         let ogTitle = htmlDecode(document.querySelector('meta[property="og:title"]').getAttribute('content'));
         console.log('og title is*******', ogTitle)
-        elResults = getElementsContainingText(ogTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
-        
-        //if the exact ogTitle text was not found, look for text that is similar enough
-        if (!elResults.length) {
-            let similarText = getFuzzyTextSimilarToHeading(ogTitle);
-            elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
-        }
 
-        console.log('results of looking for og titles', elResults);
+        if (ogTitle.length >= consts.MIN_TITLE_LENGTH) {
+            elResults = getElementsContainingText(ogTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+        
+            //if the exact ogTitle text was not found, look for text that is similar enough
+            if (!elResults.length) {
+                let similarText = getFuzzyTextSimilarToHeading(ogTitle);
+                elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+            }
+    
+            console.log('results of looking for og titles', elResults);
+        }
+       
     }
     catch(err) {
         console.log('in og:title, error is', err)
@@ -264,15 +268,19 @@ function identifyPotentialTitles() {
     try {
         if (!elResults.length) {
             let twitterTitle = htmlDecode(document.querySelector('meta[name="twitter:title"]').getAttribute('content'));
-            elResults = getElementsContainingText(twitterTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
-            
-            //if the exact twitter title text was not found, look for text that is similar enough
-            if (!elResults.length) {
-                let similarText = getFuzzyTextSimilarToHeading(twitterTitle);
-                elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
-            }
 
-            console.log('results of looking for twitter titles', elResults);
+            if (twitterTitle.length >= consts.MIN_TITLE_LENGTH) {
+                elResults = getElementsContainingText(twitterTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+            
+                //if the exact twitter title text was not found, look for text that is similar enough
+                if (!elResults.length) {
+                    let similarText = getFuzzyTextSimilarToHeading(twitterTitle);
+                    elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+                }
+    
+                console.log('results of looking for twitter titles', elResults);
+            }
+        
         }
 
     }
@@ -284,15 +292,19 @@ function identifyPotentialTitles() {
     if og and twitter titles were not found on the page, look for h headings that have texts similar to the document's title
     */
     if (!elResults.length) {
-        let hLevelHeadings = document.querySelectorAll('h1');
+
         let docTitle = document.querySelector('title').textContent;
-        console.log('doc title', docTitle, 'h level headings', hLevelHeadings)
-
-        elResults = [...hLevelHeadings].filter(heading => {
-            getFuzzyTextSimilarToHeading(docTitle, heading.textContent) != undefined
-        });
-
-        console.log('headings from document title', elResults, 'what')
+        if (docTitle.length >= consts.MIN_TITLE_LENGTH) {
+            let hLevelHeadings = document.querySelectorAll('h1');
+            console.log('doc title', docTitle, 'h level headings', hLevelHeadings)
+    
+            elResults = [...hLevelHeadings].filter(heading => {
+                getFuzzyTextSimilarToHeading(docTitle, heading.textContent) != undefined
+            });
+    
+            console.log('headings from document title', elResults)
+        }
+      
     }
 
     elResults.forEach(heading => {
