@@ -1,13 +1,13 @@
 const prefixer = require('postcss-prefix-selector');
 
 module.exports = {
-  // pages: {
-  //   popup: {
-  //     template: 'public/browser-extension.html',
-  //     entry: './src/popup/main.js',
-  //     title: 'Popup'
-  //   }
-  // },
+  pages: {
+    options: {
+      template: 'public/browser-extension.html',
+      entry: './src/options/main.js',
+      title: 'Options'
+    }
+  },
 
   pluginOptions: {
     browserExtension: {
@@ -25,7 +25,7 @@ module.exports = {
       }
     }
   },
-
+  //for prefixing Vuetify classes so they don't pollute the global namespace
   chainWebpack: (config) => {
     const sassRule = config.module.rule('sass');
     const sassNormalRule = sassRule.oneOfs.get('normal');

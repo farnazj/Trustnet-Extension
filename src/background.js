@@ -14,8 +14,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
       authServices.login(request.data.reqBody)
       .then(res => {
-        console.log('in background', res)
-        localStorage.setItem('token', JSON.stringify(res.data.user));
+        localStorage.setItem('trustnetAuthToken', JSON.stringify(res.data.user));
         resolve(res)
       })
       .catch(err => {
@@ -29,7 +28,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
       authServices.logout()
         .then(res => {
-          localStorage.removeItem('token');
+          localStorage.removeItem('trustnetAuthToken');
           resolve(res)
         })
         .catch(err => {
@@ -39,7 +38,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
   else if (request.type == 'get_user') {
     return new Promise((resolve, reject) => {
-      resolve(JSON.parse(localStorage.getItem('token')));
+      resolve(JSON.parse(localStorage.getItem('trustnetAuthToken')));
     })
   }
   else if (request.type == 'get_follows') {
@@ -60,7 +59,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
   else if (request.type == 'get_followers') {
     return new Promise((resolve, reject) => {
-      let authUsername = JSON.parse(localStorage.getItem('token')).userName;
+      let authUsername = JSON.parse(localStorage.getItem('trustnetAuthToken')).userName;
       console.log(authUsername, 'auth user name is ')
       relationServices.getFollowers({username: authUsername})
       .then(response => {
@@ -154,7 +153,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
   else if (request.type == 'get_custom_titles_of_standalone_title') {
     return new Promise((resolve, reject) => {
-        let activityUserName = JSON.parse(localStorage.getItem('token')).userName;
+        let activityUserName = JSON.parse(localStorage.getItem('trustnetAuthToken')).userName;
         let customTitleReqHeaders = {
           activityusername: activityUserName
         };

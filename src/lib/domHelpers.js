@@ -254,7 +254,8 @@ function identifyPotentialTitles() {
             //if the exact ogTitle text was not found, look for text that is similar enough
             if (!elResults.length) {
                 let similarText = getFuzzyTextSimilarToHeading(ogTitle);
-                elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+                if (similarText.length >= consts.MIN_TITLE_LENGTH)
+                    elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
             }
     
             console.log('results of looking for og titles', elResults);
@@ -275,7 +276,8 @@ function identifyPotentialTitles() {
                 //if the exact twitter title text was not found, look for text that is similar enough
                 if (!elResults.length) {
                     let similarText = getFuzzyTextSimilarToHeading(twitterTitle);
-                    elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
+                    if (similarText.length >= consts.MIN_TITLE_LENGTH)
+                        elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
                 }
     
                 console.log('results of looking for twitter titles', elResults);
@@ -300,7 +302,7 @@ function identifyPotentialTitles() {
     
             elResults = [...hLevelHeadings].filter(heading => {
                 getFuzzyTextSimilarToHeading(docTitle, heading.textContent) != undefined
-            });
+            }).filter(x => x.textContent.length >= consts.MIN_TITLE_LENGTH);
     
             console.log('headings from document title', elResults)
         }

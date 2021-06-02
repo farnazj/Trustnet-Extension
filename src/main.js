@@ -12,3 +12,5 @@ new Vue({
   vuetify,
   render: h => h(insertedApp)
 }).$mount('#app')
+
+router.replace('/');

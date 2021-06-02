@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '@/views/Home.vue'
-import CustomTitles from '@/views/CustomTitles.vue'
-import Login from '@/views/Login.vue'
+import Home from '../views/Home.vue'
+import Login from '../views/Login.vue'
 import store from '@/store'
 
 Vue.use(VueRouter)
@@ -20,15 +19,6 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
-  },
-  {
-    path: '/custom-titles/:titleId',
-    name: 'customTitles',
-    props: true,
-    component: CustomTitles,
-    meta: {
-      requiresAuth: true
-    }
   },
   {
     path: '/about',
@@ -53,7 +43,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log('router from where to where', to, from, store.getters['auth/isLoggedIn'], JSON.stringify(localStorage.getItem('trustnetAuthToken')))
+  console.log('router from where to where', to, from, JSON.stringify(localStorage.getItem('trustnetAuthToken')))
   if(to.matched.some(record => record.meta.requiresAuth)) {
     if (localStorage.getItem('trustnetAuthToken')) {
       next();

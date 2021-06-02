@@ -5,6 +5,7 @@ import auth from './modules/auth'
 import relatedSources from './modules/relatedSources'
 import pageDetails from './modules/pageDetails'
 import pageObserver from './modules/pageObserver'
+import preferences from './modules/preferences'
 
 Vue.use(Vuex)
 
@@ -20,6 +21,7 @@ export default new Vuex.Store({
     auth,
     relatedSources,
     pageDetails,
-    pageObserver
+    pageObserver,
+    preferences
   }
 })
