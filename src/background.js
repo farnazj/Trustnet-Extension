@@ -14,9 +14,13 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
       authServices.login(request.data.reqBody)
       .then(res => {
-        console.log('tu background', res)
+        console.log('in background', res)
         localStorage.setItem('token', JSON.stringify(res.data.user));
         resolve(res)
+      })
+      .catch(err => {
+        console.log(err.response.data.message)
+        reject({ message: err.response.data.message });
       })
     })
   }
@@ -27,6 +31,9 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         .then(res => {
           localStorage.removeItem('token');
           resolve(res)
+        })
+        .catch(err => {
+          reject({message: err});
         })
     })
   }
@@ -121,7 +128,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
   else if (request.type == 'post_new_title') {
     return new Promise((resolve, reject) => {
-    console.log('got called')
   
       titleServices.postCustomTitle(request.data.reqBody)
       .then(res => {
@@ -129,7 +135,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         resolve(res);
       })
       .catch(err => {
-        reject(err);
+        reject({ message: err });
       })
         
     })
@@ -150,7 +156,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
         let activityUserName = JSON.parse(localStorage.getItem('token')).userName;
         let customTitleReqHeaders = {
-        activityusername: activityUserName
+          activityusername: activityUserName
         };
     
         titleServices.getCustomTitlesOfstandaloneTitle(request.data.reqBody,
@@ -159,7 +165,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           resolve(res);
         })
         .catch(err => {
-          reject(err);
+          reject({ message: err });
         })
     })
   }
@@ -172,20 +178,19 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         resolve(res);
       })
       .catch(err => {
-        reject(err);
+        reject({ message: err });
       })
     })
   
   }
   else if (request.type == 'set_endorsement_status') {
     return new Promise((resolve, reject) => {
-      console.log('mire ke endorse kone', request.data.params, request.data.reqBody)
       titleServices.setEndorsementStatus(request.data.params, request.data.reqBody)
       .then(res => {
         resolve(res);
       })
       .catch(err => {
-        reject(err);
+        reject({ message: err });
       })
     })
   }
@@ -197,7 +202,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         resolve(res)
       })
       .catch(err => {
-        reject(err);
+        reject({ message: err });
       })
     })
   }

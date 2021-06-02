@@ -100,7 +100,6 @@ export default {
             let contentArr = content.split(/\r\n|\r|\n|\t/).filter( x=>
                 x.length <= consts.MAX_TITLE_LENGTH
             ).map(x => x.toLowerCase());
-            console.log(contentArr)
             contentArr.forEach( (str) => {
                 if (str.length >= consts.LENGTH_TO_HASH) {
                     for (let i = 0 ; i < str.length ; i++) {

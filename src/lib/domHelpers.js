@@ -31,9 +31,9 @@ function getElementsContainingText(text) {
             ancestor-or-self::h4 or ancestor-or-self::h5 or ancestor-or-self::h6 or ancestor-or-self::a)
             and ( contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
             "abcdefghijklmnopqrstuvwxyz"), 
-            "${text}") or contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            '${text}') or contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
             "abcdefghijklmnopqrstuvwxyz"), 
-            "${uncurlifiedText}")
+            '${uncurlifiedText}')
             )]`;
             query = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);  
         }
@@ -295,14 +295,7 @@ function identifyPotentialTitles() {
         console.log('headings from document title', elResults, 'what')
     }
 
-    /*
-    If the open graph title and the twitter title (or similar texts to them) weren't found on the page,
-    see if the html's title matches any of the heading elements
-    */
-
-
     elResults.forEach(heading => {
-        console.log(heading.classList)
         if (!heading.classList.contains('headline-modified'))       
             acceptInputOnHeadline(heading);
     })

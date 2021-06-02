@@ -96,7 +96,7 @@ export default {
       this.$router.push({ name: 'home' });
     })
     .catch(err => {
-      this.alertMessage = err.response.data.message;
+      this.alertMessage = err.message;
       this.alert = true;
       })
     },
