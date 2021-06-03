@@ -20,13 +20,13 @@ export default {
     this.getUser()
     .then(authUser => {
 
+      //this.logout();
       if (!authUser) {
         this.logout();
         this.$router.push({ name: 'Login' });
       }
       else {
         this.fetchTitlesAndRelationships();
-        // this.$router.push({ name: 'Home' })
       }
     });
   },
