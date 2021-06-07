@@ -25,6 +25,9 @@ module.exports = {
       }
     }
   },
+  css: {
+    extract: false
+  },
   //for prefixing Vuetify classes so they don't pollute the global namespace
   chainWebpack: (config) => {
     const sassRule = config.module.rule('sass');

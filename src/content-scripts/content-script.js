@@ -4,8 +4,6 @@ import insertedApp from '@/App';
 import router from '@/router';
 import vuetify from '@/plugins/vuetify';
 
-console.log('Hello from the content-script')
-
 // let prevIframe = document.querySelector('iframe[data-sth="customPopupIframe"]');
 // let iframe;
 // // if (prevIframe === null) {
@@ -31,7 +29,7 @@ browser.runtime.sendMessage({
     app.setAttribute('id', 'vueApp');
     container.appendChild(app);
     document.body.prepend(container);
-
+    
     /* eslint-disable no-new */
     new Vue({
         el: '#vueApp',
@@ -41,8 +39,6 @@ browser.runtime.sendMessage({
         render: h => h(insertedApp),
     });
 })
-
-
 
 
 browser.runtime.onMessage.addListener( (msgObj, sender, sendResponse) => {
