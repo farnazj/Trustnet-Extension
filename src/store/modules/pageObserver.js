@@ -15,14 +15,18 @@ export default {
           const targetNode = document.body;
           state.config = { attributes: false, childList: true, subtree: true };
 
+          let insertedApp = document.querySelector('div[data-vuetify]');
+
           const callback = generalUtils.throttle(function(mutationsList, observer) {
             console.log('going to execute callback **')
             let childMutation = false;
             for (const mutation of mutationsList) {
-                if (mutation.type === 'childList') {
+              console.log(mutation)
+                if (mutation.type === 'childList' && !insertedApp.contains(mutation.target)) {
                     childMutation = true;
                 }
             }
+            console.log('child mutation happened or not', childMutation);
             if (childMutation) {
                 console.log('A child node has been added or removed.');
                 state.observer.takeRecords();
@@ -41,6 +45,7 @@ export default {
 
       disconnect_observer: (state) => {
         console.log('observer disconnected')
+        state.observer.takeRecords();
         state.observer.disconnect();
       },
 

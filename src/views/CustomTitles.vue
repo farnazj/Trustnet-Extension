@@ -241,7 +241,7 @@ export default {
         },
         associatedStandaloneTitle: function() {
 
-            if (this.displayedTitle.titleId){
+            if (this.displayedTitle.titleId ){
                 console.log('standalone title is ', this.titles.find(title => title.id == this.displayedTitle.titleId))
                 return this.titles.find(title => title.id == this.displayedTitle.titleId);
             }
@@ -323,149 +323,156 @@ export default {
             
             }
         },
-    changeEndorsement: function(titleObj, arrIndex, endorsementVal) {
+        changeEndorsement: function(titleObj, arrIndex, endorsementVal) {
 
-        browser.runtime.sendMessage({
-            type: 'set_endorsement_status',
-            data: {
-                params: {
-                    setId: titleObj.lastVersion.setId
-                },
-                reqBody: {
-                    endorse_status: endorsementVal
-                }
-            }
-        })
-        .then(() => {
             browser.runtime.sendMessage({
-                type: 'has_user_endorsed_title',
+                type: 'set_endorsement_status',
                 data: {
                     params: {
                         setId: titleObj.lastVersion.setId
-                    }
-                }
-            })
-            .then(res => {
-              titleObj['userEndorsed'] = res.data;
-            })
-        })
-    },
-    startDelete: function(titleObj) {
-      this.delete.selectedTitle = titleObj;
-      this.showDeleteDialog = true;
-    },
-    cancelDelete: function() {
-      this.delete.selectedTitle = null;
-      this.showDeleteDialog = false;
-    },
-    proceedDelete: function() {
-
-        this.showDeleteDialog = false;
-
-        if (this.edit && this.delete.selectedTitle.lastVersion.setId == this.edit.setId) {
-            let index = this.associatedStandaloneTitle.sortedCustomTitles.findIndex(customTitle => 
-                customTitle.lastVersion.setId == this.edit.setId);
-            this.$refs.editTitleForm[index].resetValidation();
-            this.resetEdits();
-        }
-
-        browser.runtime.sendMessage({
-            type: 'delete_title',
-            data: {
-                reqBody: {
-                    standaloneTitleId: this.associatedStandaloneTitle.id,
-                    setId: this.delete.selectedTitle.lastVersion.setId
-                }
-            }
-        })
-        .then(res => {
-            this.delete.selectedTitle = null;
-            this.modifyCustomTitleInPage({
-                standaloneTitleId: this.associatedStandaloneTitle.id
-            })
-        })
-        .catch(err => {
-            this.alertMessage = err.response.data.message;
-            this.alert = true;
-        })
-
-    },
-    startEdit: function(title) {
-
-      this.edit.on = true;
-      this.edit.setId = title.lastVersion.setId;
-      this.edit.text = title.lastVersion.text;
-    },
-    saveEdits: function() {
-
-        let index = this.associatedStandaloneTitle.sortedCustomTitles.findIndex(customTitle => 
-            customTitle.lastVersion.setId == this.edit.setId);
-
-        if (this.$refs.editTitleForm[index].validate()) {
-
-            browser.runtime.sendMessage({
-                type: 'edit_title',
-                data: {
-                    reqParams: {
-                        standaloneTitleId: this.associatedStandaloneTitle.id,
-                        setId: this.edit.setId
                     },
                     reqBody: {
-                        text: this.edit.text 
+                        endorse_status: endorsementVal
+                    }
+                }
+            })
+            .then(() => {
+
+                //if user endorsed the title
+                if (endorsementVal) {
+                    this.addUserAsCustomTitleEndorser({
+                        standaloneTitleId: this.associatedStandaloneTitle.id ,
+                        customTitleSetId: titleObj.lastVersion.setId
+                    })
+                }
+                //if use unendorsed the title
+                else {
+                    this.removeUserAsCustomTitleEndorser({
+                        standaloneTitleId: this.associatedStandaloneTitle.id ,
+                        customTitleSetId: titleObj.lastVersion.setId
+                    })
+                }
+                
+            })
+        },
+        startDelete: function(titleObj) {
+            this.delete.selectedTitle = titleObj;
+            this.showDeleteDialog = true;
+        },
+        cancelDelete: function() {
+            this.delete.selectedTitle = null;
+            this.showDeleteDialog = false;
+        },
+        proceedDelete: function() {
+
+            this.showDeleteDialog = false;
+
+            if (this.edit && this.delete.selectedTitle.lastVersion.setId == this.edit.setId) {
+                let index = this.associatedStandaloneTitle.sortedCustomTitles.findIndex(customTitle => 
+                    customTitle.lastVersion.setId == this.edit.setId);
+                this.$refs.editTitleForm[index].resetValidation();
+                this.resetEdits();
+            }
+
+            browser.runtime.sendMessage({
+                type: 'delete_title',
+                data: {
+                    reqBody: {
+                        standaloneTitleId: this.associatedStandaloneTitle.id,
+                        setId: this.delete.selectedTitle.lastVersion.setId
                     }
                 }
             })
             .then(res => {
-                this.resetEdits();
-                this.$refs.editTitleForm[index].resetValidation();
+                this.delete.selectedTitle = null;
                 this.modifyCustomTitleInPage({
                     standaloneTitleId: this.associatedStandaloneTitle.id
                 })
             })
             .catch(err => {
-                console.log(err)
                 this.alertMessage = err.response.data.message;
                 this.alert = true;
             })
-      
-        }
 
-    },
-    resetEdits: function() {
+        },
+        startEdit: function(title) {
 
-      this.edit.on = false;
-      this.edit.setId = null;
-      this.edit.text = '';
-    },
-    showHistory: function(titleObj) {
+            this.edit.on = true;
+            this.edit.setId = title.lastVersion.setId;
+            this.edit.text = title.lastVersion.text;
+        },
+        saveEdits: function() {
 
-        this.setEndorsersVisibility(false);
-        this.populateTitleHistory({
-            titleHistory: titleObj.history,
-            historyOwner: titleObj.author
-        });
-        this.setHistoryVisibility(true);
-    },
-    showEndorsers: function(titleObj) {
+            let index = this.associatedStandaloneTitle.sortedCustomTitles.findIndex(customTitle => 
+                customTitle.lastVersion.setId == this.edit.setId);
 
-        this.setHistoryVisibility(false);
-        this.setEndorsersTitleIds({
-            selectedStandaloneTitleId: titleObj.lastVersion.StandaloneTitleId,
-            selectedCustomTitleSetId: titleObj.lastVersion.setId
-        })
+            if (this.$refs.editTitleForm[index].validate()) {
+
+                browser.runtime.sendMessage({
+                    type: 'edit_title',
+                    data: {
+                        reqParams: {
+                            standaloneTitleId: this.associatedStandaloneTitle.id,
+                            setId: this.edit.setId
+                        },
+                        reqBody: {
+                            text: this.edit.text 
+                        }
+                    }
+                })
+                .then(res => {
+                    this.resetEdits();
+                    this.$refs.editTitleForm[index].resetValidation();
+                    this.modifyCustomTitleInPage({
+                        standaloneTitleId: this.associatedStandaloneTitle.id
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                    this.alertMessage = err.response.data.message;
+                    this.alert = true;
+                })
         
-        this.setEndorsersVisibility(true);
-    },
-    ...mapActions('titles', [
-        'setTitlesDialogVisibility',
-        'addTitleToPage',
-        'modifyCustomTitleInPage',
-        'setDisplayedTitle',
-        'setEndorsersVisibility',
-        'setEndorsersTitleIds',
-        'setHistoryVisibility',
-        'populateTitleHistory'
-    ])
+            }
+
+        },
+        resetEdits: function() {
+
+            this.edit.on = false;
+            this.edit.setId = null;
+            this.edit.text = '';
+        },
+        showHistory: function(titleObj) {
+
+            this.setEndorsersVisibility(false);
+            this.populateTitleHistory({
+                titleHistory: titleObj.history,
+                historyOwner: titleObj.author
+            });
+            this.setHistoryVisibility(true);
+        },
+        showEndorsers: function(titleObj) {
+
+            this.setHistoryVisibility(false);
+            this.setEndorsersTitleIds({
+                selectedStandaloneTitleId: titleObj.lastVersion.StandaloneTitleId,
+                selectedCustomTitleSetId: titleObj.lastVersion.setId
+            })
+            
+            this.setEndorsersVisibility(true);
+        },
+        ...mapActions('titles', [
+            'setTitlesDialogVisibility',
+            'addTitleToPage',
+            'modifyCustomTitleInPage',
+            'setDisplayedTitle',
+            'setEndorsersVisibility',
+            'setEndorsersTitleIds',
+            'setHistoryVisibility',
+            'populateTitleHistory',
+            'addUserAsCustomTitleEndorser',
+            'removeUserAsCustomTitleEndorser'
+        ])
 
     },
     watch: {

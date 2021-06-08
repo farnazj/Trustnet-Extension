@@ -37,9 +37,7 @@ export default {
         withCredentials: true
       })
   },
-  editCustomTitle(params, reqBody) {
-    console.log(params, reqBody);
-    
+  editCustomTitle(params, reqBody) {    
     return Api().post(`custom-titles/${params.standaloneTitleId}/${params.setId}`,
       reqBody, {
         withCredentials: true

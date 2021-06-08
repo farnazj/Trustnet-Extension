@@ -89,7 +89,44 @@ export default {
         newObj.historyOwner = payload.historyOwner;
 
         state.titleHistoryState = Object.assign({}, newObj);
+    },
+
+    add_user_as_endorser: (state, payload) => {
+        
+        let standaloneTitleIndex = state.titles.findIndex(title => 
+            title.id == payload.standaloneTitleId);
+        let sortedCustomTitleIndex = state.titles[standaloneTitleIndex].sortedCustomTitles.findIndex(customTitle => 
+            customTitle.lastVersion.setId == payload.customTitleSetId);
+                
+        let endorsedCustomTitle = state.titles[standaloneTitleIndex].sortedCustomTitles[sortedCustomTitleIndex];
+        endorsedCustomTitle.lastVersion.Endorsers.push(payload.authUser);
+
+        state.titles[standaloneTitleIndex].sortedCustomTitles[sortedCustomTitleIndex].userEndorsed = true;
+        state.titles[standaloneTitleIndex].sortedCustomTitles[sortedCustomTitleIndex].sortedEndorsers = 
+            endorsedCustomTitle.lastVersion.Endorsers.slice().sort(utils.compareSources);
+
+    },
+
+    remove_user_as_endorser: (state, payload) => {
+
+        let standaloneTitleIndex = state.titles.findIndex(title => 
+            title.id == payload.standaloneTitleId);
+        let sortedCustomTitleIndex = state.titles[standaloneTitleIndex].sortedCustomTitles.findIndex(customTitle => 
+            customTitle.lastVersion.setId == payload.customTitleSetId);
+                
+        let endorsedCustomTitle = state.titles[standaloneTitleIndex].sortedCustomTitles[sortedCustomTitleIndex];
+        
+        let authUserIndex;
+        authUserIndex = endorsedCustomTitle.lastVersion.Endorsers.findIndex(endorser => endorser.id == payload.authUser.id);
+        endorsedCustomTitle.lastVersion.Endorsers.splice(authUserIndex, 1);
+
+        state.titles[standaloneTitleIndex].sortedCustomTitles[sortedCustomTitleIndex].userEndorsed = false;
+
+        authUserIndex = state.titles[standaloneTitleIndex].sortedCustomTitles[sortedCustomTitleIndex].sortedEndorsers.findIndex(endorser => 
+            endorser.id == payload.authUser.id)
+        state.titles[standaloneTitleIndex].sortedCustomTitles[sortedCustomTitleIndex].sortedEndorsers.splice(authUserIndex, 1);
     }
+
   },
   actions: {
     hashPageContent: (context, payload) => {
@@ -351,6 +388,18 @@ export default {
 
     populateTitleHistory: (context, payload) => {
         context.commit('populate_title_history', payload);
+    },
+
+    addUserAsCustomTitleEndorser: (context, payload) => {
+        let authUser = context.rootGetters['auth/user'];
+        payload.authUser = authUser;
+        context.commit('add_user_as_endorser', payload);
+    },
+
+    removeUserAsCustomTitleEndorser: (context, payload) => {
+        let authUser = context.rootGetters['auth/user'];
+        payload.authUser = authUser;
+        context.commit('remove_user_as_endorser', payload);
     }
   
   }
