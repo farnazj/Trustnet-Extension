@@ -1,5 +1,3 @@
-import preferencesServices from '@/services/preferencesServices'
-
 export default {
   namespaced: true,
   state() {
@@ -12,19 +10,22 @@ export default {
   },
   mutations: {
     set_preferences: (state, payload) => {
-        // state.userPreferences = Object.assign({}, JSON.parse(payload));
         state.userPreferences = Object.assign({}, payload);
     }
   },
   actions: {
     getUserPreferences: (context) => {
         return new Promise((resolve, reject) => {
-            let authUserId = context.rootGetters['auth/user'].id;
-            preferencesServices.getPreferences({ authUserId: authUserId })
+            console.log('going to send a message to the background')
+            browser.runtime.sendMessage({
+                type: 'get_preferences'
+            })
             .then( response => {
+                console.log('here are the prefs', response)
                 context.commit('set_preferences', response.data);
                 resolve();
             }).catch(error => {
+                console.log(error)
                 reject(error)
             })
         })
@@ -32,14 +33,17 @@ export default {
     },
     setUserPreferences: (context, payload) => {
         return new Promise((resolve, reject) => {
-            let authUserId = context.rootGetters['auth/user'].id;
+            
             let newPreferences = Object.assign({}, context.state.userPreferences);
             for (const [key, value] of Object.entries(payload))
                 newPreferences[key] = value;
 
-            preferencesServices.setPreferences({ 
-                authUserId: authUserId 
-            }, { preferences: JSON.stringify(newPreferences)})
+            browser.runtime.sendMessage({
+                type: 'set_preferences',
+                data: {
+                    reqBody: { preferences: JSON.stringify(newPreferences)}
+                }
+            })
             .then( () => {
                 context.dispatch('getUserPreferences')
                 .then(() => {

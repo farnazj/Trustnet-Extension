@@ -10,6 +10,7 @@ import { mapActions } from 'vuex'
 export default {
   name: 'optionsApp',
   created() {
+
     this.getUser()
     .then(authUser => {
 

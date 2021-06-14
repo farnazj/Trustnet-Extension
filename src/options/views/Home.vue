@@ -10,17 +10,34 @@
             <v-radio v-for="(headlineSource, index) in headlineSourceItems" :key="index"
             :value="headlineSource.value" >
                 <template v-slot:label>
-                    <v-row no-gutters>{{headlineSource.text}}</v-row>
+                    <v-row no-gutters class="my-0 caption">{{headlineSource.text}}</v-row>
                 </template>
             </v-radio>
         </v-radio-group>
 
-        <v-row class="mt-1">
+        <v-row class="mt-1" no-gutters>
             <p class="body-2">To change the sources you follow or trust you can visit the Sources page on
-                <a :href="sourcesLink" class="ml-1 custom-link" target="_blank">
-                    {{siteName}}
+                <a :href="sourcesLink" class="ml-1 custom-link" target="_blank">{{siteName}}
                 </a>.
             </p>
+        </v-row>
+
+        <v-divider></v-divider>
+
+        <v-row no-gutters class="mt-6">
+            <v-combobox v-model="blackListedWebsites" small-chips dense :hide-no-data="true"
+                label="Disable the extension on certain domains" multiple persistent-hint
+                hint="e.g., google.com or www.google.com"
+            >
+            <template v-slot:selection="{ attrs, item, select, selected }">
+                <v-chip v-bind="attrs"
+                    :input-value="selected" close 
+                    @click:close="removeWebsite(item)"
+                >
+                {{ item }}
+                </v-chip>
+            </template>   
+        </v-combobox>
         </v-row>
 
         </v-col>
@@ -31,6 +48,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import consts from '@/lib/constants'
+import utils from '@/services/utils'
 
 export default {
   name: 'optionsApp',
@@ -52,7 +70,6 @@ export default {
   computed: {
     selectedHeadlineSource: {
       get: function() {
-        console.log(this.userPreferences, 'in options')
         if (typeof this.userPreferences.headlineSources === 'undefined')
           return 'FOLLOWED_TRUSTED';
         else
@@ -61,6 +78,21 @@ export default {
       set: function(newValue) {
         this.setUserPreferences({ headlineSources: newValue });
       }
+    },
+    blackListedWebsites: {
+        get: function() {
+            if ('blackListedWebsites' in this.userPreferences)
+                return this.userPreferences.blackListedWebsites;
+            else
+                return [];
+        },
+        set: function(newVals) {
+            let sanitizedVals = newVals.map(domain => {
+                return utils.extractHostname(domain);
+            })
+            console.log('sanitized vals', sanitizedVals);
+            this.setUserPreferences({ blackListedWebsites: sanitizedVals });
+        }
     },
     siteName: function() {
         return consts.SITE_NAME;
@@ -73,6 +105,13 @@ export default {
     ])
   },
   methods: {
+    removeWebsite: function(item) {
+        const index = this.blackListedWebsites.indexOf(item);
+        if (index > -1) {
+            this.blackListedWebsites.splice(index, 1);
+            this.setUserPreferences({ blackListedWebsites: this.blackListedWebsites });
+        }
+    },
     ...mapActions('preferences', [
       'getUserPreferences',
       'setUserPreferences'

@@ -484,9 +484,9 @@ export default {
 </script>
 <style>
 html {
-    width: 100vw;
-    height: 100vh;
-    top: 0px; 
+    /* width: 100vw;
+    height: 100vh; */
+    /* top: 0px;  */
 }
 
 .custom-titles-container-card {

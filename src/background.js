@@ -2,6 +2,7 @@ import authServices from './services/authServices'
 import titleServices from './services/titleServices'
 import sourceServices from './services/sourceServices'
 import relationServices from './services/relationServices'
+import preferencesServices from './services/preferencesServices'
 
 browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log('Hello from the background')
@@ -204,6 +205,30 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         reject({ message: err });
       })
     })
+  }
+  else if (request.type == 'get_preferences') {
+    return new Promise((resolve, reject) => {
+      preferencesServices.getPreferences()
+      .then(res => {
+        resolve(res)
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
+  else if (request.type == 'set_preferences') {
+
+    return new Promise((resolve, reject) => {
+      preferencesServices.setPreferences(request.data.reqBody)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+    
   }
 
 })

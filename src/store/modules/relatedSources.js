@@ -55,7 +55,6 @@ export default {
             type: 'get_follows'
         })
         .then(response => {
-            console.log('here is what we got', response)
             context.commit('populate_follows', response);
             resolve();
         })
@@ -101,82 +100,6 @@ export default {
           console.log(err)
           reject();
         })
-      })
-    },
-
-    addTrusted: (context, payload) => {
-
-      return new Promise((resolve, reject) => {
-
-        // relationServices.addTrusted(payload)
-        // .then(response => {
-        //   context.dispatch('fetchTrusteds')
-        //   .then(()=> {
-        //     resolve();
-        //   })
-        // })
-        // .catch(err => {
-        //   console.log(err)
-        //   reject();
-        // })
-      })
-    },
-
-    deleteTrusted: (context, payload) => {
-
-      return new Promise((resolve, reject) => {
-
-        // relationServices.deleteTrusted(payload)
-        // .then(response => {
-        //   context.dispatch('fetchTrusteds')
-        //   .then(() => {
-        //     resolve();
-        //   })
-        // })
-        // .catch(err => {
-        //   console.log(err)
-        //   reject();
-        // })
-      })
-    },
-
-    follow: (context, payload) => {
-
-      return new Promise((resolve, reject) => {
-
-        // relationServices.follow(payload)
-        // .then(() => {
-        //   context.dispatch('fetchFollows')
-        //   .then(() => {
-        //     resolve()
-        //   })
-        // })
-        // .catch(err => {
-        //   console.log(err)
-        //   reject();
-        // })
-      });
-    },
-
-    unfollow: (context, payload) => {
-
-      return new Promise((resolve, reject) => {
-
-        // relationServices.unfollow(payload)
-        // .then(() => {
-        //   let dispatchProms = [
-        //     context.dispatch('fetchFollows'),
-        //     context.dispatch('fetchTrusteds')
-        //   ];
-        //   Promise.all(dispatchProms)
-        //   .then(() => {
-        //     resolve();
-        //   })
-        // })
-        // .catch(err => {
-        //   console.log(err);
-        //   reject();
-        // })
       })
     }
 
