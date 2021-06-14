@@ -149,7 +149,6 @@ function getFuzzyTextSimilarToHeading(serverReturnedTitleText, searchSnippet) {
 
 function findAndReplaceTitle(title, remove) {
     let results = getElementsContainingText(title.text);
-    console.log('inja avalesh', results)
     results = results.filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
 
     console.log('results of els', results)
@@ -297,11 +296,12 @@ function identifyPotentialTitles() {
 
         let docTitle = document.querySelector('title').textContent;
         if (docTitle.length >= consts.MIN_TITLE_LENGTH) {
-            let hLevelHeadings = document.querySelectorAll('h1');
-            console.log('doc title', docTitle, 'h level headings', hLevelHeadings)
+            let h1LevelHeadings = document.querySelectorAll('h1');
+            let h2LevelHeadings = document.querySelectorAll('h2');
     
-            elResults = [...hLevelHeadings].filter(heading => {
-                getFuzzyTextSimilarToHeading(docTitle, heading.textContent) != undefined
+            elResults = [...h1LevelHeadings, ...h2LevelHeadings].filter(heading => {
+                let similarText = getFuzzyTextSimilarToHeading(docTitle, heading.textContent);
+                return similarText != null;
             }).filter(x => x.textContent.length >= consts.MIN_TITLE_LENGTH);
     
             console.log('headings from document title', elResults)
