@@ -1,8 +1,8 @@
 {
-  "manifest_version": 2,
-  "name": "__MSG_extName__",
-  "homepage_url": "http://localhost:8080/",
-  "description": "A Vue Browser Extension",
+  "manifest_version": "0.0.0.1",
+  "name": "Headliner",
+  "homepage_url": "https://github.com/farnazj/Replace-Previews",
+  "description": "A browser extension that helps you write better, more informative news headlines as you read news articles to help your friends and to see the alternative headlines that your friends post wherever you encounter those articles.",
   "default_locale": "en",
   "permissions": [
     "activeTab",
