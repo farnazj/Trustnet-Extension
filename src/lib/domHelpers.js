@@ -106,9 +106,27 @@ function acceptInputOnHeadline (headlineTag) {
     }
 }
 
-function getFuzzyTextSimilarToHeading(serverReturnedTitleText, searchSnippet) {
+/*
+Finds a text similar to a target text in two cases:
+1. Looking for a title text returned by the server based on the hashes sent to it---
+    searches within the innerText of the whole document
+2. Looking for a title text in the document that matches the content of a meta title tag 
+    (og:title, og:twitter) in which case it searches within the innerText of the whole document.
+    Or determining whether the text content of a heading tag (passed as a searchSnippet) is
+    similar enough to the content of the document's title tag
+* @param {String} targetTitleText, Either a title text returned from the server or the text
+of a title tag in the document
+ * @param {Boolean} isSearchingForServerTitle, whether we're looking for a title that is returned
+    from the server as a possible candidate title based on the hashes sent to the server, or
+    whether we're looking for a text similar enough to a title tag. The cases are separated
+    to allow for different score thresholds (currently set to be the same).
+ * @param {String} searchSnippet (optional), the text of a heading tag
+ * @return {String} The text that is similar enough to the title we're looking for if found,
+    null if not found.
+*/
+function getFuzzyTextSimilarToHeading(targetTitleText, isSearchingForServerTitle, searchSnippet) {
 
-    console.log('inside fuzzy search', serverReturnedTitleText, searchSnippet)
+    console.log('inside fuzzy search', targetTitleText, searchSnippet)
 
     /*
     By default this function searches the whole content of the document. To not look for the text
@@ -118,22 +136,28 @@ function getFuzzyTextSimilarToHeading(serverReturnedTitleText, searchSnippet) {
     affected by CSS styling (e.g., upper/lower case). Therefore, here, we convert the search term as well asarray containing
     leaf nodes' contents to lowercase
     */
-    let pageContent;
-    if (!searchSnippet)
-        pageContent = document.body.innerText.split('\n').filter(x => x.length <= consts.MAX_TITLE_LENGTH).map(el =>
+    let textCorpus, scoreThreshold;
+    if (!searchSnippet) { //looking within the entire body of the document to find a server returned title
+        textCorpus = document.body.innerText.split('\n').filter(x => x.length <= consts.MAX_TITLE_LENGTH).map(el =>
             el.toLowerCase());
-    else
-        pageContent = [searchSnippet.toLowerCase()];
+    }
+    else { //looking within the title of a tag to see if it is similar enough with 
+        textCorpus = [searchSnippet.toLowerCase()];
+        scoreThreshold 
+    }
+
+    scoreThreshold = isSearchingForServerTitle ? consts.FINDING_TITLES_FUZZY_SCORE_THRESHOLD :
+        consts.IDENTIFYING_TITLES_FUZZY_SCORE_THRESHOLD;
 
     const options = {
         includeScore: true,
         distance: 150
     }
    
-    const fuse = new Fuse(pageContent, options)
-    let uncurlifiedText = generalUtils.uncurlify(serverReturnedTitleText);
+    const fuse = new Fuse(textCorpus, options)
+    let uncurlifiedText = generalUtils.uncurlify(targetTitleText);
 
-    let texts = uncurlifiedText != serverReturnedTitleText ? [uncurlifiedText, serverReturnedTitleText] : [serverReturnedTitleText];
+    let texts = uncurlifiedText != targetTitleText ? [uncurlifiedText, targetTitleText] : [targetTitleText];
     texts = texts.map(el => el.toLowerCase());
 
     let finalResults = [], tempResults = [];
@@ -143,8 +167,8 @@ function getFuzzyTextSimilarToHeading(serverReturnedTitleText, searchSnippet) {
             finalResults.push(tempResults[0]);
     }
     
-    console.log('fuzzy search all results were', tempResults, consts.FUZZY_SCORE_THRESHOLD, finalResults[0])
-    return (finalResults[0] && finalResults[0].score <= consts.FUZZY_SCORE_THRESHOLD) ? finalResults[0].item : null;
+    console.log('fuzzy search all results were', tempResults, scoreThreshold, finalResults[0])
+    return (finalResults[0] && finalResults[0].score <= scoreThreshold) ? finalResults[0].item : null;
 }
 
 function findAndReplaceTitle(title, remove) {
@@ -153,7 +177,7 @@ function findAndReplaceTitle(title, remove) {
 
     console.log('results of els', results)
     if (!results.length) {
-        let similarText = getFuzzyTextSimilarToHeading(title.text);
+        let similarText = getFuzzyTextSimilarToHeading(title.text, true);
         if (similarText)
             results = getElementsContainingText(similarText);
     }
@@ -252,7 +276,7 @@ function identifyPotentialTitles() {
         
             //if the exact ogTitle text was not found, look for text that is similar enough
             if (!elResults.length) {
-                let similarText = getFuzzyTextSimilarToHeading(ogTitle);
+                let similarText = getFuzzyTextSimilarToHeading(ogTitle, false);
                 if (similarText.length >= consts.MIN_TITLE_LENGTH)
                     elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
             }
@@ -274,7 +298,7 @@ function identifyPotentialTitles() {
             
                 //if the exact twitter title text was not found, look for text that is similar enough
                 if (!elResults.length) {
-                    let similarText = getFuzzyTextSimilarToHeading(twitterTitle);
+                    let similarText = getFuzzyTextSimilarToHeading(twitterTitle, false);
                     if (similarText.length >= consts.MIN_TITLE_LENGTH)
                         elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
                 }
@@ -290,7 +314,8 @@ function identifyPotentialTitles() {
     }
 
     /*
-    if og and twitter titles were not found on the page, look for h headings that have texts similar to the document's title
+    if og and twitter titles were not found on the page, look for h headings that have texts 
+    similar to the document's title
     */
     if (!elResults.length) {
 
@@ -300,7 +325,7 @@ function identifyPotentialTitles() {
             let h2LevelHeadings = document.querySelectorAll('h2');
     
             elResults = [...h1LevelHeadings, ...h2LevelHeadings].filter(heading => {
-                let similarText = getFuzzyTextSimilarToHeading(docTitle, heading.textContent);
+                let similarText = getFuzzyTextSimilarToHeading(docTitle, false, heading.textContent);
                 return similarText != null;
             }).filter(x => x.textContent.length >= consts.MIN_TITLE_LENGTH);
     
