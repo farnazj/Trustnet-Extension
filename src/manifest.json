@@ -1,18 +1,16 @@
 {
-  "manifest_version": "0.0.0.1",
-  "name": "Headliner",
+  "manifest_version": 2,
+  "version": "0.0.0.1",
+  "name": "Reheadline",
   "homepage_url": "https://github.com/farnazj/Replace-Previews",
-  "description": "A browser extension that helps you write better, more informative news headlines as you read news articles to help your friends and to see the alternative headlines that your friends post wherever you encounter those articles.",
+  "description": "Helps you write more informative news headlines as you read articles to help your friends and to see the headlines that they write.",
   "default_locale": "en",
   "permissions": [
-    "activeTab",
-    "<all_urls>",
-    "*://*/*"
   ],
   "icons": {
-    "16": "icons/16.png",
-    "48": "icons/48.png",
-    "128": "icons/128.png"
+    "16": "icons/16_.png",
+    "48": "icons/48_.png",
+    "128": "icons/128_.png"
   },
   "background": {
     "scripts": [
@@ -32,10 +30,10 @@
     }
   ],
   "browser_action": {
-    "default_title": "__MSG_extName__",
+    "default_title": "Reheadline",
     "default_icon": {
-      "19": "icons/19.png",
-      "38": "icons/38.png"
+      "19": "icons/16_.png",
+      "38": "icons/38_.png"
     }
   },
   "options_ui": {
