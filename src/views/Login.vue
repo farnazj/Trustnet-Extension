@@ -46,6 +46,7 @@
               <v-card-title primary-title>
                 <h3 class="headline">Or sign up</h3>
               </v-card-title>
+              <p class="caption">A new tab will open asking you to sign up on the Trustnet platform.</p>
             </v-row>
 
             <v-row justify="center" no-gutters>

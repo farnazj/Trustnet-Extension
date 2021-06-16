@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="login-style pa-0">
+  <v-container fluid class="custom-sidebar pa-0">
     <custom-toolbar></custom-toolbar>
 
     <v-row class="pt-0 full-height" justify="center" align="center" no-gutters fill-height>
@@ -45,6 +45,7 @@
             <v-row justify="center" no-gutters>
               <v-card-title primary-title>
                 <h3 class="headline">Or sign up</h3>
+                <p class="caption">A new tab will open that asks you to sign up on the Trustnet platform.</p>
               </v-card-title>
             </v-row>
 
@@ -106,13 +107,3 @@ export default {
 }
 
 </script>
-
-<style scoped>
-.login-style {
-    position: fixed;
-    width: 400px;
-    height: 100vh;
-    right: 0px;
-    z-index: 99999;
-}
-</style>

@@ -2,7 +2,7 @@
     <v-toolbar dense fixed color="lime lighten-1">
 
       <v-toolbar-title @click="goToPage('Home')" class="headline text-uppercase cursor-pointer">
-        <span class="font-weight-light">Trustnet</span>
+        <span class="font-weight-light">Reheadline</span>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -41,7 +41,7 @@
       </template>
 
       <template v-else>
-         <v-btn @click="goToPage('About')" text>About</v-btn>
+         <v-btn @click="goToPage(navigationText)" text>{{navigationText}}</v-btn>
       </template>
 
     </v-toolbar>
@@ -70,6 +70,13 @@ export default {
   created() {
   },
   computed: {
+
+    navigationText: function() {
+      if (this.$route.name == 'Login')
+        return 'About';
+      else
+        return 'Login';
+    },
     ...mapGetters('auth', [
      'user',
      'isLoggedIn'
@@ -91,7 +98,7 @@ export default {
    },
    goToPage: function(page) {
    
-      this.$router.push({ name: page.toLowerCase() });
+      this.$router.push({ name: page });
    }
  }
 }

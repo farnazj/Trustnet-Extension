@@ -2,6 +2,15 @@
     min-height: initial !important;
 }
 
+.custom-sidebar {
+    position: fixed;
+    width: 400px !important;
+    height: 100vh;
+    right: 0px;
+    z-index: 99999;
+    overflow: auto;
+}
+/* 
 .extension-side-bar {
     height: 100%;
     width: 400px;
@@ -10,19 +19,19 @@
     right: 0px;
     z-index: 90000;
     border: none;
-}
+} */
 
-.extension-hidden {
+/* .extension-hidden {
     display: none !important;
-}
+} */
 
-.extension-dialog {
+/* .extension-dialog {
     position: fixed;
     width: 100vw;
     height: 100vh;
     top: 0px; 
     z-index: 999999;
-}
+} */
 
 /* .body-no-scroll {
     overflow: hidden !important;
