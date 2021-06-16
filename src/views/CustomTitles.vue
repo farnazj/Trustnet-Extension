@@ -37,9 +37,9 @@
                     <v-row no-gutters class="pa-1">
                         <v-col cols="12">
                         <v-form ref="newTitleForm" lazy-validation>
-                            <v-text-field v-model="newTitle" label="Suggest alternative headline"
-                            required :rules="formsRules.newTitleRules">
-                            </v-text-field>
+                            <v-textarea v-model="newTitle" label="Suggest alternative headline"
+                            required :rules="formsRules.newTitleRules" rows="2" auto-grow>
+                            </v-textarea>
                         </v-form>
                         </v-col>
                     </v-row>
