@@ -84,6 +84,9 @@ export default {
       })
     },
 
+    /*
+    fetching followers is not used in the extension currently
+    */
     fetchFollowers: (context) => {
 
       return new Promise((resolve, reject) => {

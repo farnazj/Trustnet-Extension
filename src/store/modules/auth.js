@@ -54,7 +54,7 @@ export default {
             type: 'get_user'
         })
         .then(authUser => {
-            console.log('got auth user', authUser);
+            console.log('got auth user:', authUser);
             if (authUser) {
                 context.commit('update_user', authUser);
             }

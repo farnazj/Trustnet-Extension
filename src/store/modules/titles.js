@@ -235,7 +235,7 @@ export default {
                 titlesFoundOnPage.push(candidateTitle);
             })
     
-            console.log(titlesFoundOnPage, 'titles found on page')
+            console.log('Server returned titles found on page:', titlesFoundOnPage);
             Promise.all(allProms)
             .then(() => {
                 context.commit('populate_titles', titlesFoundOnPage);
@@ -320,11 +320,10 @@ export default {
     removeTitleFromPage: (context, payload) => {
         return new Promise((resolve, reject) => {
       
-        let replacementCount = domHelpers.findAndReplaceTitle(payload.title, true);
-        console.log('going to remove from titles', payload.title)           
-        context.commit('remove_from_titles', payload.title)
-        resolve();
-            
+            let replacementCount = domHelpers.findAndReplaceTitle(payload.title, true);
+            console.log('going to remove from store titles', payload.title)           
+            context.commit('remove_from_titles', payload.title)
+            resolve();
         })
   
     },
@@ -342,8 +341,6 @@ export default {
             if (payload.titleElementId) {
                 domHelpers.removeEventListenerFromTitle(payload.titleElementId);
             }
-
-            console.log('inside add new title', payload)
             
             context.dispatch('getTitleMatches', { titlehashes: [payload.hash] })
             .then(candidateTitles => {

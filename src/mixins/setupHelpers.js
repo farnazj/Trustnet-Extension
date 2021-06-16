@@ -17,12 +17,12 @@ export default {
       if (!this.trustedSources.length)
           this.fetchTrusteds();
       
-      this.fetchFollowers();
+      // this.fetchFollowers();
 
       this.getUserPreferences()
       .then(() => {
 
-        console.log('here', this.userPreferences)
+        console.log('user preferences:', this.userPreferences);
 
         let pageHostname = utils.extractHostname(this.url);
         let pageIsBlackListed = false;
@@ -32,7 +32,7 @@ export default {
             pageHostname.includes(blacklistedWebsite)
           )
         }
-        console.log('is page blacklisted:', pageIsBlackListed)
+        console.info('is page blacklisted:', pageIsBlackListed)
 
         if (!pageIsBlackListed) {
 

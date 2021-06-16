@@ -72,7 +72,6 @@ export default {
   computed: {
     visible: {
       get: function() {
-        console.log('inja', this.titleHistoryState)
         return this.titleHistoryState.historyVisibility;
       },
       set: function(newValue) {

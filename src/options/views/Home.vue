@@ -90,7 +90,7 @@ export default {
             let sanitizedVals = newVals.map(domain => {
                 return utils.extractHostname(domain);
             })
-            console.log('sanitized vals', sanitizedVals);
+            console.log('sanitized blacklisted websites:', sanitizedVals);
             this.setUserPreferences({ blackListedWebsites: sanitizedVals });
         }
     },

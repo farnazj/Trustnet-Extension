@@ -16,12 +16,11 @@ export default {
   actions: {
     getUserPreferences: (context) => {
         return new Promise((resolve, reject) => {
-            console.log('going to send a message to the background')
             browser.runtime.sendMessage({
                 type: 'get_preferences'
             })
             .then( response => {
-                console.log('here are the prefs', response)
+                console.log('retrieved user preferences:', response);
                 context.commit('set_preferences', response.data);
                 resolve();
             }).catch(error => {

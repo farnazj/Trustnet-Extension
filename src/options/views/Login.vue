@@ -77,9 +77,6 @@ export default {
       alertMessage: ''
     }
   },
-  created() {
-    console.log('login got created')
-  },
   methods: {
    login: function() {
     let username = this.username;

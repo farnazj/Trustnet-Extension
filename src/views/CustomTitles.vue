@@ -130,8 +130,8 @@
                                                 <v-tooltip bottom :open-on-hover="true" open-delay="500">
                                                     <template v-slot:activator="{ on }">
                                                         <v-btn v-show="edit.on && edit.setId == titleObj.lastVersion.setId" x-small outlined
-                                                        @click="saveEdits" v-on="on" color="green lighten-1" class="mr-3">
-                                                        <v-icon small class="xs-icon-font">{{icons.check}}</v-icon>
+                                                        @click="saveEdits" v-on="on" color="green lighten-1" class="mr-3" :disabled="saveEditBtnDisabled">
+                                                            <v-icon small class="xs-icon-font">{{icons.check}}</v-icon>
                                                         </v-btn>
                                                     </template>
                                                     <span>Save edit</span>
@@ -190,6 +190,7 @@ export default {
        return {
             newTitle: '',
             postBtnDisabled: false,
+            saveEditBtnDisabled: false,
             edit: {
                 on: false,
                 setId: null,
@@ -220,10 +221,6 @@ export default {
             }
             
         }
-    },
-    
-    created() {
-        console.log('in custom titles created', this.user)
     },
     // beforeRouteLeave (to, from, next) {
     //     this.hideContainer();
@@ -279,7 +276,7 @@ export default {
             if (this.$refs.newTitleForm.validate()) {
                 this.postBtnDisabled = true;
 
-                console.log(this.displayedTitle.titleText)
+                console.log('displayed title:', this.displayedTitle.titleText);
 
                 let pageIndentifiedTitle = this.displayedTitle.titleId && this.associatedStandaloneTitle ? 
                     this.associatedStandaloneTitle.text : this.displayedTitle.titleText;
@@ -298,7 +295,7 @@ export default {
                     }
                 })
                 .then(res => {
-                    console.log('got response back', res)
+                    console.log('got post new title response back:', res);
                     thisRef.newTitle = '';
                     thisRef.$refs.newTitleForm.resetValidation();
                     thisRef.addTitleToPage({
@@ -407,6 +404,7 @@ export default {
                 customTitle.lastVersion.setId == this.edit.setId);
 
             if (this.$refs.editTitleForm[index].validate()) {
+                this.saveEditBtnDisabled = true;
 
                 browser.runtime.sendMessage({
                     type: 'edit_title',
@@ -431,6 +429,9 @@ export default {
                     console.log(err)
                     this.alertMessage = err.response.data.message;
                     this.alert = true;
+                })
+                .finally(() => {
+                    this.saveEditBtnDisabled = false;
                 })
         
             }

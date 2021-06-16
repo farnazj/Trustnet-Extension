@@ -87,11 +87,11 @@ export default {
       'setEndorsersVisibility'
     ])
   },
-  watch: {
-    titleEndorsersState: function(newVal) {
-      console.log(newVal)
-    }
-  },
+  // watch: {
+  //   titleEndorsersState: function(newVal) {
+  //     console.log(newVal)
+  //   }
+  // },
   mixins: [timeHelpers, sourceHelpers]
 
 }

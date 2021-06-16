@@ -10,11 +10,9 @@ export default {
     },
     actions: {
       setUpPageUrl: function(context) {
-          console.log('dare mire url setup kone')
-  
         return new Promise((resolve, reject) => {
             context.commit('set_url', window.location.href);
-            console.log(context.state.url, 'url e page')
+            console.log('page url:', context.state.url);
             resolve;
         })
       }

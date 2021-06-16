@@ -18,7 +18,7 @@ browser.runtime.sendMessage({
 })
 .then(authUser => {
 
-    console.log(authUser, 'here is authUser')
+    console.log('auth user is', authUser)
     if (authUser)
         localStorage.setItem('trustnetAuthToken', JSON.stringify(authUser));
 

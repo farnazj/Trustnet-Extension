@@ -131,7 +131,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   
       titleServices.postCustomTitle(request.data.reqBody)
       .then(res => {
-        console.log('here is the resp', res)
         resolve(res);
       })
       .catch(err => {

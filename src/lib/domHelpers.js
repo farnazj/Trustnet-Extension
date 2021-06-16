@@ -167,7 +167,7 @@ function getFuzzyTextSimilarToHeading(targetTitleText, isSearchingForServerTitle
             finalResults.push(tempResults[0]);
     }
     
-    console.log('fuzzy search all results were', tempResults, scoreThreshold, finalResults[0])
+    console.log('All results from fuzzy search results were:', tempResults, ', final result is', finalResults[0]);
     return (finalResults[0] && finalResults[0].score <= scoreThreshold) ? finalResults[0].item : null;
 }
 
@@ -175,7 +175,7 @@ function findAndReplaceTitle(title, remove) {
     let results = getElementsContainingText(title.text);
     results = results.filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
 
-    console.log('results of els', results)
+    console.log('results of looking for elements containing the exact text returned from the server:', results)
     if (!results.length) {
         let similarText = getFuzzyTextSimilarToHeading(title.text, true);
         if (similarText)
@@ -189,8 +189,6 @@ function findAndReplaceTitle(title, remove) {
     results.forEach(el => {
         if (el.nodeName != 'SCRIPT') {
             nonScriptResultsCount += 1;
-
-            console.log('element found', el)
 
             //if headline has not been modified yet
             if (!el.classList.contains('headline-modified')) {
@@ -207,9 +205,10 @@ function findAndReplaceTitle(title, remove) {
                 el.appendChild(newSecondChild);
             }
             else {
-                /*if headline has already been modified, the displayed alt headline either needs to change to another (in case of headline editing or removing),
-                 or the alt headline should be removed altogether and the style of the original headline should be restored back to its original state 
-                 (in case there is no alt headline left for the headline)
+                /*if headline has already been modified, the displayed alt headline either needs to change to another 
+                (in case of headline editing or removing), or the alt headline should be removed altogether and the style 
+                of the original headline should be restored back to its original state (in case there is no alt headline
+                left for the headline)
                  */
                 let headlineContainer = el.parentNode;
 
@@ -269,7 +268,7 @@ function identifyPotentialTitles() {
     let elResults = [];
     try {
         let ogTitle = htmlDecode(document.querySelector('meta[property="og:title"]').getAttribute('content'));
-        console.log('og title is*******', ogTitle)
+        console.log('og title is:', ogTitle)
 
         if (ogTitle.length >= consts.MIN_TITLE_LENGTH) {
             elResults = getElementsContainingText(ogTitle).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
@@ -281,12 +280,12 @@ function identifyPotentialTitles() {
                     elResults = getElementsContainingText(similarText).filter(el => !(['SCRIPT', 'TITLE'].includes(el.nodeName)));
             }
     
-            console.log('results of looking for og titles', elResults);
+            console.log('results of looking for og titles:', elResults);
         }
        
     }
     catch(err) {
-        console.log('in og:title, error is', err)
+        console.log('in og:title, error is', err);
     }
 
     try {
@@ -329,7 +328,7 @@ function identifyPotentialTitles() {
                 return similarText != null;
             }).filter(x => x.textContent.length >= consts.MIN_TITLE_LENGTH);
     
-            console.log('headings from document title', elResults)
+            console.log('heading tags with similar text to document title', elResults);
         }
       
     }

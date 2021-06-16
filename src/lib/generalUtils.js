@@ -46,7 +46,6 @@ function isTextLight(rgbText) {
     let b = parseInt(rgbArr[2]);  // extract blue
 
     let luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
-    console.log('luma is', luma)
 
     if (luma > 128) {
         return true;
