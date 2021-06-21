@@ -1,4 +1,3 @@
-import assessmentServices from '@/services/assessmentServices'
 import sourceServices from '@/services/sourceServices'
 import utils from '@/services/utils'
 
@@ -36,13 +35,13 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log('*************assessments are', response);
+                    console.log('assessments are', response);
                     context.dispatch('restructureAssessments', response)
                     .then((restructuredAssessments) => {
-                        console.log('*************restructured assessmnets:', restructuredAssessments);
+                        console.log('restructured assessmnets:', restructuredAssessments);
                         context.dispatch('sortAssessments', restructuredAssessments)
                         .then((sortedAssessments) => {
-                            console.log('*************sorted assessments', sortedAssessments);
+                            console.log('sorted assessments', sortedAssessments);
                             context.commit('set_assessments', sortedAssessments);
                             resolve();
                         })
@@ -123,6 +122,10 @@ export default {
       
         setHistoryVisibility: (context, payload) => {
             context.commit('set_history_visibility', payload);
+        },
+
+        populateAssessmentHistory: (context, payload) => {
+            context.commit('populate_assessment_history', payload);
         }
       
     }

@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="custom-sidebar pa-0">
+  <v-container fluid class="fixed-sidebar login-sidebar pa-0">
     <custom-toolbar></custom-toolbar>
     <v-card class="pa-2">
       <v-row no-gutters>

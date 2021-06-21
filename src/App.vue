@@ -1,19 +1,20 @@
 <template>
   <v-app>
     <router-view></router-view>
+    <assessments-container v-if="isLoggedIn"></assessments-container>
   </v-app>
 </template>
 
 <script>
+import assessmentsContainer from '@/components/AssessmentsContainer'
 import setupHelpers from '@/mixins/setupHelpers';
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'insertedApp',
-
   components: {
+    'assessments-container': assessmentsContainer
   },
-
   data: () => ({
   }),
   created() {
@@ -25,7 +26,6 @@ export default {
         this.$router.push({ name: 'Login' });
       }
       else {
-        console.log('chi shod')
         this.fetchPageAndUserCharacteristics()
         .then(() => {
           console.log('hiiiiii')

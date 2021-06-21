@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="login-style pa-0">
+  <v-container fluid class="fixed-sidebar pa-0">
     <custom-toolbar></custom-toolbar>
 
     <v-row class="pt-0 full-height" justify="center" align="center" no-gutters fill-height>
@@ -93,7 +93,7 @@ export default {
       'password': password
     })
     .then(() => {
-      this.fetchTitlesAndRelationships();
+      // this.fetchTitlesAndRelationships();
       this.$router.push({ name: 'home' });
     })
     .catch(err => {

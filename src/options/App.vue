@@ -11,6 +11,7 @@ export default {
   name: 'optionsApp',
   created() {
 
+    //  this.logout();
     this.getUser()
     .then(authUser => {
 
@@ -23,12 +24,12 @@ export default {
       }
     });
   },
-   methods: {
+  methods: {
     ...mapActions('auth', [
       'getUser',
       'logout'
     ])
-  },
+  }
 }
 </script>
 
@@ -36,5 +37,9 @@ export default {
 html {
   width: 400px;
   height: 400px;
+}
+
+#whaat {
+  display: block;
 }
 </style>
