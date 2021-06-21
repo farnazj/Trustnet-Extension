@@ -13,10 +13,9 @@ export default {
         return new Promise((resolve, reject) => {
             context.commit('set_url', window.location.href);
             console.log('page url:', context.state.url);
-            resolve;
+            resolve();
         })
       }
-  
     }
   }
   

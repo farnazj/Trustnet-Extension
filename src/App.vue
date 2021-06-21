@@ -6,7 +6,7 @@
 
 <script>
 import setupHelpers from '@/mixins/setupHelpers';
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'insertedApp',
@@ -19,21 +19,35 @@ export default {
   created() {
     this.getUser()
     .then(authUser => {
-
-      //this.logout();
+      // this.logout();
       if (!authUser) {
         this.logout();
         this.$router.push({ name: 'Login' });
       }
       else {
-        this.fetchTitlesAndRelationships();
+        console.log('chi shod')
+        this.fetchPageAndUserCharacteristics()
+        .then(() => {
+          console.log('hiiiiii')
+          //this.fetchTitlesAndRelationships();
+          this.getAssessments();
+        })
+        
       }
     });
+  },
+  computed: {
+    ...mapGetters('auth', [
+      'isLoggedIn'
+    ])
   },
   methods: {
     ...mapActions('auth', [
       'getUser',
       'logout'
+    ]),
+    ...mapActions('assessments', [
+      'getAssessments'
     ])
   },
   mixins: [setupHelpers]

@@ -7,44 +7,44 @@ export default {
     }
   },
   methods: {
-    fetchTitlesAndRelationships() {
 
-      this.setUpPageUrl();
-      this.setUpObserver();
+    fetchPageAndUserCharacteristics() {
+    
+      return Promise.all([
+        this.setUpPageUrl(),
+        this.setUpObserver(),
+        this.getUserPreferences()
+      ]);
+    },
+
+    fetchTitlesAndRelationships() {
 
       if (!this.followedSources.length)
           this.fetchFollows();
       if (!this.trustedSources.length)
           this.fetchTrusteds();
-      
-      // this.fetchFollowers();
 
-      this.getUserPreferences()
-      .then(() => {
+      console.log('user preferences:', this.userPreferences);
 
-        console.log('user preferences:', this.userPreferences);
+      let pageHostname = utils.extractHostname(this.url);
+      let pageIsBlackListed = false;
 
-        let pageHostname = utils.extractHostname(this.url);
-        let pageIsBlackListed = false;
+      if ('blackListedWebsites' in this.userPreferences) {
+        pageIsBlackListed = this.userPreferences.blackListedWebsites.some(blacklistedWebsite => 
+          pageHostname.includes(blacklistedWebsite)
+        )
+      }
+      console.info('is page blacklisted:', pageIsBlackListed)
 
-        if ('blackListedWebsites' in this.userPreferences) {
-          pageIsBlackListed = this.userPreferences.blackListedWebsites.some(blacklistedWebsite => 
-            pageHostname.includes(blacklistedWebsite)
-          )
-        }
-        console.info('is page blacklisted:', pageIsBlackListed)
+      if (!pageIsBlackListed) {
 
-        if (!pageIsBlackListed) {
-
-            if ( !this.titles.length && !this.titlesFetched ) {
-              this.setUpTitles()
-              .then( () => {
-                  this.setTitlesFetched(true);
-              })
-            }
-        }
-        
-      })
+          if ( !this.titles.length && !this.titlesFetched ) {
+            this.setUpTitles()
+            .then( () => {
+                this.setTitlesFetched(true);
+            })
+          }
+      }
       
     },
     ...mapActions('titles', [

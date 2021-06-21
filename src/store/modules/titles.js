@@ -246,7 +246,6 @@ export default {
     
         })
     },
-  
 
     setUpTitles: (context) => {
         return new Promise((resolve, reject) => {
@@ -315,7 +314,6 @@ export default {
 
         })
     },
-
 
     removeTitleFromPage: (context, payload) => {
         return new Promise((resolve, reject) => {

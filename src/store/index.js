@@ -6,6 +6,7 @@ import relatedSources from './modules/relatedSources'
 import pageDetails from './modules/pageDetails'
 import pageObserver from './modules/pageObserver'
 import preferences from './modules/preferences'
+import assessments from './modules/assessments'
 
 Vue.use(Vuex)
 
@@ -22,6 +23,7 @@ export default new Vuex.Store({
     relatedSources,
     pageDetails,
     pageObserver,
-    preferences
+    preferences,
+    assessments
   }
 })

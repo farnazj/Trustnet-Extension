@@ -57,21 +57,21 @@ export default {
       setUpObserver: function(context) {  
         return new Promise((resolve, reject) => {
             context.commit('setup_observer');
-            resolve;
+            resolve();
         })
       },
 
       disconnectObserver: function(context) {
         return new Promise((resolve, reject) => {
           context.commit('disconnect_observer');
-          resolve;
+          resolve();
         })
       },
 
       reconnectObserver: function(context) {
         return new Promise((resolve, reject) => {
           context.commit('reconnect_observer');
-          resolve;
+          resolve();
         })
       }
   

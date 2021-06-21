@@ -1,3 +1,6 @@
+/*
+general functions for interacting with the DOM
+*/
 
 /*
 changes curly quotes to their non-curly counterparts

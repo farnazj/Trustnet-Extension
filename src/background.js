@@ -3,6 +3,7 @@ import titleServices from './services/titleServices'
 import sourceServices from './services/sourceServices'
 import relationServices from './services/relationServices'
 import preferencesServices from './services/preferencesServices'
+import assessmentServices from './services/assessmentServices'
 
 browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log('Hello from the background')
@@ -228,6 +229,20 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       })
     })
     
+  }
+  else if (request.type == 'get_assessments') {
+
+    return new Promise((resolve, reject) => {
+      assessmentServices.getAssessmentsForURL(request.data.headers)
+      .then(res => {
+        console.log('background', res)
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+
   }
 
 })

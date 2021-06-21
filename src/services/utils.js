@@ -1,4 +1,5 @@
 import store from '@/store'
+import consts from '@/lib/constants'
 
 //function to sort sources by full name or username (for news publishing entities)
 function compareNames(a, b) {
@@ -220,6 +221,15 @@ function extractHostname(url) {
   return hostname;
 }
 
+function getAccuracyMapping(credibility) {
+  if (credibility < consts.ACCURACY_CODES.QUESTIONED)
+      return 'refuted';
+  else if (credibility == consts.ACCURACY_CODES.QUESTIONED)
+      return 'questioned';
+  else if (credibility > consts.ACCURACY_CODES.QUESTIONED)
+      return 'confirmed';
+}
+
 export default {
   compareNames,
   compareSources,
@@ -231,5 +241,6 @@ export default {
   isFollowed,
   addLimitOffsetToQuery,
   hashCode,
-  extractHostname
+  extractHostname,
+  getAccuracyMapping
 }
