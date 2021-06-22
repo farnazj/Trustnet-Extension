@@ -2,14 +2,19 @@
     min-height: initial !important;
 }
 
-.custom-sidebar {
+.fixed-sidebar {
     position: fixed;
     width: 400px !important;
-    height: 100vh;
+    /* height: 100vh; */
     right: 0px;
     z-index: 99999;
     overflow: auto;
 }
+
+.assessments-container {
+    max-height: 100vh;
+}
+
 /* 
 .extension-side-bar {
     height: 100%;

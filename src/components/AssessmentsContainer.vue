@@ -1,41 +1,48 @@
 <template>
-    <v-container fluid class="fixed-sidebar pa-0">
+    <v-container fluid class="fixed-sidebar assessments-container pa-0">
         <v-row no-gutters>
             <v-col cols="12">
-                <v-card outlined>
-                    <v-row align-center fill-height no-gutters>
+                <v-card color="blue-grey lighten-5">
+
+                    <v-row align-center no-gutters v-if="isAssessmentNonEmpty">
                         <v-col cols="12">
                             <v-row justify="center" no-gutters>
-                                <p class="pb-0 mb-0 subheading font-weight-bold">Accurate?</p>
+                                <p class="pb-0 ma-1 subheading font-weight-bold">Accurate?</p>
                             </v-row>
-                        </v-col>
-                    </v-row>
-                    <v-row no-gutters v-for="(key, index) in ['questioned', 'refuted', 'confirmed']" :key="index">
-                        {{assessments[key]}}
-                        <v-col cols="12" v-if="assessments[key].length">
-                            <v-card-title>
-                                <div>
-                                    <p class="mb-1 body-2 font-weight-bold" v-if="key == 'questioned'"> Questioned</p>
-                                    <p class="mb-1 body-2 font-weight-bold" v-if="key == 'confirmed'"> Yes</p>
-                                    <p class="mb-1 body-2 font-weight-bold" v-else-if="key == 'refuted'"> No</p>
-                                </div>
-                            </v-card-title>
                             <v-divider></v-divider>
-
-                            <template v-for="assessment in getAssessmentsSlice(key)" >
-                                <inner-assessment :assessmentObj="assessment" 
-                                :key="assessment.lastVersion.id" :assessmentType="key"></inner-assessment>
-                            </template>
-
-                            <v-row no-gutters class="pa-1">
-                                <span v-if="assessmentsRemaining(key)" @click="revealMore(key)"
-                                class="blue--text text--darken-3 body-2 interactable">
-                                Show More Assessments</span>
-                                <v-spacer></v-spacer>
-                                <span class="caption grey--text text--darken-3 pr-1"> {{getAssessmentStats(key)}} </span>
-                            </v-row>
                         </v-col>
                     </v-row>
+
+                    <template v-if="isAssessmentNonEmpty">
+                        <v-row no-gutters v-for="(key, index) in ['questioned', 'refuted', 'confirmed']" :key="index">
+                            <template v-if="assessments[key].length">
+
+                                <v-col cols="12">
+                                    <v-card-title class="pa-1">
+                                        <p class="ma-1 body-2 font-weight-bold" v-if="key == 'questioned'"> Questioned</p>
+                                        <p class="ma-1 body-2 font-weight-bold" v-if="key == 'confirmed'"> Yes</p>
+                                        <p class="ma-1 body-2 font-weight-bold" v-else-if="key == 'refuted'"> No</p>
+                                    </v-card-title>
+                                    <v-divider></v-divider>
+
+                                    <template v-for="assessment in getAssessmentsSlice(key)" >
+                                        <inner-assessment :assessmentObj="assessment" 
+                                        :key="assessment.lastVersion.id" :assessmentType="key"></inner-assessment>
+                                    </template>
+
+                                    <v-row no-gutters class="pa-1">
+                                        <span v-if="assessmentsRemaining(key)" @click="revealMore(key)"
+                                        class="blue--text text--darken-3 body-2 interactable">
+                                        Show More Assessments</span>
+                                        <v-spacer></v-spacer>
+                                        <span class="caption grey--text text--darken-3 pr-1"> {{getAssessmentStats(key)}} </span>
+                                    </v-row>
+                                </v-col>
+
+                            </template>
+                        </v-row>
+                    </template>
+
                 </v-card>
             </v-col>
         </v-row>
@@ -56,10 +63,12 @@ export default {
         }
     },
     created() {
-        console.log('inside assessment container');
         this.resetRevealedSize();
     },
     computed: {
+        isAssessmentNonEmpty: function() {
+            return Object.values(this.assessments).flat().length;
+        },
         ...mapState('assessments', [
             'assessments'
         ])

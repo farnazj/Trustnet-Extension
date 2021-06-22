@@ -28,7 +28,6 @@ export default {
       else {
         this.fetchPageAndUserCharacteristics()
         .then(() => {
-          console.log('hiiiiii')
           //this.fetchTitlesAndRelationships();
           this.getAssessments();
         })
