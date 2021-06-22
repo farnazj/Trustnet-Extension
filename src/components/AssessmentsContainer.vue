@@ -14,6 +14,7 @@
                     </v-row>
 
                     <template v-if="isAssessmentNonEmpty">
+
                         <v-row no-gutters v-for="(key, index) in ['questioned', 'refuted', 'confirmed']" :key="index">
                             <template v-if="assessments[key].length">
 

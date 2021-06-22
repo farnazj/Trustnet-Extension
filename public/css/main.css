@@ -5,10 +5,14 @@
 .fixed-sidebar {
     position: fixed;
     width: 400px !important;
-    /* height: 100vh; */
     right: 0px;
     z-index: 99999;
     overflow: auto;
+    top: 0px;
+}
+
+.login-style{
+    height: 100vh;
 }
 
 .assessments-container {

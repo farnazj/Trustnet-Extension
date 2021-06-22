@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="fixed-sidebar pa-0">
+  <v-container fluid class="fixed-sidebar login-style pa-0">
     <custom-toolbar></custom-toolbar>
 
     <v-row class="pt-0 full-height" justify="center" align="center" no-gutters fill-height>
@@ -114,11 +114,11 @@ export default {
 </script>
 
 <style scoped>
-.login-style {
+/* .login-style {
     position: fixed;
     width: 400px;
     height: 100vh;
     right: 0px;
     z-index: 99999;
-}
+} */
 </style>
