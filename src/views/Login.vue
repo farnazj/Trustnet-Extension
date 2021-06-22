@@ -66,6 +66,7 @@
 <script>
 import setupHelpers from '@/mixins/setupHelpers';
 import customToolbar from '@/components/CustomToolbar'
+import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -94,6 +95,7 @@ export default {
     })
     .then(() => {
       // this.fetchTitlesAndRelationships();
+      this.getAssessments();
       this.$router.push({ name: 'home' });
     })
     .catch(err => {
@@ -106,7 +108,10 @@ export default {
     },
     goToPasswordReset: function() {
       this.$router.push({ name: 'forgotPassword' });
-    }
+    },
+    ...mapActions('assessments', [
+      'getAssessments'
+    ])
   },
   mixins: [setupHelpers]
 }

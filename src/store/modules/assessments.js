@@ -4,7 +4,7 @@ import utils from '@/services/utils'
 export default {
     namespaced: true,
     state: {
-        isExpanded: true,
+        isExpanded: false,
         assessments: {},
         historyVisibility: false,
         assessmentHistory: [],

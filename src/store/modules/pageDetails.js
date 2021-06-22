@@ -11,7 +11,7 @@ export default {
     actions: {
       setUpPageUrl: function(context) {
         return new Promise((resolve, reject) => {
-            context.commit('set_url', window.location.href);
+            context.commit('set_url', window.location.href.split('?')[0]);
             console.log('page url:', context.state.url);
             resolve();
         })

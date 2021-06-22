@@ -6,7 +6,7 @@
     position: fixed;
     width: 400px !important;
     right: 0px;
-    z-index: 99999;
+    z-index: 9999;
     overflow: auto;
     top: 0px;
 }
@@ -17,6 +17,15 @@
 
 .assessments-container {
     max-height: 100vh;
+    position: fixed;
+    right: 0px;
+    z-index: 9999;
+    overflow: auto;
+    top: 0px;
+}
+
+.assessments-pane {
+    width: 400px !important;
 }
 
 /* 
