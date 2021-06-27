@@ -17,11 +17,12 @@
 
 .assessments-container {
     max-height: 100vh;
-    position: fixed;
+    position: fixed !important;
     right: 0px;
     z-index: 9999;
     overflow: auto;
     top: 0px;
+    width: initial !important;
 }
 
 .assessments-pane {
