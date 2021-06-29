@@ -17,14 +17,17 @@ export default {
       ]);
     },
 
-    fetchTitlesAndRelationships() {
+    fetchRelationships() {
 
       if (!this.followedSources.length)
           this.fetchFollows();
       if (!this.trustedSources.length)
           this.fetchTrusteds();
 
-      console.log('user preferences:', this.userPreferences);
+      this.fetchFollowers();
+    },
+
+    fetchTitles() {
 
       let pageHostname = utils.extractHostname(this.url);
       let pageIsBlackListed = false;

@@ -1,10 +1,9 @@
 <!--
- @fileoverview A component that is used when assessments are requested (e.g., in the ArticleDetails and 
- ContentBooster components)
+ @fileoverview A component that is used when assessments are requested
 -->
 <template>
   <validation-observer class="assessment-form" ref="assessmentObserver" v-slot="{ invalid }">
-      <v-form ref="assessmentMenu" class="assessment-collector">
+      <v-form class="assessment-collector">
         
         <v-container class="pa-2">
 
@@ -116,7 +115,7 @@
 import sourceSelector from '@/components/SourceSelector'
 import consts from '@/lib/constants'
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import { mdiGavel } from '@mdi/js';
 
 export default {
@@ -125,14 +124,11 @@ export default {
     ValidationProvider,
     ValidationObserver,
   },
-  // props: [
-  //   // 'postCredibility',
-  //   // 'assessmentBody',
-  //   // 'assessmentId',
-  //   // 'rerenderKey'
-  // ],
   data () {
     return {
+      /*
+      input models
+      */
       credibility: null,
       anonymous: true,
       assessmentText: null,
@@ -171,13 +167,16 @@ export default {
         gavel: mdiGavel
       },
 
+      /*
+      properties of the fetched user assessment
+      */
       postCredibility: null,
-      assessmentBody: '',
-      rerenderKey: null
+      assessmentBody: ''
     }
   },
   created() {
     this.mapCredProperties();
+    this.prepopulateUserAssessment()
   },
   computed: {
     textAreaLabel: function() {
@@ -218,49 +217,65 @@ export default {
       if (index > -1)
         this.emails.splice(index, 1);
     },
-      prepopulateUserAssessment: function() {
+    prepopulateUserAssessment: function() {
 
-            if (Object.entries(this.userAssessment).length != 0) {
+      console.log('******user assessment', this.userAssessment)
+      if (Object.entries(this.userAssessment).length != 0) {
 
-                this.disableBoost = false;
-                let assessmentBody = this.userAssessment.body;
-                let postCredibility = parseFloat(this.userAssessment.postCredibility);
-                    if (assessmentBody == this.assessmentBody && postCredibility == this.postCredibility) {
-                    this.rerenderKey = Math.random();
-                }
-                else {
-                    this.assessmentBody = assessmentBody;
-                    this.postCredibility = postCredibility;
-                }
-                
-            }
-            else {
-                // this.disableBoost = true;
-                this.assessmentBody = '';
-                this.postCredibility = null;
+        this.disableBoost = false;
+        this.assessmentBody = this.userAssessment.body;
+        this.postCredibility = parseFloat(this.userAssessment.postCredibility);
+      }
+      else {
+          // this.disableBoost = true;
+          this.assessmentBody = '';
+          this.postCredibility = null;
 
-                if (this.$refs.assessmentObserver)
-                    this.$refs.assessmentObserver.reset();
-            }
+          if (this.$refs.assessmentObserver)
+              this.$refs.assessmentObserver.reset();
+      }
+
+    },
+
+    postAssessment: function() {
+      if (this.$refs.assessmentObserver.validate()) {
         
-        },
-
-        postAssessment: function() {
-            if (this.$refs.assessmentObserver.validate()) {
-                console.log('posting user assessment')
-            }
+        let reqBody = {
+          postCredibility: this.credibility - 2,
+          body: this.assessmentText
         }
+
+        if (reqBody.postCredibility == consts.ACCURACY_CODES.QUESTIONED) {
+          let arbiters = this.$refs.arbiters.targets;
+          reqBody.sourceArbiters = arbiters.map(el => el.identifier);
+          reqBody.emailArbiters = this.emails;
+          reqBody.sourceIsAnonymous = this.anonymous;
+        }
+
+        this.postAuthUserAssessment(reqBody)
+        .then(() => {
+          this.getAllAssessments()
+        })
+        .catch(err => {
+          this.$emit('assessmentUpdateErr', err);
+          console.log(err);
+        })
+
+      }
+    },
+    ...mapActions('assessments', [
+      'postAuthUserAssessment',
+      'getAuthUserPostAssessment',
+      'getAllAssessments'
+    ])
   },
   watch: {
-    assessmentId: function() {
-      this.anonymous = true;
-      this.mapCredProperties();
-    },
     postCredibility: function(val) {
       this.mapCredProperties();
     },
-    rerenderKey: function(val) {
-      this.mapCredProperties();
+    userAssessment: function() {
+      this.prepopulateUserAssessment();
+
     }
   }
 

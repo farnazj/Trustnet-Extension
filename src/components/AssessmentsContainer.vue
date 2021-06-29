@@ -11,15 +11,23 @@
             <v-expand-x-transition>
                 <v-container v-show="isExpanded" fluid class="assessments-pane pa-0">
                     <v-card color="blue-grey lighten-5" raised elevation="3">
+
+                        <v-snackbar v-model="showInfoSnackbar" top>
+                            {{ displayedError }}
+                            <v-btn color="blue lighten-1" text @click="showInfoSnackbar = false" small>
+                            Close
+                            </v-btn>
+                        </v-snackbar>
+
                         <v-row no-gutters>
                             <v-col cols="12">
 
                                 <v-row no-gutters class="pa-2">
-                                    <assessment-collector>
+                                    <assessment-collector @assessmentUpdateErr="showError">
                                     </assessment-collector>
                                 </v-row>
                                 
-                                <v-row align-center no-gutters v-if="isAssessmentNonEmpty">
+                                <v-row align-center no-gutters v-if="isAssessmentNonEmpty" class="mt-1">
                                     <v-col cols="12">
                                         <v-row justify="center" no-gutters>
                                             <p class="pb-0 ma-1 subheading font-weight-bold">Accurate?</p>
@@ -84,7 +92,9 @@ export default {
             revealedSize: {},
             icons: {
                 expander: mdiChevronLeft
-            }
+            },
+            showInfoSnackbar: false,
+            displayedError: ''
         }
     },
     created() {
@@ -120,6 +130,11 @@ export default {
                 this.setVisibility(false);
             else
                 this.setVisibility(true);
+        },
+
+        showError: function(err) {
+            this.displayedError = 'An error occured. Please try again in a few minutes.';
+            this.showInfoSnackbar = true;
         },
         ...mapActions('assessments', [
             'setVisibility'

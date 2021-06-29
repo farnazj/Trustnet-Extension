@@ -16,7 +16,7 @@
       <span v-if="assessmentObj.lastVersion.isTransitive" class="ml-2 mr-1 caption grey--text text--darken-1 "> Adopted through their network</span>
       <span class="ml-2 caption grey--text text--darken-3"> {{timeElapsed(assessmentObj.lastVersion.createdAt)}} </span>
       <span v-if="assessmentObj.history && assessmentObj.history.length"
-      class="ml-2 caption grey--text text--darken-1 interactable" @click.stop="showHistory">
+      class="ml-2 caption grey--text text--darken-1" >
         Edited</span>
     </v-row>
 

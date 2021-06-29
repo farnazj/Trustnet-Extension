@@ -95,6 +95,7 @@ export default {
     })
     .then(() => {
       // this.fetchTitlesAndRelationships();
+      this.fetchRelationships();
       this.getAllAssessments();
       this.getAuthUserPostAssessment()
       this.$router.push({ name: 'home' });

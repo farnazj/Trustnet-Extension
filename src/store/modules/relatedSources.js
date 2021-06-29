@@ -55,6 +55,7 @@ export default {
             type: 'get_follows'
         })
         .then(response => {
+          console.log('follows', response)
             context.commit('populate_follows', response);
             resolve();
         })
@@ -74,6 +75,7 @@ export default {
             type: 'get_trusteds'
         })
         .then(response => {
+          console.log('trusteds', response)
             context.commit('populate_trusteds', response);
             resolve();
         })

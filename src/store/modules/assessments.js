@@ -31,7 +31,6 @@ export default {
             return new Promise((resolve, reject) => {
             
                 let pageUrl = context.rootState.pageDetails.url;
-                console.log('in get assessments, page url', pageUrl)
                 browser.runtime.sendMessage({
                     type: 'get_assessments',
                     data: {
@@ -39,14 +38,15 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log('assessments are', response);
                     context.dispatch('restructureAssessments', response)
                     .then((restructuredAssessments) => {
-                        console.log('restructured assessmnets:', restructuredAssessments);
                         context.dispatch('sortAssessments', restructuredAssessments)
                         .then((sortedAssessments) => {
-                            console.log('sorted assessments', sortedAssessments);
                             context.commit('set_assessments', sortedAssessments);
+
+                            if (Object.values(sortedAssessments).flat().length)
+                                context.commit('set_visibility', true);
+
                             resolve();
                         })
                     })
@@ -62,7 +62,6 @@ export default {
             return new Promise((resolve, reject) => {
 
                 let assessments = {'confirmed': [], 'refuted': [], 'questioned': []};
-        
                 let assessmentsBySource = {};
             
                 returnedAssessments.forEach(returnedAssessment => {
@@ -136,8 +135,10 @@ export default {
                     }
                 })
                 .then(response => {
-                    console.log(response)
-                    let assessment = response.length ? response[0] : {};
+                    console.log('auth user post assessments', response)
+                    
+                    let assessment = response.length ? (response.filter(el => el.version == 1))[0] : {};
+                    console.log('chosen assessment', assessment)
                     context.commit('set_user_assessment', assessment);
                     resolve();
                 })
