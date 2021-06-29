@@ -244,5 +244,17 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     })
 
   }
+  else if (request.type == 'post_assessment') {
+    return new Promise((resolve, reject) => {
+      assessmentServices.postAssessmentForURL(request.data.reqBody)
+      .then(res => {
+        console.log('background', res)
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
 
 })

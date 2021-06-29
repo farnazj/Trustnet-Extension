@@ -95,7 +95,8 @@ export default {
     })
     .then(() => {
       // this.fetchTitlesAndRelationships();
-      this.getAssessments();
+      this.getAllAssessments();
+      this.getAuthUserPostAssessment()
       this.$router.push({ name: 'home' });
     })
     .catch(err => {
@@ -110,7 +111,8 @@ export default {
       this.$router.push({ name: 'forgotPassword' });
     },
     ...mapActions('assessments', [
-      'getAssessments'
+      'getAllAssessments',
+      'getAuthUserPostAssessment'
     ])
   },
   mixins: [setupHelpers]

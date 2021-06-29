@@ -29,7 +29,8 @@ export default {
         this.fetchPageAndUserCharacteristics()
         .then(() => {
           //this.fetchTitlesAndRelationships();
-          this.getAssessments();
+          this.getAllAssessments();
+          this.getAuthUserPostAssessment();
         })
         
       }
@@ -46,7 +47,8 @@ export default {
       'logout'
     ]),
     ...mapActions('assessments', [
-      'getAssessments'
+      'getAllAssessments',
+      'getAuthUserPostAssessment'
     ])
   },
   mixins: [setupHelpers]

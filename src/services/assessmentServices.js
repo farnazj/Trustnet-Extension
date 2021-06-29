@@ -6,5 +6,12 @@ export default {
       withCredentials: true,
       headers: headers
     })
-  }
+  },
+
+  postAssessmentForURL(reqBody) {
+    return Api().post('/posts/assessments/url', reqBody ,
+    {
+      withCredentials: true
+    })
+  },
 }

@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
   "version": "0.0.0.1",
-  "name": "Reheadline",
+  "name": "Trustnet",
   "homepage_url": "https://github.com/farnazj/Replace-Previews",
-  "description": "Helps you write more informative news headlines as you read articles to help your friends and to see the headlines that they write.",
+  "description": "Allows you to assess different articles as accurate or inaccurate to help your friends and to also see the assessments that they provide.",
   "default_locale": "en",
   "permissions": [
   ],
@@ -23,14 +23,16 @@
       "matches": ["*://*/*"],
       "exclude_globs": [ 
         "http://trustnet.csail.mit.edu/*",
-        "https://trustnet.csail.mit.edu/*"
+        "https://trustnet.csail.mit.edu/*",
+        "http://reheadline.csail.mit.edu/*",
+        "https://reheadline.csail.mit.edu/*"
        ],
       "js": ["js/content-script.js"],
       "css": ["css/main.css"]
     }
   ],
   "browser_action": {
-    "default_title": "Reheadline",
+    "default_title": "Trustnet",
     "default_icon": {
       "19": "icons/16_.png",
       "38": "icons/38_.png"

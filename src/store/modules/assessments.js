@@ -6,6 +6,7 @@ export default {
     state: {
         isExpanded: false,
         assessments: {},
+        userAssessment: {},
         historyVisibility: false,
         assessmentHistory: [],
         historyOwner: {}
@@ -19,11 +20,14 @@ export default {
         },
         set_assessments(state, assessments) {
             state.assessments = assessments;
+        },
+        set_user_assessment(state, assessment) {
+            state.userAssessment = assessment;
         }
     },
     actions: {
 
-        getAssessments: (context) => {
+        getAllAssessments: (context) => {
             return new Promise((resolve, reject) => {
             
                 let pageUrl = context.rootState.pageDetails.url;
@@ -116,6 +120,55 @@ export default {
             })
         },
 
+        getAuthUserPostAssessment: (context) => {
+
+            let pageUrl = context.rootState.pageDetails.url;
+
+            return new Promise((resolve, reject) => {
+
+                browser.runtime.sendMessage({
+                    type: 'get_assessments',
+                    data: {
+                        headers: { 
+                            url: pageUrl,
+                            authuser: true
+                        }
+                    }
+                })
+                .then(response => {
+                    console.log(response)
+                    let assessment = response.length ? response[0] : {};
+                    context.commit('set_user_assessment', assessment);
+                    resolve();
+                })
+                .catch(err => {
+                    reject(err);
+                })
+            })
+        },
+      
+        postAuthUserAssessment: (context, payload) => {
+    
+            let pageUrl = context.rootState.pageDetails.url;
+            return new Promise((resolve, reject) => {
+                browser.runtime.sendMessage({
+                    type: 'post_assessment',
+                    data: {
+                        reqBody: { 
+                            url: pageUrl,
+                            ...payload
+                        }
+                    }
+                })
+                .then(() => {
+                    resolve();
+                })
+                .catch(err => {
+                    reject(err);
+                })
+            })
+        },
+
         setVisibility: (context, payload) => {
             context.commit('set_visibility', payload);
         },
@@ -126,8 +179,7 @@ export default {
 
         populateAssessmentHistory: (context, payload) => {
             context.commit('populate_assessment_history', payload);
-        }
-      
+        }   
     }
   }
   

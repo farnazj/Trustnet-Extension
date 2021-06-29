@@ -2,6 +2,7 @@ import Vue from 'vue';
 import store from '@/store';
 import insertedApp from '@/App';
 import router from '@/router';
+import '@/validation'
 import vuetify from '@/plugins/vuetify';
 // let prevIframe = document.querySelector('iframe[data-sth="customPopupIframe"]');
 // let iframe;

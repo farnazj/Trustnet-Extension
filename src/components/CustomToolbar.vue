@@ -2,7 +2,7 @@
     <v-toolbar dense fixed color="lime lighten-1">
 
       <v-toolbar-title @click="goToPage('Home')" class="headline text-uppercase cursor-pointer">
-        <span class="font-weight-light">Reheadline</span>
+        <span class="font-weight-light">Trustnet</span>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>

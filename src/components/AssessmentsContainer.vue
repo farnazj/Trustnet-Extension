@@ -13,6 +13,11 @@
                     <v-card color="blue-grey lighten-5" raised elevation="3">
                         <v-row no-gutters>
                             <v-col cols="12">
+
+                                <v-row no-gutters class="pa-2">
+                                    <assessment-collector>
+                                    </assessment-collector>
+                                </v-row>
                                 
                                 <v-row align-center no-gutters v-if="isAssessmentNonEmpty">
                                     <v-col cols="12">
@@ -65,12 +70,14 @@
 
 <script>
 import innerAssessment from '@/components/InnerAssessment'
+import assessmentCollector from '@/components/AssessmentCollector'
 import { mapState, mapActions } from 'vuex'
 import { mdiChevronLeft } from '@mdi/js';
 
 export default {
     components: {
-        'inner-assessment': innerAssessment
+        'inner-assessment': innerAssessment,
+        'assessment-collector': assessmentCollector
     },
     data () {
         return {
@@ -117,11 +124,6 @@ export default {
         ...mapActions('assessments', [
             'setVisibility'
         ])
-        // ...mapActions({
-        //     hideContainer (dispatch, payload) {
-        //         return dispatch(this.namespace + '/hideContainer', payload)
-        //     }
-        // })
     }
 }
 </script>
@@ -130,4 +132,5 @@ export default {
 .expand-button {
     height: 10%;
 }
+
 </style>
