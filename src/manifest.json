@@ -8,9 +8,9 @@
   "permissions": [
   ],
   "icons": {
-    "16": "icons/16_.png",
-    "48": "icons/48_.png",
-    "128": "icons/128_.png"
+    "16": "icons/trustnet_48.png",
+    "48": "icons/trustnet_100.png",
+    "128": "icons/trustnet_128.png"
   },
   "background": {
     "scripts": [
@@ -34,8 +34,8 @@
   "browser_action": {
     "default_title": "Trustnet",
     "default_icon": {
-      "19": "icons/16_.png",
-      "38": "icons/38_.png"
+      "19": "icons/trustnet_67.png",
+      "38": "icons/trustnet_80.png"
     }
   },
   "options_ui": {
