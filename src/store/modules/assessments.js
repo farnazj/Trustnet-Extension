@@ -5,14 +5,23 @@ export default {
     namespaced: true,
     state: {
         isExpanded: false,
-        assessments: {},
+        assessments: {'confirmed': [], 'refuted': [], 'questioned': []},
         userAssessment: {},
         historyVisibility: false,
         assessmentHistory: [],
         historyOwner: {}
     },
     getters: {
-     
+        
+        isConfirmed: (state) => {
+            return state.assessments['confirmed'].length && !state.assessments['refuted'].length;
+        },
+        isRefuted: (state) => {
+            return !state.assessments['confirmed'].length && state.assessments['refuted'].length;
+        },
+        isDebated: (state) => {
+            return state.assessments['confirmed'].length && state.assessments['refuted'].length;
+        }
     },
     mutations: {
         set_visibility(state, visibility) {
@@ -22,6 +31,7 @@ export default {
             state.assessments = assessments;
         },
         set_user_assessment(state, assessment) {
+            console.log(state.userAssessment, 'user assess')
             state.userAssessment = assessment;
         }
     },
@@ -61,7 +71,7 @@ export default {
         restructureAssessments: (context, returnedAssessments) => {
             return new Promise((resolve, reject) => {
 
-                let assessments = {'confirmed': [], 'refuted': [], 'questioned': []};
+                let tmpAssessments = {'confirmed': [], 'refuted': [], 'questioned': []};
                 let assessmentsBySource = {};
             
                 returnedAssessments.forEach(returnedAssessment => {
@@ -70,7 +80,7 @@ export default {
                         if (returnedAssessment.version == 1) {
                             let assessmentsObj = { lastVersion: returnedAssessment, assessor: {} };
                             let credValue = this.accuracyMapping(assessmentsObj.lastVersion.postCredibility);
-                            assessments[credValue].push(assessmentsObj);
+                            tmpAssessments[credValue].push(assessmentsObj);
                         }
                     }
                     else {
@@ -96,14 +106,14 @@ export default {
                         sourceServices.getSourceById(SourceId)
                         .then(response => {
                             assessmentsBySource[SourceId]['assessor'] = response.data;
-                            assessments[credValue].push(assessmentsObj);
+                            tmpAssessments[credValue].push(assessmentsObj);
                         })
                     );
                 }
             
                 Promise.all(sourcePromises)
                 .then(() => {
-                    resolve(assessments);
+                    resolve(tmpAssessments);
                 })
             })
         },

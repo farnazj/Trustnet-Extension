@@ -16,7 +16,6 @@ export default {
       setUpPageUrl: function(context) {
         return new Promise((resolve, reject) => {
             context.commit('set_url', window.location.href.split('?')[0]);
-            console.log('page url:', context.state.url);
             resolve();
         })
       },
@@ -32,6 +31,7 @@ export default {
             }
           })
           .then(response => {
+            console.log('article id is', response.id)
             context.commit('set_article_id', response.id);
             resolve();
           })

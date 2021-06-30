@@ -14,18 +14,18 @@ export default {
             return new Promise((resolve, reject) => {
 
                 browser.runtime.sendMessage({
-                type: 'boost_article',
-                data: {
-                  reqBody: payload
-                }
-              })
-              .then(response => {
-                resolve();
-              })
-              .catch(err => {
-                console.log(err)
-                reject();
-              })
+                    type: 'boost_article',
+                    data: {
+                        reqBody: payload
+                    }
+                })
+                .then(response => {
+                    resolve(response);
+                })
+                .catch(err => {
+                    console.log(err)
+                    reject();
+                })
             })
         }
 

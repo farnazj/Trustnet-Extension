@@ -219,7 +219,6 @@ export default {
     },
     prepopulateUserAssessment: function() {
 
-      console.log('******user assessment', this.userAssessment)
       if (Object.entries(this.userAssessment).length != 0) {
 
         this.disableBoost = false;

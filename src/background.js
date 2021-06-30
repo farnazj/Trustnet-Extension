@@ -250,7 +250,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
       assessmentServices.postAssessmentForURL(request.data.reqBody)
       .then(res => {
-        console.log('background', res)
         resolve(res.data);
       })
       .catch(err => {
@@ -262,7 +261,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
       sourceListServices.getLists({})
       .then(res => {
-        console.log(res)
         resolve(res.data)
       })
       .catch(err => {
@@ -286,8 +284,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
       postServices.boostArticle(request.data.reqBody)
       .then(res => {
-        console.log('got res back', res)
-        resolve(res.data)
+        resolve(res)
       })
       .catch(err => {
         reject({ message: err });

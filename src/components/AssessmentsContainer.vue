@@ -2,7 +2,7 @@
     
         <v-row no-gutters class="assessments-container">
 
-            <v-btn @click="toggleAssessments" x-small color="blue-grey lighten-3" class="expand-button" height="4vh">
+            <v-btn @click="toggleAssessments" x-small :color="handleBackgroundColor" class="expand-button" height="4vh">
                 <v-icon>
                     {{icons.expander}}
                 </v-icon>
@@ -10,7 +10,7 @@
 
             <v-expand-x-transition>
                 <v-container v-show="isExpanded" fluid class="assessments-pane pa-0">
-                    <v-card color="blue-grey lighten-5" raised elevation="3">
+                    <v-card :color="containerBackgroundColor" raised elevation="3">
 
                         <v-snackbar v-model="displayInfoSnackbar" top>
                             {{ infoSnackbarMessage }}
@@ -61,7 +61,7 @@
 
                                     <v-card-actions class="py-0">
                                         <v-spacer></v-spacer>
-                                        <v-btn color="primary" text @click="boostArticle" small>
+                                        <v-btn color="primary" text @click="shareArticle" small>
                                             <v-icon class="pr-1" small>{{icons.share}}</v-icon> Share
                                         </v-btn>
                                     </v-card-actions>
@@ -121,7 +121,8 @@
 import innerAssessment from '@/components/InnerAssessment'
 import assessmentCollector from '@/components/AssessmentCollector'
 import sourceSelector from '@/components/SourceSelector'
-import { mapState, mapActions } from 'vuex'
+import constants from '@/lib/constants'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import { mdiChevronLeft, mdiShare, mdiChevronDown, mdiChevronUp } from '@mdi/js';
 
 export default {
@@ -150,6 +151,41 @@ export default {
         this.resetRevealedSize();
     },
     computed: {
+        handleBackgroundColor: function() {
+        
+            if (Object.entries(this.userAssessment).length && this.userAssessment.postCredibility != constants.ACCURACY_CODES.QUESTIONED) {
+                if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.CONFIRMED)
+                    return 'green darken-1';
+                else if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.REFUTED)
+                    return 'red lighten-1';
+            }
+            else if (this.isConfirmed)
+                return 'green darken-1';
+            else if (this.isRefuted)
+                return 'red lighten-1';
+            else if (this.isDebated)
+                return 'orange darken-1';
+            else
+                return 'blue-grey lighten-3';
+
+        },
+        containerBackgroundColor: function() {
+            
+            if (Object.entries(this.userAssessment).length && this.userAssessment.postCredibility != constants.ACCURACY_CODES.QUESTIONED) {
+                if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.CONFIRMED)
+                    return 'green lighten-5';
+                else if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.REFUTED)
+                    return 'red lighten-5';
+            }
+            else if (this.isConfirmed)
+                return 'green lighten-5';
+            else if (this.isRefuted)
+                return 'red lighten-5';
+            else if (this.isDebated)
+                return 'orange lighten-5';
+            else
+                return 'blue-grey lighten-5';
+        },
         isAssessmentNonEmpty: function() {
             return Object.values(this.assessments).flat().length;
         },
@@ -163,6 +199,11 @@ export default {
         ]),
         ...mapState('pageDetails', [
             'articleId'
+        ]),
+        ...mapGetters('assessments', [
+            'isConfirmed',
+            'isRefuted',
+            'isDebated'
         ])
     },
     methods: {
@@ -196,8 +237,7 @@ export default {
 
             return { usernames: usernames, lists: lists };
         },
-        boostArticle: function() {
-            console.log(this.$refs.boostMenu)
+        shareArticle: function() {
 
             if (this.$refs.boostMenu.validate()) {
 
@@ -214,7 +254,7 @@ export default {
                         this.errorAlert = true;
                     else {
                         // this.updateStateArticle({ postId: this.articleId })
-                        this.infoSnackbarMessage = 'Article shared to Trustnet.';
+                        this.infoSnackbarMessage = `Article shared to Trustnet: ${response.data.data}`;
                         this.displayInfoSnackbar = true;
                     }
                 })
