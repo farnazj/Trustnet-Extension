@@ -4,6 +4,8 @@ import sourceServices from './services/sourceServices'
 import relationServices from './services/relationServices'
 import preferencesServices from './services/preferencesServices'
 import assessmentServices from './services/assessmentServices'
+import sourceListServices from './services/sourceListServices'
+import postServices from './services/postServices'
 
 browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log('Hello from the background')
@@ -250,6 +252,42 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       .then(res => {
         console.log('background', res)
         resolve(res.data);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
+  else if (request.type == 'get_lists') {
+    return new Promise((resolve, reject) => {
+      sourceListServices.getLists({})
+      .then(res => {
+        console.log(res)
+        resolve(res.data)
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
+  else if (request.type == 'get_post_by_url') {
+    return new Promise((resolve, reject) => {
+      postServices.getArticleByUrl(request.data.headers)
+      .then(res => {
+        console.log(res)
+        resolve(res.data)
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
+  else if (request.type == 'boost_article') {
+    return new Promise((resolve, reject) => {
+      postServices.boostArticle(request.data.reqBody)
+      .then(res => {
+        console.log('got res back', res)
+        resolve(res.data)
       })
       .catch(err => {
         reject({ message: err });

@@ -127,13 +127,13 @@ export default {
     textWhenNoData: function() {
       if (this.population == 'downstream')
         return 'No lists or followers found';
-      else if (this.population == 'upstream')
+      else //if (this.population == 'upstream')
         return 'You do not follow or trust any source';
     },
     audienceLabel: function() {
       if (this.population == 'downstream')
         return 'Select target audience';
-      else if (this.population == 'upstream')
+      else //if (this.population == 'upstream')
         return 'Sources you would like answers from';
     },
     ...mapState('relatedSources', [

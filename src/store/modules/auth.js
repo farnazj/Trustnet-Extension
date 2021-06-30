@@ -79,8 +79,9 @@ export default {
               const user = resp.data.user;
               context.commit('auth_success');
               context.dispatch('getUser')
-              
-              resolve(resp);    
+              .then(() => {
+                resolve(resp);    
+              })
           })
           .catch(err => {
               context.commit('auth_error');

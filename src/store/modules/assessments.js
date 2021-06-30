@@ -135,12 +135,17 @@ export default {
                     }
                 })
                 .then(response => {
-                    console.log('auth user post assessments', response)
                     
                     let assessment = response.length ? (response.filter(el => el.version == 1))[0] : {};
-                    console.log('chosen assessment', assessment)
                     context.commit('set_user_assessment', assessment);
-                    resolve();
+
+                    if (Object.entries(assessment).length && !context.rootState.pageDetails.articleId)
+                        context.dispatch('pageDetails/getArticleByUrl', true , {root: true} )
+                        .then(() => {
+                            resolve();
+                        })
+                    else
+                        resolve();
                 })
                 .catch(err => {
                     reject(err);

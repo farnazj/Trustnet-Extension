@@ -5,7 +5,7 @@
   <validation-observer class="assessment-form" ref="assessmentObserver" v-slot="{ invalid }">
       <v-form class="assessment-collector">
         
-        <v-container class="pa-2">
+        <v-container class="pa-2 pt-3">
 
           <v-row no-gutters>
             <v-col cols="12">
@@ -254,7 +254,8 @@ export default {
 
         this.postAuthUserAssessment(reqBody)
         .then(() => {
-          this.getAllAssessments()
+          this.getAllAssessments();
+          this.getAuthUserPostAssessment();
         })
         .catch(err => {
           this.$emit('assessmentUpdateErr', err);
@@ -286,6 +287,7 @@ export default {
 <style scoped>
 .assessment-collector {
   border: 1px #90A4AE solid;
+  border-top: initial;
 }
 
 .assessment-form {

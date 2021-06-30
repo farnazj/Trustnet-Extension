@@ -25,6 +25,7 @@ export default {
           this.fetchTrusteds();
 
       this.fetchFollowers();
+      this.fetchLists();
     },
 
     fetchTitles() {
@@ -37,7 +38,6 @@ export default {
           pageHostname.includes(blacklistedWebsite)
         )
       }
-      console.info('is page blacklisted:', pageIsBlackListed)
 
       if (!pageIsBlackListed) {
 
@@ -67,6 +67,9 @@ export default {
     ]),
     ...mapActions('preferences', [
       'getUserPreferences'
+    ]),
+    ...mapActions('sourceLists', [
+      'fetchLists'
     ])
   },
   computed: {

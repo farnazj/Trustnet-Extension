@@ -12,11 +12,11 @@
 }
 
 .login-style{
-    height: 100vh;
+    max-height: 100vh;
 }
 
 .assessments-container {
-    max-height: 100vh;
+    max-height: 99vh;
     position: fixed !important;
     right: 0px;
     z-index: 9999;
