@@ -57,9 +57,9 @@ export default {
 };
 </script>
 <style>
-html {
+/* html {
    min-height: initial;
    min-width: initial;
    z-index: 9999999;
-}
+} */
 </style>

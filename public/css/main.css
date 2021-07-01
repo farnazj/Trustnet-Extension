@@ -72,9 +72,11 @@
     font-size: 70%;
 }
 
-[data-vuetify] .v-badge__badge {
-    inset: calc(100% - 10px) auto auto calc(100% - 10px) !important;
-}
+/* [data-vuetify] .v-badge__badge { */
+    /* height: 10px !important;
+    min-width: 10px !important; */
+    /* inset: calc(100% - 10px) auto auto calc(100% - 10px) !important; */
+/* } */
 
 .interactable {
     cursor: pointer;
@@ -98,4 +100,14 @@
 
 .title-background-dark {
     background-color: #AFB42B;
+}
+
+[data-vuetify] .v-badge__badge .v-icon {
+    font-size: 17px !important;
+    inset: calc(100% - 14px) auto auto calc(100% - 14px) !important;
+    color: #827717  !important;
+}
+
+[data-vuetify] .v-icon.v-icon {
+    width: 15px !important;
 }

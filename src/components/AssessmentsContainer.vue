@@ -156,7 +156,7 @@ export default {
             if (Object.entries(this.userAssessment).length && this.userAssessment.postCredibility != constants.ACCURACY_CODES.QUESTIONED) {
                 if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.CONFIRMED)
                     return 'green darken-1';
-                else if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.REFUTED)
+                else //if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.REFUTED)
                     return 'red lighten-1';
             }
             else if (this.isConfirmed)
@@ -174,7 +174,7 @@ export default {
             if (Object.entries(this.userAssessment).length && this.userAssessment.postCredibility != constants.ACCURACY_CODES.QUESTIONED) {
                 if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.CONFIRMED)
                     return 'green lighten-5';
-                else if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.REFUTED)
+                else //if (this.userAssessment.postCredibility == constants.ACCURACY_CODES.REFUTED)
                     return 'red lighten-5';
             }
             else if (this.isConfirmed)

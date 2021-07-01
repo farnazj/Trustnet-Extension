@@ -13,14 +13,29 @@ export default {
     },
     getters: {
         
-        isConfirmed: (state) => {
-            return state.assessments['confirmed'].length && !state.assessments['refuted'].length;
+        isConfirmed: (state, getters, rootState, rootGetters) => {
+            let trustedIds = rootGetters['relatedSources/trustedIds'];
+
+            return state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
+                trustedIds.includes(sourceId)).length &&
+            !(state.assessments['refuted'].map(assessment => assessment.assessor.id).filter(sourceId => 
+                trustedIds.includes(sourceId)).length);
         },
-        isRefuted: (state) => {
-            return !state.assessments['confirmed'].length && state.assessments['refuted'].length;
+        isRefuted: (state, getters, rootState, rootGetters) => {
+            let trustedIds = rootGetters['relatedSources/trustedIds'];
+
+            return !(state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
+                trustedIds.includes(sourceId)).length) &&
+            state.assessments['refuted'].map(assessment => assessment.assessor.id).filter(sourceId => 
+                trustedIds.includes(sourceId)).length;
         },
-        isDebated: (state) => {
-            return state.assessments['confirmed'].length && state.assessments['refuted'].length;
+        isDebated: (state, getters, rootState, rootGetters) => {
+            let trustedIds = rootGetters['relatedSources/trustedIds'];
+
+            return state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
+                trustedIds.includes(sourceId)).length &&
+            state.assessments['refuted'].map(assessment => assessment.assessor.id).filter(sourceId => 
+                trustedIds.includes(sourceId)).length;
         }
     },
     mutations: {
@@ -29,6 +44,7 @@ export default {
         },
         set_assessments(state, assessments) {
             state.assessments = assessments;
+            console.log('assessments*****((((((((()))))))))', assessments)
         },
         set_user_assessment(state, assessment) {
             console.log(state.userAssessment, 'user assess')
@@ -48,6 +64,7 @@ export default {
                     }
                 })
                 .then((response) => {
+                    console.log('got all assessments', response)
                     context.dispatch('restructureAssessments', response)
                     .then((restructuredAssessments) => {
                         context.dispatch('sortAssessments', restructuredAssessments)

@@ -1,11 +1,13 @@
 <template>
 
   <span v-on="clickEnabled ? { click: goToPage } : {}" :class="[clickEnabled ? 'cursor-pointer' : '', 'reset-font'] ">
-    <v-badge v-if="isTrusted === true"
+    <!-- <v-badge v-if="isTrusted === true"
       overlap color="#DAA520" class="custom-badge" bottom content="T">
-      <!-- <template v-slot:badge >
-        <span class="reset-line-height">T</span>
-      </template> -->
+      <inner-avatar :user="user" :size="size ? size : avatarSize"></inner-avatar>
+    </v-badge> -->
+
+    <v-badge v-if="isTrusted === true"
+      overlap color="" bottom :icon="icons.shield">
       <inner-avatar :user="user" :size="size ? size : avatarSize"></inner-avatar>
     </v-badge>
 
@@ -18,6 +20,7 @@
 <script>
 import innerAvatar from '../components/InnerAvatar'
 import utils from '@/services/utils'
+import { mdiShield } from '@mdi/js';
 
 export default {
   components: {
@@ -38,6 +41,9 @@ export default {
   },
   data () {
     return {
+      icons: {
+        shield: mdiShield
+      }
     }
   },
   computed: {

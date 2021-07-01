@@ -103,7 +103,7 @@
         </v-container>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="postAssessment" :disabled="invalid" small>
+          <v-btn color="primary" text @click="postAssessment" :disabled="invalid || disableAssess" small>
               <v-icon class="pr-1" small>{{icons.gavel}}</v-icon> Assess
           </v-btn>
         </v-card-actions>
@@ -171,7 +171,8 @@ export default {
       properties of the fetched user assessment
       */
       postCredibility: null,
-      assessmentBody: ''
+      assessmentBody: '',
+      disableAssess: false
     }
   },
   created() {
@@ -209,7 +210,7 @@ export default {
         return consts.ACCURACY_CODES.REFUTED + 2;
       else if (credValue > 0)
         return consts.ACCURACY_CODES.CONFIRMED + 2;
-      else if (credValue == 0)
+      // else //if (credValue == 0)
         return consts.ACCURACY_CODES.QUESTIONED + 2;
     },
     removeEmail: function(item) {
@@ -239,6 +240,8 @@ export default {
     postAssessment: function() {
       if (this.$refs.assessmentObserver.validate()) {
         
+        this.disableAssess = true;
+
         let reqBody = {
           postCredibility: this.credibility - 2,
           body: this.assessmentText
@@ -259,6 +262,9 @@ export default {
         .catch(err => {
           this.$emit('assessmentUpdateErr', err);
           console.log(err);
+        })
+        .finally(() => {
+          this.disableAssess = false;
         })
 
       }
