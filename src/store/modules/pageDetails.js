@@ -2,14 +2,14 @@ export default {
     namespaced: true,
     state: {
       url: null,
-      articleId: null
+      article: null
     },
     mutations: {
       set_url: (state, url) => {
         state.url = url;
       },
-      set_article_id: (state, id) => {
-        state.articleId = id;
+      set_article: (state, article) => {
+        state.article = article;
       }
     },
     actions: {
@@ -31,8 +31,8 @@ export default {
             }
           })
           .then(response => {
-            console.log('article id is', response.id)
-            context.commit('set_article_id', response.id);
+            console.log('article is', response)
+            context.commit('set_article', response);
             resolve();
           })
           .catch(err => {

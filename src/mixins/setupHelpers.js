@@ -11,9 +11,9 @@ export default {
     fetchPageAndUserCharacteristics() {
     
       return Promise.all([
-        this.setUpPageUrl(),
+        this.setUpPageUrl().then(() => this.getArticleByUrl()),
         this.setUpObserver(),
-        this.getUserPreferences()
+        this.getUserPreferences(),
       ]);
     },
 
@@ -60,7 +60,8 @@ export default {
       'fetchFollowers'
     ]),
     ...mapActions('pageDetails', [
-      'setUpPageUrl'
+      'setUpPageUrl',
+      'getArticleByUrl'
     ]),
     ...mapActions('pageObserver', [
         'setUpObserver'

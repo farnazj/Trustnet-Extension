@@ -36,6 +36,21 @@ export default {
                 trustedIds.includes(sourceId)).length &&
             state.assessments['refuted'].map(assessment => assessment.assessor.id).filter(sourceId => 
                 trustedIds.includes(sourceId)).length;
+        },
+        /*
+        determines if there are assessments by a source other than the original poster of the article
+        */
+        isNoSourceAssessmentNonEmpty: function(state, getters, rootState, rootGetter) {
+            if (rootState.pageDetails.article) {
+                let articleSourceId = rootState.pageDetails.article.SourceId;
+                let noSourceAssessments = Object.values(state.assessments).flat().filter(assessment =>
+                     assessment.assessor.id != articleSourceId);
+    
+                return noSourceAssessments.length;
+            }
+            else
+                return Object.values(state.assessments).flat().length;
+            
         }
     },
     mutations: {
@@ -44,10 +59,8 @@ export default {
         },
         set_assessments(state, assessments) {
             state.assessments = assessments;
-            console.log('assessments*****((((((((()))))))))', assessments)
         },
         set_user_assessment(state, assessment) {
-            console.log(state.userAssessment, 'user assess')
             state.userAssessment = assessment;
         }
     },
@@ -64,14 +77,13 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log('got all assessments', response)
                     context.dispatch('restructureAssessments', response)
                     .then((restructuredAssessments) => {
                         context.dispatch('sortAssessments', restructuredAssessments)
                         .then((sortedAssessments) => {
                             context.commit('set_assessments', sortedAssessments);
 
-                            if (Object.values(sortedAssessments).flat().length)
+                            if (context.rootGetters['assessments/isNoSourceAssessmentNonEmpty'])
                                 context.commit('set_visibility', true);
 
                             resolve();

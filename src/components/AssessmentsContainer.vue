@@ -198,7 +198,7 @@ export default {
             'userAssessment'
         ]),
         ...mapState('pageDetails', [
-            'articleId'
+            'article'
         ]),
         ...mapGetters('assessments', [
             'isConfirmed',
@@ -243,7 +243,7 @@ export default {
 
                 let targets = this.getSelectedUsernamesAndLists();
                 let reqBody = {
-                    post_id: this.articleId,
+                    post_id: this.article.id,
                     target_usernames: targets.usernames,
                     target_lists: targets.lists
                 };
@@ -253,7 +253,7 @@ export default {
                     if (response.status != 200)
                         this.errorAlert = true;
                     else {
-                        // this.updateStateArticle({ postId: this.articleId })
+                        // this.updateStateArticle({ postId: this.article.id })
                         this.infoSnackbarMessage = `Article shared to Trustnet: ${response.data.data}`;
                         this.displayInfoSnackbar = true;
                     }

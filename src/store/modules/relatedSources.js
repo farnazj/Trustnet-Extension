@@ -55,9 +55,8 @@ export default {
             type: 'get_follows'
         })
         .then(response => {
-          console.log('follows', response)
-            context.commit('populate_follows', response);
-            resolve();
+          context.commit('populate_follows', response);
+          resolve();
         })
         .catch(err => {
           console.log(err)
@@ -72,12 +71,11 @@ export default {
       return new Promise((resolve, reject) => {
 
         browser.runtime.sendMessage({
-            type: 'get_trusteds'
+          type: 'get_trusteds'
         })
         .then(response => {
-          console.log('trusteds', response)
-            context.commit('populate_trusteds', response);
-            resolve();
+          context.commit('populate_trusteds', response);
+          resolve();
         })
         .catch(err => {
           console.log(err)
@@ -94,12 +92,11 @@ export default {
       return new Promise((resolve, reject) => {
 
         browser.runtime.sendMessage({
-            type: 'get_followers'
+          type: 'get_followers'
         })
         .then(response => {
-            console.log('followers respo', response)
-            context.commit('populate_followers', response);
-            resolve();
+          context.commit('populate_followers', response);
+          resolve();
         })
         .catch(err => {
           console.log(err)
