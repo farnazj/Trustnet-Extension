@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "version": "0.0.0.1",
+  "version": "0.0.0.2",
   "name": "Trustnet",
   "homepage_url": "https://github.com/farnazj/Replace-Previews/tree/add-assessments",
   "description": "Allows you to assess different articles as (in)accurate to help your friends and to also see the assessments that they provide.",
