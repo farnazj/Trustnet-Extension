@@ -100,7 +100,7 @@ export default {
       .then(() => {
         this.getAllAssessments();
         this.getAuthUserPostAssessment()
-        this.$router.push({ name: 'home' });
+        this.$router.push({ name: 'Home' });
       })
       
     })

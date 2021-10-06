@@ -16,11 +16,14 @@ export default {
     'assessments-container': assessmentsContainer
   },
   data: () => ({
+    authUser: null
   }),
   created() {
+
     this.getUser()
     .then(authUser => {
       // this.logout();
+      this.authUser = authUser;
       if (!authUser) {
         this.logout();
         this.$router.push({ name: 'Login' });
@@ -31,6 +34,7 @@ export default {
         this.fetchPageAndUserCharacteristics()
         .then(() => {
           //this.fetchTitlesAndRelationships();
+          console.log('getting user assessments')
           this.getAllAssessments();
           this.getAuthUserPostAssessment();
         })

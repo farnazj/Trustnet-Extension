@@ -7,7 +7,7 @@
 
   <v-autocomplete v-model="targets" :items="populationList" dense
   filled small-chips color="blue-grey lighten-2" :filter="filterFollowersLists"
-  item-text="text" item-value="value" multiple :no-data-text="textWhenNoData">
+  item-text="text" item-value="value" multiple :no-data-text="textWhenNoData" hide-details="auto">
 
     <template v-slot:label>
       <span class="subtitle-2">

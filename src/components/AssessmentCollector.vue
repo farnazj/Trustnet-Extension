@@ -41,7 +41,7 @@
                 :label="textAreaLabel"> -->
                 <validation-provider :rules="{ reasoningRule: { selectValue: '@selectValue', username: user ? user.userName : undefined } }"
                 v-slot="{ errors }">
-                    <v-textarea v-model="assessmentText" rows="3" auto-grow dense class="body-2">
+                    <v-textarea v-model="assessmentText" rows="2" auto-grow dense class="body-2 user-text">
                       <template v-slot:label>
                         <span class="caption">
                           {{textAreaLabel}}
@@ -60,7 +60,7 @@
             <v-tooltip bottom max-width="600" open-delay="700">
               <template v-slot:activator="{ on }">
                 <v-switch v-on="on" dense :color="anonymous ? 'blue lighten-1' : ''"
-                  v-model="anonymous">
+                  v-model="anonymous" class="mt-1" hide-details="auto">
                   <template v-slot:label>
                     <span class="caption">
                       Pose question anonymously
@@ -78,7 +78,7 @@
               </source-selector>
             </v-col>
 
-            <v-col cols=12>
+            <v-col cols=12 class="mt-3">
               <v-combobox v-model="emails" small-chips dense :hide-no-data="true"
                 multiple 
               >
@@ -91,9 +91,9 @@
                 <template v-slot:selection="{ attrs, item, select, selected }">
                   <v-chip v-bind="attrs"
                     :input-value="selected" close @click="select"
-                    @click:close="removeEmail(item)"
+                    @click:close="removeEmail(item)" class="caption"
                   >
-                  {{ item }}
+                  {{item}}
                   </v-chip>
                 </template>
               </v-combobox>
@@ -298,4 +298,6 @@ export default {
 .assessment-form {
     width: 100%;
 }
+
+
 </style>

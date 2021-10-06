@@ -1,16 +1,30 @@
 <template>
     
-        <v-row no-gutters class="assessments-container">
+    <v-row no-gutters class="assessments-container">
 
-            <v-btn @click="toggleAssessments" x-small :color="handleBackgroundColor" class="expand-button" height="4vh">
-                <v-icon>
-                    {{icons.expander}}
-                </v-icon>
-            </v-btn>
-
+        <v-col cols="1" v-if="expanderIsDisplayed">
+            <v-row no-gutters>
+                <v-btn @click="toggleAssessments" 
+                    x-small :color="handleBackgroundColor" class="expand-button" height="4vh">
+                    <v-icon small v-if="assessmentsPaneIsExpanded">
+                        {{icons.collapser}}
+                    </v-icon>
+                    <v-icon small v-else>
+                        {{icons.expander}}
+                    </v-icon>
+                </v-btn>
+            </v-row>
+            <v-row no-gutters>
+                <v-btn x-small class="hide-expander" @click="hideExpander" >
+                    <v-icon x-small>{{icons.close}}</v-icon>
+                </v-btn>
+            </v-row>
+        </v-col>
+            
+        <v-col cols="11">
             <v-expand-x-transition>
-                <v-container v-show="isExpanded" fluid class="assessments-pane pa-0">
-                    <v-card :color="containerBackgroundColor" raised elevation="3">
+                <v-container v-show="assessmentsPaneIsExpanded" fluid class="assessments-pane pa-0">
+                    <v-card :color="containerBackgroundColor" raised elevation="3" class="assessments-container-card">
 
                         <v-snackbar v-model="displayInfoSnackbar" top>
                             {{ infoSnackbarMessage }}
@@ -113,7 +127,8 @@
                     </v-card>
                 </v-container>
             </v-expand-x-transition>
-        </v-row>
+        </v-col>
+    </v-row>
 
 </template>
 
@@ -123,7 +138,7 @@ import assessmentCollector from '@/components/AssessmentCollector'
 import sourceSelector from '@/components/SourceSelector'
 import constants from '@/lib/constants'
 import { mapState, mapGetters, mapActions } from 'vuex'
-import { mdiChevronLeft, mdiShare, mdiChevronDown, mdiChevronUp } from '@mdi/js';
+import { mdiChevronLeft, mdiChevronRight, mdiShare, mdiChevronDown, mdiChevronUp, mdiGavel, mdiClose } from '@mdi/js';
 
 export default {
     components: {
@@ -136,15 +151,19 @@ export default {
             revealedSize: {},
             icons: {
                 expander: mdiChevronLeft,
+                collapser: mdiChevronRight,
                 share: mdiShare,
                 down: mdiChevronDown,
-                up: mdiChevronUp
+                up: mdiChevronUp,
+                gavel: mdiGavel,
+                close: mdiClose
             },
             errorAlert: false,
             displayInfoSnackbar: false,
             infoSnackbarMessage: '',
             displayShareMenu: false,
-            displayUserAssessmentMenu: false
+            displayUserAssessmentMenu: false,
+            expanderIsDisplayed: true
         }
     },
     created() {
@@ -192,6 +211,9 @@ export default {
         disableBoost: function() {
             return !Object.values(this.userAssessment).length;
         },
+        assessmentsPaneIsExpanded: function() {
+            return this.isExpanded;
+        },
         ...mapState('assessments', [
             'assessments',
             'isExpanded',
@@ -223,7 +245,7 @@ export default {
             return this.getAssessmentsSlice(key).length < this.assessments[key].length;
         },
         toggleAssessments: function() {
-            if (this.isExpanded)
+            if (this.assessmentsPaneIsExpanded)
                 this.setVisibility(false);
             else
                 this.setVisibility(true);
@@ -268,6 +290,12 @@ export default {
         toggleUserAssessmentDisplay: function() {
             this.displayUserAssessmentMenu = !this.displayUserAssessmentMenu
         },
+        
+        hideExpander: function() {
+            this.expanderIsDisplayed = false;
+            if (this.assessmentsPaneIsExpanded)
+                this.setVisibility(false);
+        },
 
         showError: function(err) {
             this.errorAlert = true;
@@ -285,11 +313,23 @@ export default {
 <style scoped>
 .expand-button {
     height: 10%;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+.hide-expander {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
 }
 
 .share-container {
     border: 1px  #90A4AE solid;
     border-top: initial;
+}
+
+.assessments-container-card {
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;
 }
 
 .boost-form {
