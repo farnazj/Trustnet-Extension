@@ -1,5 +1,4 @@
 import { mapState, mapActions } from 'vuex'
-import utils from '@/services/utils'
 
 export default {
   data: () => {
@@ -7,14 +6,19 @@ export default {
     }
   },
   methods: {
-
     fetchPageAndUserCharacteristics() {
+
+      let thisRef = this;
     
       return Promise.all([
         this.setUpPageUrl().then(() => this.getArticleByUrl()),
+        this.setUpURLObserver(),
         this.setUpObserver(),
         this.getUserPreferences(),
-      ]);
+      ])
+      .then(() => {
+        thisRef.setBlackListStatus();
+      })
     },
 
     fetchRelationships() {
@@ -30,16 +34,9 @@ export default {
 
     fetchTitles() {
 
-      let pageHostname = utils.extractHostname(this.url);
-      let pageIsBlackListed = false;
+   
 
-      if ('blackListedWebsites' in this.userPreferences) {
-        pageIsBlackListed = this.userPreferences.blackListedWebsites.some(blacklistedWebsite => 
-          pageHostname.includes(blacklistedWebsite)
-        )
-      }
-
-      if (!pageIsBlackListed) {
+      if (!this.isBlackListed) {
 
           if ( !this.titles.length && !this.titlesFetched ) {
             this.setUpTitles()
@@ -48,6 +45,8 @@ export default {
             })
           }
       }
+
+
       
     },
     ...mapActions('titles', [
@@ -61,7 +60,9 @@ export default {
     ]),
     ...mapActions('pageDetails', [
       'setUpPageUrl',
-      'getArticleByUrl'
+      'setUpURLObserver',
+      'getArticleByUrl',
+      'setBlackListStatus'
     ]),
     ...mapActions('pageObserver', [
         'setUpObserver'
@@ -86,7 +87,8 @@ export default {
       'userPreferences'
     ]),
     ...mapState('pageDetails', [
-      'url'
+      'url',
+      'isBlacklisted'
     ])
   }
 

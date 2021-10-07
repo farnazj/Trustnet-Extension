@@ -78,9 +78,9 @@
               </source-selector>
             </v-col>
 
-            <v-col cols=12 class="mt-3">
+            <v-col cols=12 class="mt-4">
               <v-combobox v-model="emails" small-chips dense :hide-no-data="true"
-                multiple 
+                multiple hide-details="auto"
               >
                 <template v-slot:label>
                   <span class="caption">

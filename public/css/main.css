@@ -111,3 +111,8 @@
 [data-vuetify] .v-icon.v-icon {
     width: 15px !important;
 }
+
+/* for removing the weird spacing inside the autocompletes which hold chips
+[data-vuetify] .v-select__selections {
+    padding: 1% !important;
+} */

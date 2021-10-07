@@ -1,8 +1,12 @@
+import utils from '@/services/utils'
+import constants from '@/lib/constants'
+
 export default {
     namespaced: true,
     state: {
       url: null,
-      article: null
+      article: null,
+      isBlacklisted: false
     },
     mutations: {
       set_url: (state, url) => {
@@ -10,13 +14,49 @@ export default {
       },
       set_article: (state, article) => {
         state.article = article;
-      }
+      },
+      set_black_list_status: (state, status) => {
+        state.isBlacklisted = status;
+      },
     },
     actions: {
+
+      setUpURLObserver: function(context) {
+        let lastUrl = window.location.href; 
+        new MutationObserver(() => {
+          const url = window.location.href;
+          if (url !== lastUrl) {
+            lastUrl = url;
+            onUrlChange();
+          }
+        }).observe(document, { subtree: true, childList: true });
+        
+        function onUrlChange() {
+          context.dispatch('setUpPageUrl')
+          .then(() => {
+            context.dispatch('setBlackListStatus')
+            .then(() => {
+              context.dispatch('assessments/getAllAssessments', true, { root: true });
+              context.dispatch('assessments/getAuthUserPostAssessment', true, { root: true });
+              console.log('getting assessments again');
+            })
+          
+          });
+          
+        }
+      },
+
       setUpPageUrl: function(context) {
         return new Promise((resolve, reject) => {
-            context.commit('set_url', window.location.href.split('?')[0]);
-            resolve();
+          let sanitizedUrl;
+          if ( ['facebook.com/photo/?fbid', 'facebook.com/watch', 'youtube.com/watch'].some(el => 
+            window.location.href.includes(el)))
+            sanitizedUrl = window.location.href.split('&')[0];
+          else
+            sanitizedUrl = window.location.href.split('?')[0]
+            
+          context.commit('set_url', sanitizedUrl);
+          resolve();
         })
       },
 
@@ -40,7 +80,31 @@ export default {
             reject();
           })
         })
+      },
+
+      setBlackListStatus: function(context) {
+        return new Promise((resolve, reject) => {
+          let pageHostname = utils.extractHostname(context.state.url);
+          let pageIsBlackListed = false;
+
+          let allBlackLists = constants.GLOBAL_BLACKLISTED_DOMAINS;
+          let userPreferences = context.rootState['preferences'].userPreferences;
+          console.log('user preferences', userPreferences);
+          if ('blackListedWebsites' in userPreferences) {
+            allBlackLists = allBlackLists.concat(userPreferences.blackListedWebsites);
+          }
+
+          console.log('all blacklists', allBlackLists)
+          console.log('page host name', pageHostname)
+          pageIsBlackListed = allBlackLists.some(blacklistedWebsite => 
+            pageHostname.includes(blacklistedWebsite)
+          )
+          context.commit('set_black_list_status', pageIsBlackListed);
+          resolve();
+        })
       }
+  
+
     }
   }
   

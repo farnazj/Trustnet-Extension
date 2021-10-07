@@ -66,7 +66,7 @@
 <script>
 import setupHelpers from '@/mixins/setupHelpers';
 import customToolbar from '@/components/CustomToolbar'
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
@@ -83,6 +83,11 @@ export default {
   created() {
     console.log('login got created')
   },
+  computed: {
+    ...mapState('pageDetails', [
+      'isBlacklisted'
+    ])
+  },
   methods: {
    login: function() {
     let username = this.username;
@@ -94,12 +99,15 @@ export default {
       'password': password
     })
     .then(() => {
+      console.log('inja raft?')
       // this.fetchTitlesAndRelationships();
       this.fetchRelationships();
       this.fetchPageAndUserCharacteristics()
       .then(() => {
-        this.getAllAssessments();
-        this.getAuthUserPostAssessment()
+        if (!this.isBlacklisted) {
+          this.getAllAssessments();
+          this.getAuthUserPostAssessment()
+        }
         this.$router.push({ name: 'Home' });
       })
       

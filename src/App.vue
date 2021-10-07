@@ -1,14 +1,14 @@
 <template>
   <v-app>
     <router-view></router-view>
-    <assessments-container v-if="isLoggedIn"></assessments-container>
+    <assessments-container v-if="isLoggedIn & !isBlacklisted"></assessments-container>
   </v-app>
 </template>
 
 <script>
 import assessmentsContainer from '@/components/AssessmentsContainer'
 import setupHelpers from '@/mixins/setupHelpers';
-import { mapGetters, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'insertedApp',
@@ -35,8 +35,10 @@ export default {
         .then(() => {
           //this.fetchTitlesAndRelationships();
           console.log('getting user assessments')
-          this.getAllAssessments();
-          this.getAuthUserPostAssessment();
+          if (!this.isBlacklisted) {
+            this.getAllAssessments();
+            this.getAuthUserPostAssessment();
+          }
         })
         
       }
@@ -45,6 +47,9 @@ export default {
   computed: {
     ...mapGetters('auth', [
       'isLoggedIn'
+    ]),
+    ...mapState('pageDetails', [
+      'isBlacklisted'
     ])
   },
   methods: {

@@ -73,7 +73,7 @@
                                         </v-col>
                                     </v-row>
 
-                                    <v-card-actions class="py-0">
+                                    <v-card-actions class="py-0 mt-1">
                                         <v-spacer></v-spacer>
                                         <v-btn color="primary" text @click="shareArticle" small>
                                             <v-icon class="pr-1" small>{{icons.share}}</v-icon> Share
@@ -84,9 +84,18 @@
                             </v-row>
                         </v-expand-transition>
 
-                        
                         <v-row align-center no-gutters v-if="isAssessmentNonEmpty" class="mt-3">
-                            <v-col cols="12">
+                              <v-col cols="12">
+                                <v-container fluid class="visit-container py-1 px-2">
+                                    <p class="body-2 mb-0 grey--text text--darken-2">Visit the article on 
+                                        <a :href="`${clientUrl}/posts/${article.id}`" target="_blank">Trustnet</a>.</p>
+                                </v-container>
+                            </v-col>
+                        </v-row>
+
+                        <v-row align-center no-gutters v-if="isAssessmentNonEmpty" class="mt-3">
+
+                            <v-col cols="12" class="pt-2">
                                 <v-row justify="center" no-gutters>
                                     <p class="pb-0 ma-1 subheading font-weight-bold">Accurate?</p>
                                 </v-row>
@@ -214,6 +223,9 @@ export default {
         assessmentsPaneIsExpanded: function() {
             return this.isExpanded;
         },
+        clientUrl: function() {
+            return constants.CLIENT_URL;
+        },
         ...mapState('assessments', [
             'assessments',
             'isExpanded',
@@ -325,6 +337,10 @@ export default {
 .share-container {
     border: 1px  #90A4AE solid;
     border-top: initial;
+}
+
+.visit-container {
+    border: 1px  #90A4AE solid;
 }
 
 .assessments-container-card {
