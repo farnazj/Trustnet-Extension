@@ -202,25 +202,36 @@ function hashCode(s) {
     0);              
 }
 
-function extractHostname(url) {
-  var hostname;
+function extractHostname(url, removeProtocol) {
+  let hostname = url;
   //find & remove protocol (http, ftp, etc.) and get hostname
-  console.log('extracthose name', url)
 
-  if (url.indexOf("//") > -1) {
-      hostname = url.split('/')[2];
+  let keepQueryParam = false;
+  if (['facebook.com/photo/?fbid', 'facebook.com/watch', 'youtube.com/watch'].some(el => 
+    url.includes(el)))
+    keepQueryParam = true;
+
+  if (url.indexOf("//") != -1 ) {
+    
+    if (keepQueryParam)
+      hostname = hostname.split('&')[0];
+    else {
+      let indexOfFirstParam = hostname.indexOf('?', hostname.indexOf("//") + 2);
+      if (indexOfFirstParam != -1)
+        hostname = hostname.substring(0, indexOfFirstParam);
+    }
+      
   }
   else {
-      hostname = url.split('/')[0];
+    console.log('what kind of url is it', url);
   }
 
-  //find & remove port number
-  hostname = hostname.split(':')[0];
-  //find & remove "?"
-  hostname = hostname.split('?')[0];
+  if (removeProtocol)
+    hostname = hostname.split('//')[1];    
 
   return hostname;
 }
+
 
 function getAccuracyMapping(credibility) {
   if (credibility < consts.ACCURACY_CODES.QUESTIONED)

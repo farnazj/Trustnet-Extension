@@ -1,5 +1,6 @@
 import utils from '@/services/utils'
 import constants from '@/lib/constants'
+import domHelpers from '@/lib/domHelpers';
 
 export default {
     namespaced: true,
@@ -36,6 +37,11 @@ export default {
           .then(() => {
             context.dispatch('setBlackListStatus')
             .then(() => {
+              domHelpers.clearInPageModifications();
+              context.dispatch('linkAssessments/clearAssessments', true, { root: true })
+              .then(() => {
+                context.dispatch('linkAssessments/getAssessmentsForLinks', true, { root: true })
+              });
               context.dispatch('assessments/getAllAssessments', true, { root: true });
               context.dispatch('assessments/getAuthUserPostAssessment', true, { root: true });
               console.log('getting assessments again');

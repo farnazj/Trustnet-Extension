@@ -32,23 +32,19 @@ export default {
       this.fetchLists();
     },
 
-    fetchTitles() {
+    // fetchTitles() {
 
-   
+    //   if (!this.isBlackListed) {
 
-      if (!this.isBlackListed) {
+    //       if ( !this.titles.length && !this.titlesFetched ) {
+    //         this.setUpTitles()
+    //         .then( () => {
+    //             this.setTitlesFetched(true);
+    //         })
+    //       }
+    //   }
 
-          if ( !this.titles.length && !this.titlesFetched ) {
-            this.setUpTitles()
-            .then( () => {
-                this.setTitlesFetched(true);
-            })
-          }
-      }
-
-
-      
-    },
+    // },
     ...mapActions('titles', [
       'setUpTitles',
       'setTitlesFetched'

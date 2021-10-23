@@ -2,7 +2,7 @@ import Api from './api'
 
 export default {
   getAssessmentsForURL(headers) {
-    return Api().get('/posts/assessments/url', {
+    return Api().get('/posts/assessments/urls', {
       withCredentials: true,
       headers: headers
     })
@@ -14,4 +14,11 @@ export default {
       withCredentials: true
     })
   },
+
+  getQuestionsForURL(headers) {
+    return Api().get('/posts/questions/urls', {
+      withCredentials: true,
+      headers: headers
+    })
+  }
 }

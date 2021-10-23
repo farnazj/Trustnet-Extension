@@ -116,3 +116,24 @@
 [data-vuetify] .v-select__selections {
     padding: 1% !important;
 } */
+
+.link-accuracy-icon {
+    transform: scale(0.9);
+    vertical-align: bottom;
+}
+
+.link-accuracy-icon-accurate {
+    color: #43A047;
+}
+
+.link-accuracy-icon-inaccurate {
+    color: #E53935;
+}
+
+.link-accuracy-icon-questioned {
+    color: #B0BEC5;
+}
+
+.inaccurate-link {
+    opacity: 0.25;
+}

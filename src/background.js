@@ -235,6 +235,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   else if (request.type == 'get_assessments') {
 
     return new Promise((resolve, reject) => {
+      console.log('umad shuru kone')
       assessmentServices.getAssessmentsForURL(request.data.headers)
       .then(res => {
         console.log('background', res)
@@ -257,6 +258,18 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       })
     })
   }
+  else if (request.type == 'get_questions') {
+    return new Promise((resolve, reject) => {
+      assessmentServices.getQuestionsForURL(request.data.headers)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
+
   else if (request.type == 'get_lists') {
     return new Promise((resolve, reject) => {
       sourceListServices.getLists({})

@@ -31,7 +31,7 @@ export default {
                 console.log('A child node has been added or removed.');
                 state.observer.takeRecords();
                 state.observer.disconnect();
-                store.dispatch('titles/setUpTitles');
+                store.dispatch('linkAssessments/getAssessmentsForLinks');
             }
           }, 5000);
   

@@ -73,11 +73,14 @@ export default {
                 browser.runtime.sendMessage({
                     type: 'get_assessments',
                     data: {
-                        headers: { url: pageUrl }
+                        headers: { urls: JSON.stringify([pageUrl]) }
                     }
                 })
                 .then((response) => {
-                    context.dispatch('restructureAssessments', response)
+                    console.log('response chi bud', response)
+                    let returnedAssessments = response.length ? response[0].PostAssessments : [];
+                    console.log('inja', returnedAssessments)
+                    context.dispatch('restructureAssessments', returnedAssessments)
                     .then((restructuredAssessments) => {
                         context.dispatch('sortAssessments', restructuredAssessments)
                         .then((sortedAssessments) => {
@@ -108,7 +111,7 @@ export default {
                     if (returnedAssessment.SourceId === null ) {
                         if (returnedAssessment.version == 1) {
                             let assessmentsObj = { lastVersion: returnedAssessment, assessor: {} };
-                            let credValue = this.accuracyMapping(assessmentsObj.lastVersion.postCredibility);
+                            let credValue = utils.getAccuracyMapping(assessmentsObj.lastVersion.postCredibility);
                             tmpAssessments[credValue].push(assessmentsObj);
                         }
                     }
@@ -168,14 +171,13 @@ export default {
                     type: 'get_assessments',
                     data: {
                         headers: { 
-                            url: pageUrl,
+                            urls: JSON.stringify([pageUrl]),
                             authuser: true
                         }
                     }
                 })
                 .then(response => {
-                    
-                    let assessment = response.length ? (response.filter(el => el.version == 1))[0] : {};
+                    let assessment = response.length ? (response[0].PostAssessments.filter(el => el.version == 1))[0] : {};
                     context.commit('set_user_assessment', assessment);
 
                     if (Object.entries(assessment).length && !context.rootState.pageDetails.articleId)

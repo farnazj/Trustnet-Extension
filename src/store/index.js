@@ -7,6 +7,7 @@ import pageDetails from './modules/pageDetails'
 import pageObserver from './modules/pageObserver'
 import preferences from './modules/preferences'
 import assessments from './modules/assessments'
+import linkAssessments from './modules/linkAssessments'
 import sourceLists from './modules/sourceLists'
 import boosts from './modules/boosts'
 
@@ -27,6 +28,7 @@ export default new Vuex.Store({
     pageObserver,
     preferences,
     assessments,
+    linkAssessments,
     sourceLists,
     boosts
   }

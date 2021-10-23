@@ -38,6 +38,7 @@ export default {
           if (!this.isBlacklisted) {
             this.getAllAssessments();
             this.getAuthUserPostAssessment();
+            this.getAssessmentsForLinks();
           }
         })
         
@@ -60,6 +61,9 @@ export default {
     ...mapActions('assessments', [
       'getAllAssessments',
       'getAuthUserPostAssessment'
+    ]),
+    ...mapActions('linkAssessments', [
+      'getAssessmentsForLinks'
     ])
   },
   mixins: [setupHelpers]
