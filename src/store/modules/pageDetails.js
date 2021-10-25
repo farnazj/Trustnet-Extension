@@ -37,14 +37,13 @@ export default {
           .then(() => {
             context.dispatch('setBlackListStatus')
             .then(() => {
-              domHelpers.clearInPageModifications();
               context.dispatch('linkAssessments/clearAssessments', true, { root: true })
               .then(() => {
                 context.dispatch('linkAssessments/getAssessmentsForLinks', true, { root: true })
               });
               context.dispatch('assessments/getAllAssessments', true, { root: true });
               context.dispatch('assessments/getAuthUserPostAssessment', true, { root: true });
-              console.log('getting assessments again');
+              console.log('getting assessments again as a result of url change');
             })
           
           });

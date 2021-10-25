@@ -348,7 +348,6 @@ function populateLinkAssessments (allLinksAssessments) {
         let linkEls = document.querySelectorAll(`a[href='${link}']`);
 
         if (linkEls.length) {
-            console.log('link els', linkEls)
 
             let linkIsQuestioned = store.getters['linkAssessments/isQuestioned'](link);
             if (linkIsQuestioned) {
@@ -422,19 +421,12 @@ function populateLinkAssessments (allLinksAssessments) {
             }
         }
         
-
-       
     }
-}
-
-function clearInPageModifications() {
-
 }
 
 export default {
     findAndReplaceTitle,
     identifyPotentialTitles,
     removeEventListenerFromTitle,
-    populateLinkAssessments,
-    clearInPageModifications
+    populateLinkAssessments
 }
