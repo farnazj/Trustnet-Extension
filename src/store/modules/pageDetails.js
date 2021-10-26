@@ -1,6 +1,5 @@
 import utils from '@/services/utils'
 import constants from '@/lib/constants'
-import domHelpers from '@/lib/domHelpers';
 
 export default {
     namespaced: true,

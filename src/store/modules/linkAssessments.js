@@ -1,6 +1,10 @@
 import domHelpers from "@/lib/domHelpers";
 import utils from '@/services/utils'
 
+/*
+This module is for fetching assessments and accuracy questions of all the links
+found on the current page.
+*/
 export default {
     namespaced: true,
     state: {
@@ -99,7 +103,7 @@ export default {
                         if (url[0] == '/' || url[0] == '?' || url[0] == '#')
                             sanitizedUrl = window.location.protocol + '//' + window.location.host + url;
                         
-                        return utils.extractHostname(sanitizedUrl, false);
+                        return utils.extractHostname(sanitizedUrl, true);
                 });
 
                 let allLinksProms = []; 
@@ -205,8 +209,10 @@ export default {
                                 let originalLinkIndices = [];
                                 let sanitizedLinkIndex = -1;
 
+                                let urlWOProtocol = post.url.substring(post.url.indexOf('//') + 2);
+
                                 do {
-                                    sanitizedLinkIndex = sanitizedLinks.indexOf(post.url, sanitizedLinkIndex + 1);
+                                    sanitizedLinkIndex = sanitizedLinks.indexOf(urlWOProtocol, sanitizedLinkIndex + 1);
                                     if (sanitizedLinkIndex != -1)
                                         originalLinkIndices.push(sanitizedLinkIndex);
                                 }
@@ -233,8 +239,10 @@ export default {
                             let originalLinkIndices = [];
                             let sanitizedLinkIndex = -1;
 
+                            let urlWOProtocol = post.url.substring(post.url.indexOf('//') + 2);
+
                             do {
-                                sanitizedLinkIndex = sanitizedLinks.indexOf(post.url, sanitizedLinkIndex + 1);
+                                sanitizedLinkIndex = sanitizedLinks.indexOf(urlWOProtocol, sanitizedLinkIndex + 1);
                                 if (sanitizedLinkIndex != -1)
                                     originalLinkIndices.push(sanitizedLinkIndex);
                             }

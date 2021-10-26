@@ -14,7 +14,8 @@ export default {
     getters: {
         
         isConfirmed: (state, getters, rootState, rootGetters) => {
-            let trustedIds = rootGetters['relatedSources/trustedIds'];
+            let authUserId = rootGetters['auth/user'].id;
+            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
 
             return state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
                 trustedIds.includes(sourceId)).length &&
@@ -22,7 +23,8 @@ export default {
                 trustedIds.includes(sourceId)).length);
         },
         isRefuted: (state, getters, rootState, rootGetters) => {
-            let trustedIds = rootGetters['relatedSources/trustedIds'];
+            let authUserId = rootGetters['auth/user'].id;
+            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
 
             return !(state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
                 trustedIds.includes(sourceId)).length) &&
@@ -30,7 +32,8 @@ export default {
                 trustedIds.includes(sourceId)).length;
         },
         isDebated: (state, getters, rootState, rootGetters) => {
-            let trustedIds = rootGetters['relatedSources/trustedIds'];
+            let authUserId = rootGetters['auth/user'].id;
+            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
 
             return state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
                 trustedIds.includes(sourceId)).length &&
@@ -70,16 +73,16 @@ export default {
             return new Promise((resolve, reject) => {
             
                 let pageUrl = context.rootState.pageDetails.url;
+                let pageUrlWOProtocol = pageUrl.substring(pageUrl.indexOf('//') + 2);
                 browser.runtime.sendMessage({
                     type: 'get_assessments',
                     data: {
-                        headers: { urls: JSON.stringify([pageUrl]) }
+                        headers: { urls: JSON.stringify([pageUrlWOProtocol]) }
                     }
                 })
                 .then((response) => {
-                    console.log('response chi bud', response)
                     let returnedAssessments = response.length ? response[0].PostAssessments : [];
-                    console.log('inja', returnedAssessments)
+                    
                     context.dispatch('restructureAssessments', returnedAssessments)
                     .then((restructuredAssessments) => {
                         context.dispatch('sortAssessments', restructuredAssessments)
