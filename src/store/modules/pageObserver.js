@@ -31,14 +31,15 @@ export default {
                 console.log('A child node has been added or removed.');
                 state.observer.takeRecords();
                 state.observer.disconnect();
-                store.dispatch('linkAssessments/getAssessmentsForLinks');
+                store.dispatch('linkAssessments/setupLinkAssessments', true, { root: true })
             }
-          }, 5000);
+          }, 2000);
   
           state.observer = new MutationObserver(callback);
           document.addEventListener('DOMContentLoaded', function() {
-              state.observer.observe(targetNode, state.config);    
-          }, false);
+            console.log('event listener add shod')
+                
+          }, false); 
         }
 
       },
@@ -54,7 +55,8 @@ export default {
       }
     },
     actions: {
-      setUpObserver: function(context) {  
+      setUpObserver: function(context) { 
+        console.log('observer is set up') 
         return new Promise((resolve, reject) => {
             context.commit('setup_observer');
             resolve();

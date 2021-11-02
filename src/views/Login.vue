@@ -99,14 +99,13 @@ export default {
       'password': password
     })
     .then(() => {
-      console.log('inja raft?')
-      // this.fetchTitlesAndRelationships();
       this.fetchRelationships();
       this.fetchPageAndUserCharacteristics()
       .then(() => {
         if (!this.isBlacklisted) {
           this.getAllAssessments();
-          this.getAuthUserPostAssessment()
+          this.getAuthUserPostAssessment();
+          this.setupLinkAssessments();
         }
         this.$router.push({ name: 'Home' });
       })
@@ -126,6 +125,9 @@ export default {
     ...mapActions('assessments', [
       'getAllAssessments',
       'getAuthUserPostAssessment'
+    ]),
+    ...mapActions('linkAssessments', [
+      'setupLinkAssessments'
     ])
   },
   mixins: [setupHelpers]

@@ -20,5 +20,12 @@ export default {
       withCredentials: true,
       headers: headers
     })
+  },
+
+  getRedirects(headers) {
+    return Api().get('/urls/follow-redirects', {
+      withCredentials: true,
+      headers: headers
+    })
   }
 }

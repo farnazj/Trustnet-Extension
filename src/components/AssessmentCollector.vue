@@ -228,8 +228,8 @@ export default {
       }
       else {
           // this.disableBoost = true;
-          this.assessmentBody = '';
-          this.postCredibility = null;
+          this.assessmentText = '';
+          this.credibility = null;
 
           if (this.$refs.assessmentObserver)
               this.$refs.assessmentObserver.reset();
@@ -254,17 +254,23 @@ export default {
           reqBody.sourceIsAnonymous = this.anonymous;
         }
 
+        let self = this;
+
         this.postAuthUserAssessment(reqBody)
         .then(() => {
           this.getAllAssessments();
-          this.getAuthUserPostAssessment();
+          this.getAuthUserPostAssessment()
+          .then(() => {
+            self.disableAssess = false;
+          })
         })
         .catch(err => {
           this.$emit('assessmentUpdateErr', err);
           console.log(err);
+          this.disableAssess = false;
         })
         .finally(() => {
-          this.disableAssess = false;
+          
         })
 
       }
@@ -280,8 +286,8 @@ export default {
       this.mapCredProperties();
     },
     userAssessment: function() {
+      console.log('khob avaz shod dige')
       this.prepopulateUserAssessment();
-
     }
   }
 

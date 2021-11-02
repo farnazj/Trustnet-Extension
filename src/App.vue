@@ -30,15 +30,12 @@ export default {
       }
       else {        
         this.fetchRelationships();
-
         this.fetchPageAndUserCharacteristics()
         .then(() => {
-          //this.fetchTitlesAndRelationships();
-          console.log('getting user assessments')
           if (!this.isBlacklisted) {
             this.getAllAssessments();
             this.getAuthUserPostAssessment();
-            this.getAssessmentsForLinks();
+            this.setupLinkAssessments();
           }
         })
         
@@ -63,7 +60,7 @@ export default {
       'getAuthUserPostAssessment'
     ]),
     ...mapActions('linkAssessments', [
-      'getAssessmentsForLinks'
+      'setupLinkAssessments'
     ])
   },
   mixins: [setupHelpers]

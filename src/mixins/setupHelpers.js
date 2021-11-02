@@ -61,7 +61,7 @@ export default {
       'setBlackListStatus'
     ]),
     ...mapActions('pageObserver', [
-        'setUpObserver'
+      'setUpObserver'
     ]),
     ...mapActions('preferences', [
       'getUserPreferences'

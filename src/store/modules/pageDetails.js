@@ -34,11 +34,12 @@ export default {
         function onUrlChange() {
           context.dispatch('setUpPageUrl')
           .then(() => {
+            console.log('url has changed', context.state.url)
             context.dispatch('setBlackListStatus')
             .then(() => {
               context.dispatch('linkAssessments/clearAssessments', true, { root: true })
               .then(() => {
-                context.dispatch('linkAssessments/getAssessmentsForLinks', true, { root: true })
+                context.dispatch('linkAssessments/setupLinkAssessments', true, { root: true })
               });
               context.dispatch('assessments/getAllAssessments', true, { root: true });
               context.dispatch('assessments/getAuthUserPostAssessment', true, { root: true });

@@ -1,5 +1,6 @@
 import store from '@/store'
 import consts from '@/lib/constants'
+const axios = require('axios');
 
 //function to sort sources by full name or username (for news publishing entities)
 function compareNames(a, b) {
@@ -202,6 +203,14 @@ function hashCode(s) {
     0);              
 }
 
+
+function extractFacebooklink(link) {
+  let sanitizedLink = link.substr(link.indexOf('l.php?u=') + 8); // remove before ?u=
+  sanitizedLink = sanitizedLink.substr(0, sanitizedLink.indexOf('&')); // remove after &
+
+  return decodeURIComponent(sanitizedLink);
+}
+
 function extractHostname(url, removeProtocol) {
   let hostname = url;
   //find & remove protocol (http, ftp, etc.) and get hostname
@@ -211,8 +220,11 @@ function extractHostname(url, removeProtocol) {
     url.includes(el)))
     keepQueryParam = true;
 
+  if (url.includes('https://l.facebook.com/l.php?'))
+    hostname = extractFacebooklink(hostname);
+  
   if (url.indexOf("//") != -1 ) {
-    
+
     if (keepQueryParam)
       hostname = hostname.split('&')[0];
     else {
@@ -233,6 +245,7 @@ function extractHostname(url, removeProtocol) {
 }
 
 
+
 function getAccuracyMapping(credibility) {
   if (credibility < consts.ACCURACY_CODES.QUESTIONED)
       return 'refuted';
@@ -240,6 +253,61 @@ function getAccuracyMapping(credibility) {
       return 'questioned';
   else if (credibility > consts.ACCURACY_CODES.QUESTIONED)
       return 'confirmed';
+}
+
+/*
+This function follows the trail of redirects given a link as a parameter. Although
+Axios should follow all redirects, we see that in practice it does not (e.g., a 
+shortened link on Twitter -> shortened link on Youtube -> full Youtube link. Axios
+stops at step 2). Therefore, this function recursively calls itself to fetch the next link
+*/
+async function followRedirects(link) {
+  let extractedURL;
+
+  return axios.get(link, { maxRedirects: 8 } ).then((response) => {
+   
+    /*
+    If ultimately, the returned response data is large (we set the threshold to be 4000 characters),
+    the entire page has been fetched and therefore, the target URL is the current link.
+    Else, a stringified HTML is returned which needs to be parsed and the URL fetched from it.
+    */
+    if (response.data.length <= 4000) {
+        const parser = new DOMParser();
+        const htmlDOM = parser.parseFromString(response.data, "text/xml");
+        const content = htmlDOM.getElementsByTagName("META")[0].getAttribute('content');
+        const URLIndex = content.indexOf('URL=');
+        extractedURL = content.substring( URLIndex + 4);
+
+        if (extractedURL == link)
+          return ({ type: 'completed redirect chain', link: extractedURL });
+        else 
+          return followRedirects(extractedURL);
+    }
+    else
+      return ({ type: 'entire page is fetched', link: link });
+  
+})
+.catch(err => {
+  if (err.response) {
+    if (err.response.status == 404)
+      return ({ type: 'error', detail: '404' });
+    }
+    /*
+    One occasion when err.request happens is when the browser encounters a
+    CORS issue. This e.g., happens on Facebook or Twitter where the initially
+    encountered links are shortened links from the Facebook/Twitter domain but the
+    target links belong to other domains which enforce the CORS policy.
+    */
+    else if (err.request) {
+      return ({ type: 'error', detail: 'CORS', link: link });
+    }
+    else {
+      console.log(err);
+      return ({ type: 'error', detail: 'Unknown' });
+    }
+  
+});
+
 }
 
 export default {
@@ -254,5 +322,6 @@ export default {
   addLimitOffsetToQuery,
   hashCode,
   extractHostname,
-  getAccuracyMapping
+  getAccuracyMapping,
+  followRedirects
 }

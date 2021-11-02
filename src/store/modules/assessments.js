@@ -73,11 +73,13 @@ export default {
             return new Promise((resolve, reject) => {
             
                 let pageUrl = context.rootState.pageDetails.url;
-                let pageUrlWOProtocol = pageUrl.substring(pageUrl.indexOf('//') + 2);
                 browser.runtime.sendMessage({
                     type: 'get_assessments',
                     data: {
-                        headers: { urls: JSON.stringify([pageUrlWOProtocol]) }
+                        headers: { 
+                            urls: JSON.stringify([pageUrl]),
+                            excludeposter: true
+                        }
                     }
                 })
                 .then((response) => {
@@ -166,6 +168,9 @@ export default {
 
         getAuthUserPostAssessment: (context) => {
 
+            console.log('going to get auth user assessments');
+            console.time('authUserStart');
+            console.timeLog('authUserStart')
             let pageUrl = context.rootState.pageDetails.url;
 
             return new Promise((resolve, reject) => {
@@ -182,6 +187,7 @@ export default {
                 .then(response => {
                     let assessment = response.length ? (response[0].PostAssessments.filter(el => el.version == 1))[0] : {};
                     context.commit('set_user_assessment', assessment);
+                    console.timeEnd('authUserStart');
 
                     if (Object.entries(assessment).length && !context.rootState.pageDetails.articleId)
                         context.dispatch('pageDetails/getArticleByUrl', true , {root: true} )
