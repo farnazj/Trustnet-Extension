@@ -131,9 +131,9 @@
 }
 
 .link-accuracy-icon-questioned {
-    color: #B0BEC5;
+    color: #546E7A;
 }
 
-.inaccurate-link {
+*[inaccurate-link=true] {
     opacity: 0.25;
 }

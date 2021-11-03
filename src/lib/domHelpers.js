@@ -353,6 +353,7 @@ function populateLinkAssessments (allLinksAssessments) {
             allLinksAssessments[link].questioned.length) {
 
                 let linkEls = document.querySelectorAll(`a[href='${link}']`);
+                console.log('element ro peida kard ya na', linkEls, 'for link', link)
 
                 if (linkEls.length) {
         
@@ -367,20 +368,15 @@ function populateLinkAssessments (allLinksAssessments) {
         
                         //add question icon
                         linkEls.forEach(linkEl => {
-                            if (!linkEl.classList.contains('trustnet-modified-question-link')) {
+                            if (!linkEl.getAttribute('trustnet-modified-question-link')) {
         
                                 [...linkEl.children].forEach(child => {
                                     child.style.display = "inline";
-                
-                                    if (specialStatus == 'inaccurate')
-                                        child.classList.add('inaccurate-link');
-                                    
-                                    child.classList.add('trustnet-modified-link-child');
                                 });
             
                                 let iconToAddClone = questionIcon.cloneNode(true);
                                 linkEl.prepend(iconToAddClone);
-                                linkEl.classList.add('trustnet-modified-question-link');
+                                linkEl.setAttribute('trustnet-modified-question-link', true);
                             }
                             
                         });
@@ -430,23 +426,21 @@ function populateLinkAssessments (allLinksAssessments) {
                     // add assessment icon
                     if (specialStatus) {
                         linkEls.forEach(linkEl => {
-                            if (!linkEl.classList.contains('trustnet-modified-link')) {
+                            if (!linkEl.getAttribute('trustnet-modified-link')) {
                                 
-                                if (!linkEl.classList.contains('trustnet-modified-question-link')) {
+                                if (!linkEl.getAttribute('trustnet-modified-question-link')) {
                                         
                                     [...linkEl.children].forEach(child => {
                                         child.style.display = "inline";
-                    
-                                        if (specialStatus == 'inaccurate')
-                                            child.classList.add('inaccurate-link');
-                                        
-                                        child.classList.add('trustnet-modified-link-child');
                                     });
                                 }
+
+                                if (specialStatus == 'inaccurate')
+                                    linkEl.setAttribute('inaccurate-link', true);
             
                                 let iconToAddClone = iconToAdd.cloneNode(true);
                                 linkEl.prepend(iconToAddClone);
-                                linkEl.classList.add('trustnet-modified-link');
+                                linkEl.setAttribute('trustnet-modified-link', true);
                             }
                             
                         });
