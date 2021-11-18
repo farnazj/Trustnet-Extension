@@ -22,10 +22,22 @@ export default {
     })
   },
 
-  getRedirects(headers) {
+  followRedirects(headers) {
     return Api().get('/urls/follow-redirects', {
       withCredentials: true,
       headers: headers
+    })
+  },
+  getRedirects(headers) {
+    return Api().get('/urls/redirects', {
+      withCredentials: true,
+      headers: headers
+    })
+  },
+  updateRedirects(reqBody) {
+    return Api().post('/urls/redirects', reqBody ,
+    {
+      withCredentials: true
     })
   }
 }

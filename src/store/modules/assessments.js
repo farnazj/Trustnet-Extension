@@ -73,18 +73,31 @@ export default {
             return new Promise((resolve, reject) => {
             
                 let pageUrl = context.rootState.pageDetails.url;
-                browser.runtime.sendMessage({
+
+                Promise.all([browser.runtime.sendMessage({
                     type: 'get_assessments',
                     data: {
                         headers: { 
-                            urls: JSON.stringify([pageUrl]),
-                            excludeposter: true
+                            urls: JSON.stringify([pageUrl])
+                            // excludeposter: true
                         }
                     }
-                })
-                .then((response) => {
-                    let returnedAssessments = response.length ? response[0].PostAssessments : [];
-                    
+                }),
+                /*
+                for getting questions posted by the people who trust the auth user and have either
+                specified the auth user as an arbiter of a question or have specified no one
+                */
+                browser.runtime.sendMessage({
+                    type: 'get_questions',
+                    data: {
+                        headers: { urls: JSON.stringify([pageUrl]) }
+                    }
+                })])
+                .then(([postsWAssessments, postsWQuestions]) => {
+                    let returnedAssessments = postsWAssessments.length ? postsWAssessments[0].PostAssessments : [];
+                    let returnedQuestions = postsWQuestions.length ? postsWQuestions[0].PostAssessments : [];
+
+                    returnedAssessments = returnedAssessments.concat(returnedQuestions)
                     context.dispatch('restructureAssessments', returnedAssessments)
                     .then((restructuredAssessments) => {
                         context.dispatch('sortAssessments', restructuredAssessments)
@@ -106,6 +119,7 @@ export default {
         },
 
         restructureAssessments: (context, returnedAssessments) => {
+            
             return new Promise((resolve, reject) => {
 
                 let tmpAssessments = {'confirmed': [], 'refuted': [], 'questioned': []};
@@ -179,8 +193,7 @@ export default {
                     type: 'get_assessments',
                     data: {
                         headers: { 
-                            urls: JSON.stringify([pageUrl]),
-                            authuser: true
+                            urls: JSON.stringify([pageUrl])
                         }
                     }
                 })

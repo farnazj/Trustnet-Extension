@@ -1,5 +1,6 @@
 import domHelpers from "@/lib/domHelpers";
 import utils from '@/services/utils'
+import { mdiConsoleLine } from "@mdi/js";
 
 /*
 This module is for fetching assessments and accuracy questions of all the links
@@ -55,7 +56,6 @@ export default {
         */
         update_links_assessments(state, linksAssessments) {
 
-            console.log('commiting to the state', linksAssessments)
             let oldLinksToRemain = Object.keys(state.linksAssessments).filter(key => !Object.keys(linksAssessments).includes(key));
             const preservedLinksAssessments = Object.keys(state.linksAssessments)
             .filter(key => oldLinksToRemain.includes(key))
@@ -116,8 +116,8 @@ export default {
                         prevNonEmptyLinks.includes(el)
                 )));
 
-                console.log('previous links w assessments found on page', prevNonEmptyLinks)
-                console.log('new repeated links', newRepeatedLinks)
+                console.log('previous links w assessments found on page', prevNonEmptyLinks);
+                console.log('new repeated links', newRepeatedLinks);
                 newRepeatedLinks.forEach(link => {
                     domHelpers.populateLinkAssessments(context.state.nonEmptyLinkAssessments[link]);
                 });
@@ -139,162 +139,237 @@ export default {
                         
                         return utils.extractHostname(sanitizedUrl, false);
                 });
-
-                let allLinksProms = []; 
-                let allLinksAssessments = {}
+          
+                let redirectedToSanitizedLinksMapping = {}; //for all the links found on the page
+                let allLinksAssessments = {};
                 /*
-                Because sanitizedLinks can have duplicates (as explained above), an object of unique sanitizedLinks
-                is created with each key being a sanitized link and its corresponding value a boolean indicating
-                whether the link has been visited yet , with visited meaning its trail of redirects have been followed
-                and its assessments have been fetched.
+                Ask the server for mappings of sanitized links already stored on the server and get their assessments
+                Throughout the code, the links whose redirects are to be determined by the server (and then their assessments
+                fetched) are sent via get requests in batches of 20 because there is a limit on the size of the http header.
                 */
-                let uniqueSanitizedLinksVisited = Array.from(new Set(sanitizedLinks)).reduce((obj, x) => 
-                    Object.assign(obj, { [x]: 0 }), {});
-
-                /*
-                The sanitized links can be redirects to other links. Therefore, they need to be followed and
-                their corresponding target link fetched so that assessments can be requested on the target links.
-                Their redirects are followed in batches of 20 at a time to prevent getting rate limited.
-                For each batch, becase sanitizedLinks can have duplicates, we check to see if we have already
-                visited the link by looking through uniqueSanitizedLinksVisited.
-                */
-                
-                let allAxiosProms = []; //Promises related to fetching the trail of redirects for all the sanitized links
-                let redirectedToSanitizedLinksMapping = {};
-                let unavailableResources = [];
-                let CORSBlockedLinks = [];
-
-                for (let i = 0 ; i < sanitizedLinks.length ; i += 20) {
-
-                    let iterationAxiosProms = []; //Promises related to fetching the trail of redirects for this iteration of sanitized links
-                    let linksFragment = sanitizedLinks.slice(i, i + 20);
-
-                    let linksFragmentUnvisited = linksFragment.filter((link) => {
-                        if (uniqueSanitizedLinksVisited[link] == 0 ) {
-                            uniqueSanitizedLinksVisited[link] = 1;
-                            let iterationProm = utils.followRedirects(link).then((response) => {
-                                console.log('results of client following redirect trail', link, response, response.detail == 'CORS')
-                                if (response.type == 'error') {
-                                    if (response.detail == '404')
-                                        unavailableResources.push(link);
-                                    /*
-                                    Even though on chasing the redirects of some links we may have encountered a CORS issue,
-                                    we nevertheless add the mapping of the redirected response to the original link. This mapping
-                                    may or may not be final. For example, in the case of WashingtonPost articles, when we encounter
-                                    a CORS issue, we already have the final URL. However, in the case of links to BBC or NYT on Facebook, 
-                                    because the links are shortened, we still do not have the final link when we encounter the CORS issue.
-                                    All of these CORS blocked links will be later sent to the server so that the server can find the
-                                    ultimate target link. We keep the mapping here nonetheless, because for paywalled articles, the 
-                                    server may not be able to get the redirected links (and rather get 403 for example).
-                                    */
-                                    if (response.detail == 'CORS') {
-                                        redirectedToSanitizedLinksMapping[utils.extractHostname(response.link)] = link;
-                                        CORSBlockedLinks.push(link);
-                                    }
+                let mappingReqProms = [];
+                let serverSentMappings = [];
+                for (let j = 0 ; j < sanitizedLinks.length ; j += 20) {
+                    let iterationRequestedLinks = sanitizedLinks.slice(j, j + 20).filter(url => utils.isValidHttpUrl(url));
+                    mappingReqProms.push(
+                        browser.runtime.sendMessage({
+                            type: 'get_redirects',
+                            data: {
+                                headers: { 
+                                    urls: JSON.stringify(iterationRequestedLinks)
                                 }
-                                if (response.type != 'error')  {
-                                    redirectedToSanitizedLinksMapping[utils.extractHostname(response.link)] = link;
-                                }
-                                    
-                            });
-                            iterationAxiosProms.push(iterationProm);
-                            allAxiosProms.push(iterationProm);
+                            }
+                        })
+                        .then((serverResponse) => {
 
-                            return true;
-                        }
-                        else
-                            return false;
-                    })
-
-                    /*
-                    Once redirects for this batch of sanitized links are followed and fetched by the client,
-                    assessments are requested for the target links from the server and the assessments are placed
-                    on the DOM.
-                    */
-                    allLinksProms.push(
-                        Promise.allSettled(iterationAxiosProms)
-                        .then(() => {
-                            // console.log('this round of fetching assessments', Object.keys(redirectedToSanitizedLinksMapping))
+                            let reFormattedMappings = {};
+                            for (let i = 0 ; i < serverResponse.length; i++) {
+                                reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
+                            }                        
+        
                             context.dispatch('getAndShowAssessments', {
-                                linksFragmentUnvisited: Object.keys(redirectedToSanitizedLinksMapping),
-                                redirectedToSanitizedLinksMapping: redirectedToSanitizedLinksMapping,
+                                linksFragmentUnvisited: Object.keys(reFormattedMappings),
+                                redirectedToSanitizedLinksMapping: reFormattedMappings,
                                 sanitizedLinks: sanitizedLinks,
                                 rawLinks: links
                             })
                             .then((restructuredAssessments) => {
                                 allLinksAssessments = Object.assign(allLinksAssessments, restructuredAssessments);
                             })
+
+                            serverSentMappings = serverSentMappings.concat(serverResponse);
                         })
-                    )
+                    );   
                 }
+                
+                //find sanitized links that were not sent by the server and follow their chain of redirects
+                Promise.all(mappingReqProms)
+                .then( () => {
+                    console.log('all server sent mappings are', serverSentMappings)
+            
+                    //The remainder of those sanitized links for which the server did not have mappings to their ultimate links
+                    
+                    let sanitizedLinksRemainder = sanitizedLinks.filter((link, index) => 
+                        !serverSentMappings[index]
+                    ).filter(url => utils.isValidHttpUrl(url));
 
-                /*
-                Once the redirects for all the sanitized links have been followed by the client, we send those
-                that the client could not check because of CORS issues to the server so that it can follow their redirects and return
-                the target links.
-                */
-                Promise.allSettled(allAxiosProms)
-                .then(() => {
-
-                    console.log('url mappings provided by the client', redirectedToSanitizedLinksMapping);
-                    console.log('sending links that the client was unable to retreive to the server', CORSBlockedLinks);
-
+                    console.log(`The sanitized links for which the server does not have mappings`, sanitizedLinksRemainder)
+                    redirectedToSanitizedLinksMapping = Object.assign(redirectedToSanitizedLinksMapping, serverSentMappings);
+    
+                    let allLinksProms = []; 
                     /*
-                    The links whose redirects are to be determined by the server (and then their assessments fetched)
-                    are sent via get requests in batches of 20 because there is a limit on the size of the http header.
+                    Because sanitizedLinks can have duplicates (as explained above), an object of unique sanitizedLinks
+                    is created with each key being a sanitized link and its corresponding value a boolean indicating
+                    whether the link has been visited yet , with visited meaning its trail of redirects have been followed
+                    and its assessments have been fetched.
                     */
-                    for (let i = 0 ; i < CORSBlockedLinks.length ; i += 20) {
-                        let linksFragment = CORSBlockedLinks.slice(i, i + 20);
-                        allLinksProms.push(
-                            browser.runtime.sendMessage({
-                                type: 'get_redirects',
-                                data: {
-                                    headers: { 
-                                        urls: JSON.stringify(linksFragment)
+                    let uniqueSanitizedLinksVisited = Array.from(new Set(sanitizedLinksRemainder)).reduce((obj, x) => 
+                        Object.assign(obj, { [x]: 0 }), {});
+    
+                    /*
+                    The sanitized links can be redirects to other links. Therefore, they need to be followed and
+                    their corresponding target link fetched so that assessments can be requested on the target links.
+                    Their redirects are followed in batches of 20 at a time to prevent getting rate limited.
+                    For each batch, becase sanitizedLinksRemainder can have duplicates, we check to see if we have already
+                    visited the link by looking through uniqueSanitizedLinksVisited.
+                    */
+                    
+                    let allAxiosProms = []; //Promises related to fetching the trail of redirects for all the sanitized links
+                    let unavailableResources = [];
+                    let CORSBlockedLinks = [];
+    
+                    for (let i = 0 ; i < sanitizedLinksRemainder.length ; i += 20) {
+    
+                        let iterationAxiosProms = []; //Promises related to fetching the trail of redirects for this iteration of sanitized links
+                        let iterationMappings = {};
+                        let linksFragment = sanitizedLinksRemainder.slice(i, i + 20);
+    
+                        let linksFragmentUnvisited = linksFragment.filter((link) => {
+                            if (uniqueSanitizedLinksVisited[link] == 0 ) {
+                                uniqueSanitizedLinksVisited[link] = 1;
+                                let iterationProm = utils.followRedirects(link).then((response) => {
+                                    // console.log('results of client following redirect trail', link, response, response.detail == 'CORS')
+                                    if (response.type == 'error') {
+                                        if (response.detail == '404')
+                                            unavailableResources.push(link);
+                                        /*
+                                        Even though on chasing the redirects of some links we may have encountered a CORS issue,
+                                        we nevertheless add the mapping of the redirected response to the original link. This mapping
+                                        may or may not be final. For example, in the case of WashingtonPost articles, when we encounter
+                                        a CORS issue, we already have the final URL. However, in the case of links to BBC or NYT on Facebook, 
+                                        because the links are shortened, we still do not have the final link when we encounter the CORS issue.
+                                        All of these CORS blocked links will be later sent to the server so that the server can find the
+                                        ultimate target link. We keep the mapping here nonetheless, because for paywalled articles, the 
+                                        server may not be able to get the redirected links (and rather get 403 for example).
+                                        */
+                                        if (response.detail == 'CORS') {
+                                            iterationMappings[utils.extractHostname(response.link)] = link;
+                                            CORSBlockedLinks.push(link);
+                                        }
                                     }
-                                }
-                            })
-                            .then((urlMapping) => {
-                            
-                                console.log('url mapping from redirects returned from the server', urlMapping)
+                                    if (response.type != 'error')  {
+                                        iterationMappings[utils.extractHostname(response.link)] = link;
+                                    }
+                                        
+                                });
+                                iterationAxiosProms.push(iterationProm);
+                                allAxiosProms.push(iterationProm);
+    
+                                return true;
+                            }
+                            else
+                                return false;
+                        })
+    
+                        /*
+                        Once redirects for this batch of sanitized links are followed and fetched by the client,
+                        assessments are requested for the target links from the server and the assessments are placed
+                        on the DOM.
+                        */
+                        allLinksProms.push(
+                            Promise.allSettled(iterationAxiosProms)
+                            .then(() => {
+                                redirectedToSanitizedLinksMapping = Object.assign(redirectedToSanitizedLinksMapping, iterationMappings);
 
                                 context.dispatch('getAndShowAssessments', {
-                                    linksFragmentUnvisited: Object.keys(urlMapping),
-                                    redirectedToSanitizedLinksMapping: urlMapping,
+                                    linksFragmentUnvisited: Object.keys(iterationMappings),
+                                    redirectedToSanitizedLinksMapping: iterationMappings,
                                     sanitizedLinks: sanitizedLinks,
                                     rawLinks: links
                                 })
                                 .then((restructuredAssessments) => {
                                     allLinksAssessments = Object.assign(allLinksAssessments, restructuredAssessments);
                                 })
-                                
                             })
                         )
+
                     }
     
                     /*
-                    Once the assessments for all the links have been fetched, they are committed to the state.
-                    The links for which there have been no assessments or questions are also committed because
-                    when the page encounters a mutation and therefore the looking for links and assessments is
-                    performed again, we do not want to perform the same operations for the previously encountered
-                    links (which could be numerous) again and again.
+                    Inform the server of the redirects that it did not know about so that it can store them.
+                    These mappings include redirectedToSanitizedLinksMapping but not the CORSBlockedLinks (since
+                    they will be explicitly followed by the server later and then stored) and the initial links need
+                    to be in sanitizedLinksRemainder (since sanitizedLinksRemainder is filtered to only include the links whose mapping
+                    the server did not know)
                     */
-                    Promise.allSettled(allLinksProms)
+                    Promise.allSettled(allAxiosProms)
                     .then(() => {
-                        
-                        links.forEach((link) => {
-                            if (!(link in allLinksAssessments))
-                                allLinksAssessments[link] = {'confirmed': [], 'refuted': [], 'questioned': []}
+
+                        let mappingsToStore = Object.fromEntries(Object.entries(redirectedToSanitizedLinksMapping).filter( ([originLink, targetLink]) => 
+                            !CORSBlockedLinks.includes(originLink) && sanitizedLinksRemainder.includes(originLink)));
+
+                        console.log('url mappings to send to the server for storage after all the redirection followings', mappingsToStore);
+
+                        browser.runtime.sendMessage({
+                            type: 'send_redirects',
+                            data: {
+                                reqBody: { 
+                                    urlMappings: JSON.stringify(mappingsToStore)
+                                }
+                            }
                         })
+                        .then(resp => {
+                            console.log('posted redirects to the server', resp)
+                        });
 
-                        context.commit('update_links_assessments', allLinksAssessments);
-                        context.dispatch('pageObserver/reconnectObserver', {}, { root: true });
+                        console.log('sending links that the client was unable to retrieve to the server', CORSBlockedLinks);
+                   
+                        /*
+                        Once the redirects for all the sanitized links have been followed by the client, we send those
+                        that the client could not check because of CORS issues to the server so that it can follow their redirects and return
+                        the target links.
+                        */
+                        for (let i = 0 ; i < CORSBlockedLinks.length ; i += 20) {
+                            let linksFragment = CORSBlockedLinks.slice(i, i + 20);
+                            allLinksProms.push(
+                                browser.runtime.sendMessage({
+                                    type: 'follow_redirects',
+                                    data: {
+                                        headers: { 
+                                            urls: JSON.stringify(linksFragment)
+                                        }
+                                    }
+                                })
+                                .then((urlMapping) => {
+                                    
+                                    context.dispatch('getAndShowAssessments', {
+                                        linksFragmentUnvisited: Object.keys(urlMapping),
+                                        redirectedToSanitizedLinksMapping: urlMapping,
+                                        sanitizedLinks: sanitizedLinks,
+                                        rawLinks: links
+                                    })
+                                    .then((restructuredAssessments) => {
+                                        allLinksAssessments = Object.assign(allLinksAssessments, restructuredAssessments);
+                                    })
+                                    
+                                })
+                            )
+                        }
+        
+                        /*
+                        Once the assessments for all the links have been fetched, they are committed to the state.
+                        The links for which there have been no assessments or questions are also committed because
+                        when the page encounters a mutation and therefore the looking for links and assessments is
+                        performed again, we do not want to perform the same operations for the previously encountered
+                        links (which could be numerous) again and again.
+                        */
+                        Promise.allSettled(allLinksProms)
+                        .then(() => {
+                            
+                            links.forEach((link) => {
+                                if (!(link in allLinksAssessments))
+                                    allLinksAssessments[link] = {'confirmed': [], 'refuted': [], 'questioned': []}
+                            })
     
-                        resolve();
+                            context.commit('update_links_assessments', allLinksAssessments);
+                            context.dispatch('pageObserver/reconnectObserver', {}, { root: true });
+        
+                            resolve();
+                        })
                     })
-                })
 
-          
+                })
+               
             })
         },
 
@@ -349,7 +424,6 @@ export default {
                     }
                 })])
                 .then(([postsWAssessments, postsWQuestions]) => {
-                    console.log('assessments and questions returned from the server', postsWQuestions, postsWAssessments);
                     resolve({
                         postsWAssessments: postsWAssessments,
                         postsWQuestions: postsWQuestions

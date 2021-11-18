@@ -176,7 +176,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
       titleServices.deleteCustomTitle(request.data.reqBody)
       .then(res => {
-        console.log('got the response', res)
         resolve(res);
       })
       .catch(err => {
@@ -235,10 +234,8 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   else if (request.type == 'get_assessments') {
 
     return new Promise((resolve, reject) => {
-      console.log('umad shuru kone')
       assessmentServices.getAssessmentsForURL(request.data.headers)
       .then(res => {
-        console.log('background', res)
         resolve(res.data);
       })
       .catch(err => {
@@ -269,9 +266,31 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       })
     })
   }
+  else if (request.type == 'follow_redirects') {
+    return new Promise((resolve, reject) => {
+      assessmentServices.followRedirects(request.data.headers)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
   else if (request.type == 'get_redirects') {
     return new Promise((resolve, reject) => {
       assessmentServices.getRedirects(request.data.headers)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
+  else if (request.type == 'send_redirects') {
+    return new Promise((resolve, reject) => {
+      assessmentServices.updateRedirects(request.data.reqBody)
       .then(res => {
         resolve(res.data);
       })
@@ -295,7 +314,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
       postServices.getArticleByUrl(request.data.headers)
       .then(res => {
-        console.log(res)
         resolve(res.data)
       })
       .catch(err => {
