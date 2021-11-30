@@ -13,34 +13,59 @@ export default {
         nonEmptyLinkAssessments: {}
     },
     getters: {
+
+        linkAssessmentsBySources: (state, getters, rootState, rootGetters) => 
+            (assessments, accuracyStatus, sources) => {
+            let authUserId = rootGetters['auth/user'].id;
+
+            let sourcesIds;
+            if (sources == 'trusted')
+                sourcesIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
+            else if (sources == 'followed')
+                sourcesIds = rootGetters['relatedSources/followedIds'].concat(authUserId);
+
+            return assessments[accuracyStatus].map(assessment => assessment.SourceId).filter(sourceId => 
+                sourcesIds.includes(sourceId));
+        },
         
-        isConfirmed: (state, getters, rootState, rootGetters) => (assessments) => {
+        isConfirmed: (state, getters) => (assessments) => {
 
-            let authUserId = rootGetters['auth/user'].id;
-            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
+            let confirmedByTrusted = getters.linkAssessmentsBySources(assessments, 'confirmed', 'trusted');
+            let refutedByTrusted = getters.linkAssessmentsBySources(assessments, 'refuted', 'trusted');
 
-            return assessments['confirmed'].map(assessment => assessment.SourceId).filter(sourceId => 
-                trustedIds.includes(sourceId)).length &&
-            !(assessments['refuted'].map(assessment => assessment.SourceId).filter(sourceId => 
-                trustedIds.includes(sourceId) ).length);
+            if (confirmedByTrusted.length || refutedByTrusted.length)
+                return confirmedByTrusted.length && !(refutedByTrusted.length);
+            else {
+                let confirmedByFollowed = getters.linkAssessmentsBySources(assessments, 'confirmed', 'followed');
+                let refutedByFollowed = getters.linkAssessmentsBySources(assessments, 'refuted', 'followed');
+                return confirmedByFollowed.length && !(refutedByFollowed.length);
+            }
         },
-        isRefuted: (state, getters, rootState, rootGetters) => (assessments) =>  {
-            let authUserId = rootGetters['auth/user'].id;
-            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
+        isRefuted: (state, getters) => (assessments) =>  {
+            let confirmedByTrusted = getters.linkAssessmentsBySources(assessments, 'confirmed', 'trusted');
+            let refutedByTrusted = getters.linkAssessmentsBySources(assessments, 'refuted', 'trusted');
 
-            return !(assessments['confirmed'].map(assessment => assessment.SourceId).filter(sourceId => 
-                trustedIds.includes(sourceId)).length) &&
-            assessments['refuted'].map(assessment => assessment.SourceId).filter(sourceId => 
-                trustedIds.includes(sourceId) ).length;
+            if (confirmedByTrusted.length || refutedByTrusted.length) {
+                return !(confirmedByTrusted.length) && refutedByTrusted.length;
+            }
+            else {
+                let confirmedByFollowed = getters.linkAssessmentsBySources(assessments, 'confirmed', 'followed');
+                let refutedByFollowed = getters.linkAssessmentsBySources(assessments, 'refuted', 'followed');
+                return !(confirmedByFollowed.length) && refutedByFollowed.length;
+            }
         },
-        isDebated: (state, getters, rootState, rootGetters) => (assessments) => {
-            let authUserId = rootGetters['auth/user'].id;
-            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
+        isDebated: (state, getters) => (assessments) => {
+            let confirmedByTrusted = getters.linkAssessmentsBySources(assessments, 'confirmed', 'trusted');
+            let refutedByTrusted = getters.linkAssessmentsBySources(assessments, 'refuted', 'trusted');
 
-            return assessments['confirmed'].map(assessment => assessment.SourceId).filter(sourceId => 
-                trustedIds.includes(sourceId)).length &&
-            assessments['refuted'].map(assessment => assessment.SourceId).filter(sourceId => 
-                trustedIds.includes(sourceId) ).length;
+            if (confirmedByTrusted.length || refutedByTrusted.length) {
+                return confirmedByTrusted.length && refutedByTrusted.length;
+            }
+            else {
+                let confirmedByFollowed = getters.linkAssessmentsBySources(assessments, 'confirmed', 'followed');
+                let refutedByFollowed = getters.linkAssessmentsBySources(assessments, 'refuted', 'followed');
+                return confirmedByFollowed.length && refutedByFollowed.length;
+            }
         },
         isQuestioned: (state) => (assessments) => {
             return assessments['questioned'].length > 0;
@@ -103,6 +128,9 @@ export default {
                     )));
 
                 console.log('raw links found', links)
+
+                if (links.includes('/2021/11/30/politics/mark-meadows-january-6-committee/index.html'))
+                        console.log('peida shod?\n')
 
                 /*
                 Links that are newly added to the page but for which we already have fetched assessments
@@ -246,6 +274,8 @@ export default {
                                             iterationMappings[utils.extractHostname(response.link)] = link;
                                             CORSBlockedLinks.push(link);
                                         }
+                                        if (response.detail == 'Unknown')
+                                            CORSBlockedLinks.push(link);
                                     }
                                     if (response.type != 'error')  {
                                         iterationMappings[utils.extractHostname(response.link)] = link;
@@ -300,18 +330,21 @@ export default {
 
                         console.log('url mappings to send to the server for storage after all the redirection followings', mappingsToStore);
 
-                        browser.runtime.sendMessage({
-                            type: 'send_redirects',
-                            data: {
-                                reqBody: { 
-                                    urlMappings: JSON.stringify(mappingsToStore)
+                        if (mappingsToStore.length) {
+                            browser.runtime.sendMessage({
+                                type: 'send_redirects',
+                                data: {
+                                    reqBody: { 
+                                        urlMappings: JSON.stringify(mappingsToStore)
+                                    }
                                 }
-                            }
-                        })
-                        .then(resp => {
-                            console.log('posted redirects to the server', resp)
-                        });
-
+                            })
+                            .then(resp => {
+                                console.log('posted redirects to the server', resp)
+                            });
+    
+                        }
+                        
                         console.log('sending links that the client was unable to retrieve to the server', CORSBlockedLinks);
                    
                         /*

@@ -118,7 +118,7 @@
 } */
 
 .link-accuracy-icon {
-    transform: scale(0.9);
+    transform: scale(0.8);
     vertical-align: bottom;
 }
 
@@ -127,7 +127,7 @@
 }
 
 .link-accuracy-icon-inaccurate {
-    color: #E53935;
+    color: #B71C1C;
 }
 
 .link-accuracy-icon-questioned {
@@ -136,4 +136,15 @@
 
 *[inaccurate-link=true] {
     opacity: 0.25;
+}
+
+.accuracy-icon {
+    z-index: 20;
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+}
+
+*[trustnet-modified-link=true], *[trustnet-modified-question-link=true] {
+    position: relative;
 }

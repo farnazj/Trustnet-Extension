@@ -13,7 +13,7 @@
         </v-tooltip>
       </span>
       <span v-else>
-        <v-icon small>{{accountIcon}}</v-icon>
+        <v-icon small>{{icons.accountIcon}}</v-icon>
       </span>
 
       <div class="slice">

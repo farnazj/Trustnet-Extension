@@ -12,33 +12,60 @@ export default {
         historyOwner: {}
     },
     getters: {
+
+        linkAssessmentsBySources: (state, getters, rootState, rootGetters) => 
+            (accuracyStatus, sources) => {
+            let authUserId = rootGetters['auth/user'].id;
+
+            let sourcesIds;
+            if (sources == 'trusted')
+                sourcesIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
+            else if (sources == 'followed')
+                sourcesIds = rootGetters['relatedSources/followedIds'].concat(authUserId);
+
+            return state.assessments[accuracyStatus].map(assessment => assessment.SourceId).filter(sourceId => 
+                sourcesIds.includes(sourceId));
+        },
         
-        isConfirmed: (state, getters, rootState, rootGetters) => {
-            let authUserId = rootGetters['auth/user'].id;
-            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
+        isConfirmed: (state, getters) => {
 
-            return state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
-                trustedIds.includes(sourceId)).length &&
-            !(state.assessments['refuted'].map(assessment => assessment.assessor.id).filter(sourceId => 
-                trustedIds.includes(sourceId)).length);
+            let confirmedByTrusted = getters.linkAssessmentsBySources('confirmed', 'trusted');
+            let refutedByTrusted = getters.linkAssessmentsBySources('refuted', 'trusted');
+
+            if (confirmedByTrusted.length || refutedByTrusted.length)
+                return confirmedByTrusted.length && !(refutedByTrusted.length);
+            else {
+                let confirmedByFollowed = getters.linkAssessmentsBySources('confirmed', 'followed');
+                let refutedByFollowed = getters.linkAssessmentsBySources('refuted', 'followed');
+                return confirmedByFollowed.length && !(refutedByFollowed.length);
+            }
         },
-        isRefuted: (state, getters, rootState, rootGetters) => {
-            let authUserId = rootGetters['auth/user'].id;
-            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
+        isRefuted: (state, getters) => {
 
-            return !(state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
-                trustedIds.includes(sourceId)).length) &&
-            state.assessments['refuted'].map(assessment => assessment.assessor.id).filter(sourceId => 
-                trustedIds.includes(sourceId)).length;
+            let confirmedByTrusted = getters.linkAssessmentsBySources('confirmed', 'trusted');
+            let refutedByTrusted = getters.linkAssessmentsBySources('refuted', 'trusted');
+
+            if (confirmedByTrusted.length || refutedByTrusted.length) {
+                return !(confirmedByTrusted.length) && refutedByTrusted.length;
+            }
+            else {
+                let confirmedByFollowed = getters.linkAssessmentsBySources('confirmed', 'followed');
+                let refutedByFollowed = getters.linkAssessmentsBySources('refuted', 'followed');
+                return !(confirmedByFollowed.length) && refutedByFollowed.length;
+            }
         },
-        isDebated: (state, getters, rootState, rootGetters) => {
-            let authUserId = rootGetters['auth/user'].id;
-            let trustedIds = rootGetters['relatedSources/trustedIds'].concat(authUserId);
+        isDebated: (state, getters) => {
+            let confirmedByTrusted = getters.linkAssessmentsBySources('confirmed', 'trusted');
+            let refutedByTrusted = getters.linkAssessmentsBySources('refuted', 'trusted');
 
-            return state.assessments['confirmed'].map(assessment => assessment.assessor.id).filter(sourceId => 
-                trustedIds.includes(sourceId)).length &&
-            state.assessments['refuted'].map(assessment => assessment.assessor.id).filter(sourceId => 
-                trustedIds.includes(sourceId)).length;
+            if (confirmedByTrusted.length || refutedByTrusted.length) {
+                return confirmedByTrusted.length && refutedByTrusted.length;
+            }
+            else {
+                let confirmedByFollowed = getters.linkAssessmentsBySources('confirmed', 'followed');
+                let refutedByFollowed = getters.linkAssessmentsBySources('refuted', 'followed');
+                return confirmedByFollowed.length && refutedByFollowed.length;
+            }
         },
         /*
         determines if there are assessments by a source other than the original poster of the article

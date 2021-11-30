@@ -9,7 +9,7 @@
         :credibilityValue="assessmentObj.lastVersion.postCredibility" class="mb-1">
       </assessor>
       
-      <span v-if="assessmentType == 'question' && assessmentObj.lastVersion.sourceIsAnonymous" 
+      <span v-if="assessmentType == 'questioned' && assessmentObj.lastVersion.sourceIsAnonymous" 
         class="ml-2 mr-1 caption grey--text text--darken-3"> Asked anonymously</span>
 
       <!-- <span v-if="assessmentObj.lastVersion.postCredibility != 0" class="ml-2 mr-1 caption grey--text text--darken-1"> {{confidence}}</span> -->
