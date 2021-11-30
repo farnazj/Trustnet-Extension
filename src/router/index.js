@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
 import About from '@/views/About.vue'
-import CustomTitles from '@/views/CustomTitles.vue'
 import Login from '@/views/Login.vue'
 import store from '@/store'
 
@@ -21,15 +20,6 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
-  },
-  {
-    path: '/custom-titles/:titleId',
-    name: 'customTitles',
-    props: true,
-    component: CustomTitles,
-    meta: {
-      requiresAuth: true
-    }
   },
   {
     path: '/about',

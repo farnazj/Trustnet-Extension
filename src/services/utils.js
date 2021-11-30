@@ -294,20 +294,20 @@ async function followRedirects(link) {
   if (err.response) {
     if (err.response.status == 404)
       return ({ type: 'error', detail: '404' });
-    }
+  }
     /*
     One occasion when err.request happens is when the browser encounters a
     CORS issue. This e.g., happens on Facebook or Twitter where the initially
     encountered links are shortened links from the Facebook/Twitter domain but the
     target links belong to other domains which enforce the CORS policy.
     */
-    else if (err.request) {
-      return ({ type: 'error', detail: 'CORS', link: link });
-    }
-    else {
-      console.log(err);
-      return ({ type: 'error', detail: 'Unknown' });
-    }
+  else if (err.request) {
+    return ({ type: 'error', detail: 'CORS', link: link });
+  }
+  else {
+    console.log(err);
+    return ({ type: 'error', detail: 'Unknown' });
+  }
   
 });
 

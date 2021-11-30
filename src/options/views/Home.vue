@@ -3,18 +3,6 @@
     <v-row no-gutters justify="center" class="pt-5">
         <v-col cols="10" sm="6" md="4" lg="3">
 
-        <v-radio-group v-model="selectedHeadlineSource">
-            <template v-slot:label>
-                <div>I'd like to see alternative headlines from:</div>
-            </template>
-            <v-radio v-for="(headlineSource, index) in headlineSourceItems" :key="index"
-            :value="headlineSource.value" >
-                <template v-slot:label>
-                    <v-row no-gutters class="my-0 caption">{{headlineSource.text}}</v-row>
-                </template>
-            </v-radio>
-        </v-radio-group>
-
         <v-row class="mt-1" no-gutters>
             <p class="body-2">To change the sources you follow or trust you can visit the Sources page on
                 <a :href="sourcesLink" class="ml-1 custom-link" target="_blank">{{siteName}}
@@ -24,7 +12,7 @@
 
         <v-divider></v-divider>
 
-        <v-row no-gutters class="mt-6">
+        <!-- <v-row no-gutters class="mt-6">
             <v-combobox v-model="blackListedWebsites" small-chips dense :hide-no-data="true"
                 label="Disable the extension on certain domains" multiple persistent-hint
                 hint="e.g., google.com or www.google.com"
@@ -38,7 +26,7 @@
                 </v-chip>
             </template>   
         </v-combobox>
-        </v-row>
+        </v-row> -->
 
         </v-col>
     </v-row>
