@@ -129,7 +129,7 @@ export default {
 
                 console.log('raw links found', links)
 
-                if (links.includes('/2021/11/30/politics/mark-meadows-january-6-committee/index.html'))
+                if (links.includes('/2021/11/30/politics/dr-oz-senate-campaign-pennsylvania/index.html'))
                         console.log('peida shod?\n')
 
                 /*
@@ -158,14 +158,25 @@ export default {
                 we want to know which raw link a sanitized link pertains to (they will both share the same index
                 in their corresponding arrays-- links and sanitizedLinks).
                 */
-                let sanitizedLinks = links.map(url => {
+                let sanitizedLinks = links.map( (url, index) => {
                         let sanitizedUrl = url;
                         if (url[0] == '/' || url[0] == '?')
                             sanitizedUrl = window.location.protocol + '//' + window.location.host + url;
                         if (url[0] == '#')
                             sanitizedUrl = utils.extractHostname(window.location.href, false) + url;
-                        
+    
                         return utils.extractHostname(sanitizedUrl, false);
+                });
+
+                //remove invalid urls both from sanitizedLinks and raw links arrays
+                sanitizedLinks = sanitizedLinks.filter((url, index) => {
+                    if (utils.isValidHttpUrl(url))
+                        return true;
+                    else {
+                        console.lo
+                        links.splice(index, 1);
+                        return false;
+                    }
                 });
           
                 let redirectedToSanitizedLinksMapping = {}; //for all the links found on the page
@@ -178,21 +189,24 @@ export default {
                 let mappingReqProms = [];
                 let serverSentMappings = [];
                 for (let j = 0 ; j < sanitizedLinks.length ; j += 20) {
-                    let iterationRequestedLinks = sanitizedLinks.slice(j, j + 20).filter(url => utils.isValidHttpUrl(url));
+                    let iterationRequestedLinks = sanitizedLinks.slice(j, j + 20);
+                    
                     mappingReqProms.push(
                         browser.runtime.sendMessage({
                             type: 'get_redirects',
                             data: {
                                 headers: { 
-                                    urls: JSON.stringify(iterationRequestedLinks)
+                                    urls: JSON.stringify(iterationRequestedLinks.filter(link => link))
                                 }
                             }
                         })
                         .then((serverResponse) => {
+                            serverSentMappings = serverSentMappings.concat(serverResponse);
 
                             let reFormattedMappings = {};
                             for (let i = 0 ; i < serverResponse.length; i++) {
-                                reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
+                                if (serverResponse[i])
+                                    reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
                             }                        
         
                             context.dispatch('getAndShowAssessments', {
@@ -204,8 +218,7 @@ export default {
                             .then((restructuredAssessments) => {
                                 allLinksAssessments = Object.assign(allLinksAssessments, restructuredAssessments);
                             })
-
-                            serverSentMappings = serverSentMappings.concat(serverResponse);
+                            
                         })
                     );   
                 }
@@ -214,7 +227,9 @@ export default {
                 Promise.all(mappingReqProms)
                 .then( () => {
                     console.log('all server sent mappings are', serverSentMappings)
-            
+                    console.log('non-null server sent mappings', sanitizedLinks.filter((link, index) => 
+                        serverSentMappings[index]
+                    ))
                     //The remainder of those sanitized links for which the server did not have mappings to their ultimate links
                     
                     let sanitizedLinksRemainder = sanitizedLinks.filter((link, index) => 
