@@ -124,7 +124,7 @@ export default {
                     let returnedAssessments = postsWAssessments.length ? postsWAssessments[0].PostAssessments : [];
                     let returnedQuestions = postsWQuestions.length ? postsWQuestions[0].PostAssessments : [];
 
-                    returnedAssessments = returnedAssessments.concat(returnedQuestions)
+                    returnedAssessments = returnedAssessments.concat(returnedQuestions);
                     context.dispatch('restructureAssessments', returnedAssessments)
                     .then((restructuredAssessments) => {
                         context.dispatch('sortAssessments', restructuredAssessments)
@@ -134,6 +134,23 @@ export default {
                             if (context.rootGetters['assessments/isNoSourceAssessmentNonEmpty'])
                                 context.commit('set_visibility', true);
 
+                            if (returnedAssessments.length) {
+                                let postId = postsWAssessments.length ? postsWAssessments[0].id : postsWQuestions[0].id
+
+                                browser.runtime.sendMessage({
+                                    type: 'log_interaction',
+                                    interaction: {
+                                        type: 'page_assessments', 
+                                        data: { 
+                                            pageURL: pageUrl,
+                                            pageFullURL: window.location.href,
+                                            assessments: JSON.stringify(context.state.assessments),
+                                            postId: postId
+                                        }
+                                    }
+                                })
+                            }
+                            
                             resolve();
                         })
                     })
@@ -209,9 +226,6 @@ export default {
 
         getAuthUserPostAssessment: (context) => {
 
-            console.log('going to get auth user assessments');
-            console.time('authUserStart');
-            console.timeLog('authUserStart')
             let pageUrl = context.rootState.pageDetails.url;
 
             return new Promise((resolve, reject) => {
@@ -227,7 +241,6 @@ export default {
                 .then(response => {
                     let assessment = response.length ? (response[0].PostAssessments.filter(el => el.version == 1))[0] : {};
                     context.commit('set_user_assessment', assessment);
-                    console.timeEnd('authUserStart');
 
                     if (Object.entries(assessment).length && !context.rootState.pageDetails.articleId)
                         context.dispatch('pageDetails/getArticleByUrl', true , {root: true} )

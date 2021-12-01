@@ -40,7 +40,6 @@ function populateLinkAssessments (allLinksAssessments) {
                                 linkEl.prepend(iconToAddClone);
 
                                 linkEl.setAttribute('trustnet-modified-question-link', true);
-
                             }
                             
                         });
@@ -106,9 +105,50 @@ function populateLinkAssessments (allLinksAssessments) {
                                 iconToAddClone.classList.add('accuracy-icon')
                                 linkEl.prepend(iconToAddClone);
                                 linkEl.setAttribute('trustnet-modified-link', true);
+
                             }
-                            
+                             
                         });
+                    }
+
+                    if (linkIsQuestioned || specialStatus) {
+
+                        linkEls.forEach(linkEl => {
+
+                            if (!linkEl.getAttribute('trustnet-listener')) {
+
+                                linkEl.setAttribute('trustnet-listener', true);
+
+                                browser.runtime.sendMessage({
+                                    type: 'log_interaction',
+                                    interaction: {
+                                        type: 'link_encounter', 
+                                        data: { 
+                                            link: link,
+                                            pageURL: window.location.href,
+                                            accuracyStatus: specialStatus ? specialStatus : null,
+                                            isQuestioned: linkIsQuestioned
+                                        }
+                                    }
+                                });
+
+                                linkEl.addEventListener('click', function(ev) {
+                                    browser.runtime.sendMessage({
+                                        type: 'log_interaction',
+                                        interaction: {
+                                            type: 'link_click', 
+                                            data: { 
+                                                link: link,
+                                                pageURL: window.location.href,
+                                                accuracyStatus: specialStatus ? specialStatus : null,
+                                                isQuestioned: linkIsQuestioned
+                                            }
+                                        }
+                                    })
+                                }, true) //the event should run on the capture phase to make sure this is executed before the click handler on the element itself which redirects to another page
+                            }
+                        })
+                        
                     }
                 }
             }
