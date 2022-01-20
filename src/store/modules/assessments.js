@@ -23,7 +23,7 @@ export default {
             else if (sources == 'followed')
                 sourcesIds = rootGetters['relatedSources/followedIds'].concat(authUserId);
 
-            return state.assessments[accuracyStatus].map(assessment => assessment.SourceId).filter(sourceId => 
+            return state.assessments[accuracyStatus].map(assessment => assessment.lastVersion.SourceId).filter(sourceId => 
                 sourcesIds.includes(sourceId));
         },
         
@@ -123,8 +123,16 @@ export default {
                 .then(([postsWAssessments, postsWQuestions]) => {
                     let returnedAssessments = postsWAssessments.length ? postsWAssessments[0].PostAssessments : [];
                     let returnedQuestions = postsWQuestions.length ? postsWQuestions[0].PostAssessments : [];
-
                     returnedAssessments = returnedAssessments.concat(returnedQuestions);
+
+                    let userId = context.rootGetters['auth/user'].id;
+                    let userAssessmentArr = returnedAssessments.filter(el => el.version == 1 && el.SourceId == userId) ;
+                    if (userAssessmentArr.length)
+                        context.commit('set_user_assessment', userAssessmentArr[0]);
+
+                    if ( returnedAssessments.length && !context.rootState.pageDetails.articleId)
+                        context.dispatch('pageDetails/getArticleByUrl', true , { root: true } );
+
                     context.dispatch('restructureAssessments', returnedAssessments)
                     .then((restructuredAssessments) => {
                         context.dispatch('sortAssessments', restructuredAssessments)
@@ -221,38 +229,6 @@ export default {
                     sortedAssessments[key] = assessments[key].slice().sort(utils.compareAssessments);
                 }
                 resolve(sortedAssessments);
-            })
-        },
-
-        getAuthUserPostAssessment: (context) => {
-
-            let pageUrl = context.rootState.pageDetails.url;
-
-            return new Promise((resolve, reject) => {
-
-                browser.runtime.sendMessage({
-                    type: 'get_assessments',
-                    data: {
-                        headers: { 
-                            urls: JSON.stringify([pageUrl])
-                        }
-                    }
-                })
-                .then(response => {
-                    let assessment = response.length ? (response[0].PostAssessments.filter(el => el.version == 1))[0] : {};
-                    context.commit('set_user_assessment', assessment);
-
-                    if (Object.entries(assessment).length && !context.rootState.pageDetails.articleId)
-                        context.dispatch('pageDetails/getArticleByUrl', true , {root: true} )
-                        .then(() => {
-                            resolve();
-                        })
-                    else
-                        resolve();
-                })
-                .catch(err => {
-                    reject(err);
-                })
             })
         },
       

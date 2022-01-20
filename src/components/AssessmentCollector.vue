@@ -258,8 +258,7 @@ export default {
 
         this.postAuthUserAssessment(reqBody)
         .then(() => {
-          this.getAllAssessments();
-          this.getAuthUserPostAssessment()
+          this.getAllAssessments()
           .then(() => {
             self.disableAssess = false;
           })
@@ -277,7 +276,6 @@ export default {
     },
     ...mapActions('assessments', [
       'postAuthUserAssessment',
-      'getAuthUserPostAssessment',
       'getAllAssessments'
     ])
   },
@@ -286,7 +284,6 @@ export default {
       this.mapCredProperties();
     },
     userAssessment: function() {
-      console.log('khob avaz shod dige')
       this.prepopulateUserAssessment();
     }
   }

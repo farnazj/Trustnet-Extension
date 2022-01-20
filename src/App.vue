@@ -34,7 +34,6 @@ export default {
         .then(() => {
           if (!this.isBlacklisted) {
             this.getAllAssessments();
-            this.getAuthUserPostAssessment();
             this.setupLinkAssessments();
           }
         })
@@ -56,8 +55,7 @@ export default {
       'logout'
     ]),
     ...mapActions('assessments', [
-      'getAllAssessments',
-      'getAuthUserPostAssessment'
+      'getAllAssessments'
     ]),
     ...mapActions('linkAssessments', [
       'setupLinkAssessments'

@@ -119,8 +119,9 @@ export default {
                 /*
                 Get all the links on the page that in their raw form aren't exactly the same as the links
                 for which we have already obtained assessments (we already have asessments for some links
-                e.g., in the case that we are loading more links into the page). This means that even if 
-                there are newer assessments for such links, they will not get updated.
+                e.g., in the case that we are loading more links into the page, for instance, through infinite
+                scrolling). This means that even if there are newer assessments for such links, they will not
+                get updated.
                 */
                 let links = Array.from(new Set([...document.querySelectorAll('a')].map(el => 
                     el.getAttribute('href')).filter(el => el && !['/', '#'].includes(el) && el.substring(0, 7) != 'mailto:' ).filter(el => 
@@ -129,13 +130,15 @@ export default {
 
                 console.log('raw links found', links)
 
-                if (links.includes('/2021/11/30/politics/dr-oz-senate-campaign-pennsylvania/index.html'))
-                        console.log('peida shod?\n')
-
                 /*
                 Links that are newly added to the page but for which we already have fetched assessments
                 */
                 let prevNonEmptyLinks = Object.keys(context.state.nonEmptyLinkAssessments);
+                /*
+                Links that are newly appended to the page but whose href value is that same as a link for
+                which we already have assessments. In this case, we do not request assessments again, but
+                simply show these links with assessments we have already fetched.
+                */
                 let newRepeatedLinks = Array.from(new Set([...document.querySelectorAll('a')].filter(el => 
                     !el.getAttribute('trustnet-modified-question-link') && 
                     !el.getAttribute('trustnet-modified-link')
@@ -156,7 +159,7 @@ export default {
                 that distinguish a resource using query parameters)
                 After sanitization, some links may end up being the same. These are not filtered however, because
                 we want to know which raw link a sanitized link pertains to (they will both share the same index
-                in their corresponding arrays-- links and sanitizedLinks).
+                in their corresponding arrays---links and sanitizedLinks).
                 */
                 let sanitizedLinks = links.map( (url, index) => {
                         let sanitizedUrl = url;
@@ -173,7 +176,6 @@ export default {
                     if (utils.isValidHttpUrl(url))
                         return true;
                     else {
-                        console.lo
                         links.splice(index, 1);
                         return false;
                     }
@@ -241,9 +243,12 @@ export default {
     
                     let allLinksProms = []; 
                     /*
-                    Because sanitizedLinks can have duplicates (as explained above), an object of unique sanitizedLinks
-                    is created with each key being a sanitized link and its corresponding value a boolean indicating
-                    whether the link has been visited yet , with visited meaning its trail of redirects have been followed
+                    As examplained, sanitizedLinks can have duplicates (as explained above, two different raw links when sanitized,
+                    will end up having the same value. But because when we insert assessments into the page, we look for the raw links,
+                    we keep the mapping of both duplicate sanitized links to their corresponding raw links). But so that we do not
+                    waste bandwidth and compute power on getting the tail of redirects or assessments for these duplicates, we create
+                    an object of unique sanitizedLinks with each key being a sanitized link and its corresponding value a boolean indicating
+                    whether the link has been visited yet, with visited meaning its trail of redirects have been followed
                     and its assessments have been fetched.
                     */
                     let uniqueSanitizedLinksVisited = Array.from(new Set(sanitizedLinksRemainder)).reduce((obj, x) => 
@@ -282,8 +287,9 @@ export default {
                                         a CORS issue, we already have the final URL. However, in the case of links to BBC or NYT on Facebook, 
                                         because the links are shortened, we still do not have the final link when we encounter the CORS issue.
                                         All of these CORS blocked links will be later sent to the server so that the server can find the
-                                        ultimate target link. We keep the mapping here nonetheless, because for paywalled articles, the 
-                                        server may not be able to get the redirected links (and rather get 403 for example).
+                                        ultimate target link (since CORS is only imposed in browsers). We keep the mapping here nonetheless,
+                                        because for paywalled articles, the server may not be able to get the redirected links (and rather
+                                        get 403 for example).
                                         */
                                         if (response.detail == 'CORS') {
                                             iterationMappings[utils.extractHostname(response.link)] = link;

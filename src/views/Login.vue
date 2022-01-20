@@ -104,7 +104,6 @@ export default {
       .then(() => {
         if (!this.isBlacklisted) {
           this.getAllAssessments();
-          this.getAuthUserPostAssessment();
           this.setupLinkAssessments();
         }
         this.$router.push({ name: 'Home' });
@@ -123,8 +122,7 @@ export default {
       this.$router.push({ name: 'forgotPassword' });
     },
     ...mapActions('assessments', [
-      'getAllAssessments',
-      'getAuthUserPostAssessment'
+      'getAllAssessments'
     ]),
     ...mapActions('linkAssessments', [
       'setupLinkAssessments'
