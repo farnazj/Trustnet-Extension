@@ -105,7 +105,7 @@ export default {
                     type: 'get_assessments',
                     data: {
                         headers: { 
-                            urls: JSON.stringify([pageUrl])
+                            urls: JSON.stringify([utils.extractHostname(pageUrl)])
                             // excludeposter: true
                         }
                     }
@@ -117,13 +117,15 @@ export default {
                 browser.runtime.sendMessage({
                     type: 'get_questions',
                     data: {
-                        headers: { urls: JSON.stringify([pageUrl]) }
+                        headers: { urls: JSON.stringify([utils.extractHostname(pageUrl)]) }
                     }
                 })])
                 .then(([postsWAssessments, postsWQuestions]) => {
                     let returnedAssessments = postsWAssessments.length ? postsWAssessments[0].PostAssessments : [];
                     let returnedQuestions = postsWQuestions.length ? postsWQuestions[0].PostAssessments : [];
                     returnedAssessments = returnedAssessments.concat(returnedQuestions);
+
+                    console.log('got assessments and questions', returnedAssessments)
 
                     let userId = context.rootGetters['auth/user'].id;
                     let userAssessmentArr = returnedAssessments.filter(el => el.version == 1 && el.SourceId == userId) ;
@@ -135,8 +137,10 @@ export default {
 
                     context.dispatch('restructureAssessments', returnedAssessments)
                     .then((restructuredAssessments) => {
+                        console.log('restructured assessments', restructuredAssessments)
                         context.dispatch('sortAssessments', restructuredAssessments)
                         .then((sortedAssessments) => {
+                            console.log('what are sorted assessments', sortedAssessments)
                             context.commit('set_assessments', sortedAssessments);
 
                             if (context.rootGetters['assessments/isNoSourceAssessmentNonEmpty'])
@@ -171,7 +175,7 @@ export default {
         },
 
         restructureAssessments: (context, returnedAssessments) => {
-            
+
             return new Promise((resolve, reject) => {
 
                 let tmpAssessments = {'confirmed': [], 'refuted': [], 'questioned': []};
@@ -213,7 +217,7 @@ export default {
                         })
                     );
                 }
-            
+
                 Promise.all(sourcePromises)
                 .then(() => {
                     resolve(tmpAssessments);
@@ -246,6 +250,7 @@ export default {
                     }
                 })
                 .then(() => {
+                    console.log('posted assessment', payload)
                     resolve();
                 })
                 .catch(err => {

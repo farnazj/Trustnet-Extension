@@ -1,6 +1,5 @@
 import domHelpers from "@/lib/domHelpers";
 import utils from '@/services/utils'
-import { mdiConsoleLine } from "@mdi/js";
 
 /*
 This module is for fetching assessments and accuracy questions of all the links
@@ -351,7 +350,8 @@ export default {
 
                         console.log('url mappings to send to the server for storage after all the redirection followings', mappingsToStore);
 
-                        if (mappingsToStore.length) {
+                        if (Object.keys(mappingsToStore).length) {
+                            
                             browser.runtime.sendMessage({
                                 type: 'send_redirects',
                                 data: {
@@ -362,7 +362,10 @@ export default {
                             })
                             .then(resp => {
                                 console.log('posted redirects to the server', resp)
-                            });
+                            })
+                            .catch(error => {
+                                console.log('chi shod', error)
+                            })
     
                         }
                         
@@ -385,7 +388,6 @@ export default {
                                     }
                                 })
                                 .then((urlMapping) => {
-                                    
                                     context.dispatch('getAndShowAssessments', {
                                         linksFragmentUnvisited: Object.keys(urlMapping),
                                         redirectedToSanitizedLinksMapping: urlMapping,
@@ -422,6 +424,9 @@ export default {
                         })
                     })
 
+                })
+                .catch(err => {
+                    console.log(err, 'whaaaat')
                 })
                
             })
@@ -503,72 +508,68 @@ export default {
             return new Promise((resolve, reject) => {
 
                 let linkAssessments = {};
-                
-                postsWAssessments.forEach((post) => {
-                    if (post.PostAssessments.length) {
-                        post.PostAssessments.forEach(assessment => {
-                            if (assessment.version == 1) {
-       
-                                let credValue = utils.getAccuracyMapping(assessment.postCredibility);
-                                /*
-                                get all indices of post.url in sanitizedLinks (because sanitizedLinks can have duplicates)
-                                and using the indices, get their correponding raw links in the originalLinks array
-                                */
-                                let originalLinkIndices = [];
-                                let sanitizedLinkIndex = -1;
 
-                                let clientSanitizedUrl = urlMapping[post.url];
-                                do {
-                                    sanitizedLinkIndex = sanitizedLinks.indexOf(clientSanitizedUrl, sanitizedLinkIndex + 1);
-                                    if (sanitizedLinkIndex != -1)
-                                        originalLinkIndices.push(sanitizedLinkIndex);
-                                }
-                                while (sanitizedLinkIndex != -1);
-                                
-                                /*
-                                Each instance of the raw links will be a key in linkAssessments mapped to its assessments
-                                */
-                                originalLinkIndices.forEach((index) => {
-                                    let originalLink = originalLinks[index];
-                                    if (!(originalLink in linkAssessments))
-                                        linkAssessments[originalLink] = {'confirmed': [], 'refuted': [], 'questioned': []};
+                for (let postTuple of [{'assessments': postsWAssessments}, {'questions': postsWQuestions}]) {
 
-                                    linkAssessments[originalLink][credValue].push(assessment);
-                                })
+                    Object.values(postTuple)[0].forEach((post) => {
 
-                            }
-                        })
-                    }
-                })
-
-                postsWQuestions.forEach(post => {
-
-                    if (post.PostAssessments.length) {
-
-                        post.PostAssessments.forEach(question => {
-                            let originalLinkIndices = [];
-                            let sanitizedLinkIndex = -1;
-
-                            let clientSanitizedUrl = urlMapping[post.url];
-
-                            do {
-                                sanitizedLinkIndex = sanitizedLinks.indexOf(clientSanitizedUrl, sanitizedLinkIndex + 1);
-                                if (sanitizedLinkIndex != -1)
-                                    originalLinkIndices.push(sanitizedLinkIndex);
-                            }
-                            while (sanitizedLinkIndex != -1);
+                        if (post.PostAssessments.length) {
+                            post.PostAssessments.forEach(assessment => {
                             
-                            originalLinkIndices.forEach((index) => {
-                                let originalLink = originalLinks[index];
-                                if (!(originalLink in linkAssessments))
-                                    linkAssessments[originalLink] = {'confirmed': [], 'refuted': [], 'questioned': []};
+                                if (assessment.version == 1) {
+                                    let credValue;
+                                    if (Object.keys(postTuple)[0] == 'assessments') {
+                                        credValue = utils.getAccuracyMapping(assessment.postCredibility);
+                                    }
+                                    else {
+                                        credValue = 'questioned';
+                                    }
+                                        
+                                    /*
+                                    get all indices of post.url in sanitizedLinks (because sanitizedLinks can have duplicates)
+                                    and using the indices, get their correponding raw links in the originalLinks array
+                                    */
+                                    let clientSanitizedUrl;
+                                    
+                                    if (post.url in urlMapping)
+                                        clientSanitizedUrl = urlMapping[post.url];
+                                    else {
+                                        let altUrls = utils.constructAltURLs([post.url]);
+                                        let altUrl = altUrls.filter(url => url in urlMapping)[0];
+                                        clientSanitizedUrl = urlMapping[altUrl];
+                                    }
+                                        
+                                    let protocolRemovedSanitizedLinks = sanitizedLinks.map(el => {
+                                        return el.split('//')[1];
+                                    });
+                                    let protocolRemovedClientSanitizedUrl = clientSanitizedUrl.split('//')[1];
 
-                                linkAssessments[originalLink]['questioned'].push(question);
+                                    let originalLinkIndices = [];
+                                    let sanitizedLinkIndex = -1;
+                                    do {
+                                        sanitizedLinkIndex = protocolRemovedSanitizedLinks.indexOf(protocolRemovedClientSanitizedUrl, sanitizedLinkIndex + 1);
+                                        if (sanitizedLinkIndex != -1)
+                                            originalLinkIndices.push(sanitizedLinkIndex);
+                                    }
+                                    while (sanitizedLinkIndex != -1); 
 
+                                    /*
+                                    Each instance of the raw links will be a key in linkAssessments mapped to its assessments
+                                    */
+                                    originalLinkIndices.forEach((index) => {
+                                        let originalLink = originalLinks[index];
+                                        if (!(originalLink in linkAssessments))
+                                            linkAssessments[originalLink] = {'confirmed': [], 'refuted': [], 'questioned': []};
+    
+                                        linkAssessments[originalLink][credValue].push(assessment);
+                                    })
+                                }
+                            
                             })
-                        })
-                    }
-                })
+                        }
+
+                    })
+                }
                 
                 resolve(linkAssessments);
             })

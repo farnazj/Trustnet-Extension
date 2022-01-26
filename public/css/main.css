@@ -6,7 +6,7 @@
     position: fixed;
     width: 400px !important;
     right: 0px;
-    z-index: 9999;
+    z-index: 99999999;
     overflow: auto;
     top: 0px;
 }
@@ -19,7 +19,7 @@
     max-height: 99vh;
     position: fixed !important;
     right: 0px;
-    z-index: 9999;
+    z-index: 99999999;
     overflow: auto;
     top: 0px;
     width: initial !important;
@@ -120,31 +120,38 @@
 .link-accuracy-icon {
     transform: scale(0.8);
     vertical-align: bottom;
+    margin-right: 2px;
 }
 
-.link-accuracy-icon-accurate {
-    color: #43A047;
+/* the second selectors below is for redundancy---certain websites enforce the fill color on icons.
+These selectors have a high specificity and ensure that the fill will apply.*/
+.link-accuracy-icon-accurate, .link-accuracy-icon.link-accuracy-icon-accurate path{
+    color: #00897B !important;
+    fill: #00897B !important;
 }
 
-.link-accuracy-icon-inaccurate {
-    color: #B71C1C;
+.link-accuracy-icon-inaccurate, .link-accuracy-icon.link-accuracy-icon-inaccurate path {
+    color: #B71C1C !important;
+    fill: #B71C1C !important;
 }
 
-.link-accuracy-icon-questioned {
-    color: #546E7A;
+.link-accuracy-icon-questioned, .link-accuracy-icon.link-accuracy-icon-questioned path {
+    color: #546E7A !important;
+    fill: #546E7A !important;
 }
 
 *[inaccurate-link=true] {
     opacity: 0.25;
 }
 
-.accuracy-icon {
+.overlay-accuracy-icon {
     z-index: 20;
     position: absolute;
     bottom: -5px;
-    right: -5px;
+    right: 0px;
 }
 
 *[trustnet-modified-link=true], *[trustnet-modified-question-link=true] {
     position: relative;
 }
+

@@ -222,9 +222,15 @@ function extractHostname(url, removeProtocol) {
 
   if (url.includes('https://l.facebook.com/l.php?'))
     hostname = extractFacebooklink(hostname);
-  
-  if (url.indexOf("//") != -1 ) {
 
+  if (url.includes('cnn.com/videos')) {
+    let index = url.indexOf('/video/playlists/');
+    if (index != -1 ) {
+      hostname = url.substring(0, index);
+    }
+  }
+    
+  if (url.indexOf("//") != -1 ) {
     if (keepQueryParam)
       hostname = hostname.split('&')[0];
     else {
@@ -232,7 +238,6 @@ function extractHostname(url, removeProtocol) {
       if (indexOfFirstParam != -1)
         hostname = hostname.substring(0, indexOfFirstParam);
     }
-      
   }
   else {
     console.log('what kind of url is it', url);
@@ -325,6 +330,22 @@ function isValidHttpUrl(string) {
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
+
+function constructAltURLs(urls) {
+
+  let indexAlternativeUrls = urls.map(url => {
+    let index = url.indexOf('/index.html');
+    if (index != -1)
+      return url.substring(0, index);
+    else 
+      return url + '/index.html';
+  });
+  
+  let extendedUrls = urls.concat(indexAlternativeUrls);
+  return extendedUrls;
+}
+
+
 export default {
   compareNames,
   compareSources,
@@ -339,5 +360,6 @@ export default {
   extractHostname,
   getAccuracyMapping,
   followRedirects,
-  isValidHttpUrl
+  isValidHttpUrl,
+  constructAltURLs
 }

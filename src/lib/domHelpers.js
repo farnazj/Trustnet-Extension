@@ -1,6 +1,41 @@
 
 import store from '@/store'
 
+function getSiblings(e) {
+    // for collecting siblings
+    let siblings = []; 
+    // if no parent, return no sibling
+    if (!e.parentNode) {
+        return siblings;
+    }
+    // first child of the parent node
+    let sibling  = e.parentNode.firstChild;
+    
+    // collecting siblings
+    while (sibling) {
+        if (sibling.nodeType === 1 && sibling !== e) {
+            siblings.push(sibling);
+        }
+        sibling = sibling.nextSibling;
+    }
+    return siblings;
+}
+
+function isEmbedded(link) {
+    // let siblings = getSiblings(link);
+    // let linkIsEmbedded = false;
+
+    // for (const sibling of siblings) {
+    //     if (sibling.innerText.trim().length) {
+    //         linkIsEmbedded = true;
+    //         break;
+    //     }
+    // }
+    //return linkIsEmbedded;
+    return link.parentElement.innerText.trim().length > link.innerText.trim().length;
+    
+}
+
 /*
 This function changes the UI to signify assessed or questioned links
 */
@@ -30,13 +65,22 @@ function populateLinkAssessments (allLinksAssessments) {
                         //add question icon
                         linkEls.forEach(linkEl => {
                             if (!linkEl.getAttribute('trustnet-modified-question-link')) {
-        
-                                // [...linkEl.children].forEach(child => {
-                                //     child.style.display = "inline";
-                                // });
             
                                 let iconToAddClone = questionIcon.cloneNode(true);
-                                iconToAddClone.classList.add('accuracy-icon');
+                                let accuracyClass;
+                                if (isEmbedded(linkEl)) {
+                                    accuracyClass = 'inline-accuracy-icon';
+                                    [...linkEl.children].forEach(child => {
+                                        child.style.display = "inline";
+                                    });
+                                }
+                                else {
+                                    accuracyClass = 'overlay-accuracy-icon';
+                                    if (['inline', ''].includes(linkEl.style.display))
+                                        linkEl.style.display = 'inline-block';
+                                }
+                                    
+                                iconToAddClone.classList.add(accuracyClass);
                                 linkEl.prepend(iconToAddClone);
 
                                 linkEl.setAttribute('trustnet-modified-question-link', true);
@@ -98,14 +142,33 @@ function populateLinkAssessments (allLinksAssessments) {
                                     // });
                                 // }
 
-                                if (specialStatus == 'inaccurate')
+                                if (specialStatus == 'inaccurate') {
                                     linkEl.setAttribute('inaccurate-link', true);
+                                    [...linkEl.children].forEach(child => {
+                                        child.setAttribute('inaccurate-link', true);
+                                    });
+                                }
             
                                 let iconToAddClone = iconToAdd.cloneNode(true);
-                                iconToAddClone.classList.add('accuracy-icon')
+                                let accuracyClass;
+
+                                if (isEmbedded(linkEl)) {
+                                    accuracyClass = 'inline-accuracy-icon';
+                                    [...linkEl.children].forEach(child => {
+                                        child.style.display = "inline";
+                                    });
+                                }
+                                else {
+                                    accuracyClass = 'overlay-accuracy-icon';
+                                    if (['inline', ''].includes(linkEl.style.display))
+                                        linkEl.style.display = 'inline-block';
+                                }
+                                    
+                                iconToAddClone.classList.add(accuracyClass);
+
                                 linkEl.prepend(iconToAddClone);
                                 linkEl.setAttribute('trustnet-modified-link', true);
-
+               
                             }
                              
                         });
