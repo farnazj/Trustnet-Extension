@@ -188,7 +188,8 @@ export default {
                 fetched) are sent via get requests in batches of 20 because there is a limit on the size of the http header.
                 */
                 let mappingReqProms = [];
-                let serverSentMappings = [];
+                let serverSentMappingsArr = [];
+                let serverSentMappings = {}
                 for (let j = 0 ; j < sanitizedLinks.length ; j += 20) {
                     let iterationRequestedLinks = sanitizedLinks.slice(j, j + 20);
                     
@@ -202,14 +203,15 @@ export default {
                             }
                         })
                         .then((serverResponse) => {
-                            serverSentMappings = serverSentMappings.concat(serverResponse);
+                            serverSentMappingsArr = serverSentMappingsArr.concat(serverResponse);
 
                             let reFormattedMappings = {};
                             for (let i = 0 ; i < serverResponse.length; i++) {
                                 if (serverResponse[i])
                                     reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
                             }                        
-        
+                            Object.assign(serverSentMappings, reFormattedMappings);
+
                             context.dispatch('getAndShowAssessments', {
                                 linksFragmentUnvisited: Object.keys(reFormattedMappings),
                                 redirectedToSanitizedLinksMapping: reFormattedMappings,
@@ -229,16 +231,17 @@ export default {
                 .then( () => {
                     console.log('all server sent mappings are', serverSentMappings)
                     console.log('non-null server sent mappings', sanitizedLinks.filter((link, index) => 
-                        serverSentMappings[index]
+                    serverSentMappingsArr[index]
                     ))
                     //The remainder of those sanitized links for which the server did not have mappings to their ultimate links
                     
                     let sanitizedLinksRemainder = sanitizedLinks.filter((link, index) => 
-                        !serverSentMappings[index]
+                        !serverSentMappingsArr[index]
                     ).filter(url => utils.isValidHttpUrl(url));
 
                     console.log(`The sanitized links for which the server does not have mappings`, sanitizedLinksRemainder)
-                    redirectedToSanitizedLinksMapping = Object.assign(redirectedToSanitizedLinksMapping, serverSentMappings);
+                    //redirectedToSanitizedLinksMapping = Object.assign(redirectedToSanitizedLinksMapping, serverSentMappings);
+                    Object.assign(redirectedToSanitizedLinksMapping, serverSentMappings);
     
                     let allLinksProms = []; 
                     /*
@@ -318,8 +321,8 @@ export default {
                         */
                         allLinksProms.push(
                             Promise.allSettled(iterationAxiosProms)
-                            .then(() => {
-                                redirectedToSanitizedLinksMapping = Object.assign(redirectedToSanitizedLinksMapping, iterationMappings);
+                            .then(() => {                                
+                                Object.assign(redirectedToSanitizedLinksMapping, iterationMappings);
 
                                 context.dispatch('getAndShowAssessments', {
                                     linksFragmentUnvisited: Object.keys(iterationMappings),
@@ -349,6 +352,9 @@ export default {
                             !CORSBlockedLinks.includes(originLink) && sanitizedLinksRemainder.includes(originLink)));
 
                         console.log('url mappings to send to the server for storage after all the redirection followings', mappingsToStore);
+                        console.log('redirected to sanitized link mappings constructed by the client', redirectedToSanitizedLinksMapping);
+                        console.log('links that are CORS blocked and therefore sent to the server', CORSBlockedLinks)
+                        console.log('links for which we want assessments', sanitizedLinksRemainder)
 
                         if (Object.keys(mappingsToStore).length) {
                             
