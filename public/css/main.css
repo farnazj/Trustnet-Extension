@@ -102,15 +102,34 @@
     background-color: #AFB42B;
 }
 
-[data-vuetify] .v-badge__badge .v-icon {
+/* [data-vuetify] .v-badge__badge .v-icon {
     font-size: 17px !important;
     inset: calc(100% - 14px) auto auto calc(100% - 14px) !important;
     color: #827717  !important;
 }
-
+*/
 [data-vuetify] .v-icon.v-icon {
     width: 15px !important;
-}
+} 
+
+
+[data-vuetify] .v-badge__badge .v-icon {
+    font-size: 17px !important;
+    inset: calc(100% - 11px) auto auto calc(100% - 15px);
+    color: #827717  !important;
+    height: 14px !important;
+  }
+  [data-vuetify] .assessor .v-badge__badge .v-icon {
+    inset: calc(100% - 14px) auto auto calc(100% - 13px); 
+  }
+  
+  [data-vuetify] .v-chip__content .v-avatar {
+    overflow: initial;
+  }
+  
+  [data-vuetify] .v-chip .v-badge__badge .v-icon {
+    transform: scale(0.8);
+  }
 
 /* for removing the weird spacing inside the autocompletes which hold chips
 [data-vuetify] .v-select__selections {
@@ -155,3 +174,6 @@ These selectors have a high specificity and ensure that the fill will apply.*/
     position: relative;
 }
 
+[data-vuetify] .v-select__selections {
+    padding: 1%;
+}

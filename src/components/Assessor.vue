@@ -1,11 +1,11 @@
 <template>
 
-  <div :class="['c100', valuePercentage, valueColor , { transitive: isTransitive }]">
+  <div :class="['c100', valuePercentage, valueColor , { transitive: isTransitive }, 'assessor']">
       <span v-if="isUserNonEmpty">
         <v-tooltip bottom open-delay="500" z-index="10000">
           <template v-slot:activator="{ on }">
             <span v-on="on">
-              <custom-avatar :user="user" :clickEnabled="true">
+              <custom-avatar :user="user" :clickEnabled="true" >
               </custom-avatar>
             </span>
           </template>
