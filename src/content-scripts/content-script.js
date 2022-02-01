@@ -24,7 +24,7 @@ browser.runtime.sendMessage({
         localStorage.setItem('trustnetAuthToken', JSON.stringify(authUser));
 
     const container = document.createElement('div');
-    container.setAttribute('data-vuetify', '')
+    container.setAttribute('data-vuetify-trustnet', '')
     const app = document.createElement('div');
     app.setAttribute('id', 'vueApp');
     container.appendChild(app);

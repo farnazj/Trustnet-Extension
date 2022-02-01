@@ -15,7 +15,7 @@ export default {
           const targetNode = document.body;
           state.config = { attributes: false, childList: true, subtree: true };
 
-          let insertedApp = document.querySelector('div[data-vuetify]');
+          let insertedApp = document.querySelector('div[data-vuetify-trustnet]');
 
           const callback = generalUtils.throttle(function(mutationsList, observer) {
             console.log('going to execute mutation callback **')

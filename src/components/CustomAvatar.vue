@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import innerAvatar from '../components/InnerAvatar'
+import innerAvatar from '@/components/InnerAvatar'
 import utils from '@/services/utils'
 import { mdiShield } from '@mdi/js';
 

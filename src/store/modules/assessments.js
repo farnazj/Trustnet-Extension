@@ -7,6 +7,7 @@ export default {
         isExpanded: false,
         assessments: {'confirmed': [], 'refuted': [], 'questioned': []},
         userAssessment: {},
+        postOwnerAssessment: {},
         historyVisibility: false,
         assessmentHistory: [],
         historyOwner: {}
@@ -32,11 +33,18 @@ export default {
             let confirmedByTrusted = getters.linkAssessmentsBySources('confirmed', 'trusted');
             let refutedByTrusted = getters.linkAssessmentsBySources('refuted', 'trusted');
 
+            console.log('confirmed by trusted', confirmedByTrusted);
+            console.log('refuted by trusted', refutedByTrusted)
+
             if (confirmedByTrusted.length || refutedByTrusted.length)
                 return confirmedByTrusted.length && !(refutedByTrusted.length);
             else {
                 let confirmedByFollowed = getters.linkAssessmentsBySources('confirmed', 'followed');
                 let refutedByFollowed = getters.linkAssessmentsBySources('refuted', 'followed');
+
+                console.log('confirmed by followed', confirmedByFollowed);
+                console.log('refuted by followed', refutedByFollowed)
+    
                 return confirmedByFollowed.length && !(refutedByFollowed.length);
             }
         },
@@ -71,16 +79,9 @@ export default {
         determines if there are assessments by a source other than the original poster of the article
         */
         isNoSourceAssessmentNonEmpty: function(state, getters, rootState, rootGetter) {
-            if (rootState.pageDetails.article) {
-                let articleSourceId = rootState.pageDetails.article.SourceId;
-                let noSourceAssessments = Object.values(state.assessments).flat().filter(assessment =>
-                     assessment.assessor.id != articleSourceId);
-    
-                return noSourceAssessments.length;
-            }
-            else
-                return Object.values(state.assessments).flat().length;
-            
+
+            let postOwnerAssessmentCount = Object.values(state.postOwnerAssessment).length ? 1 : 0; //either 1 or 0;
+            return Object.values(state.assessments).flat().length - postOwnerAssessmentCount;
         }
     },
     mutations: {
@@ -92,6 +93,9 @@ export default {
         },
         set_user_assessment(state, assessment) {
             state.userAssessment = assessment;
+        },
+        set_article_poster_assessment(state, assessment) {
+            state.postOwnerAssessment = assessment;
         }
     },
     actions: {
@@ -125,12 +129,18 @@ export default {
                     let returnedQuestions = postsWQuestions.length ? postsWQuestions[0].PostAssessments : [];
                     returnedAssessments = returnedAssessments.concat(returnedQuestions);
 
-                    console.log('got assessments and questions', returnedAssessments)
-
                     let userId = context.rootGetters['auth/user'].id;
                     let userAssessmentArr = returnedAssessments.filter(el => el.version == 1 && el.SourceId == userId) ;
                     if (userAssessmentArr.length)
                         context.commit('set_user_assessment', userAssessmentArr[0]);
+                    
+                    let post = postsWAssessments.length ? postsWAssessments[0] : postsWQuestions.length ? postsWQuestions[0] : null;
+                    if (post) {
+                        let articlePoster = post.SourceId;
+                        let articlePosterAssessmentArr = returnedAssessments.filter(assessment => assessment.SourceId == articlePoster);
+                        if (articlePosterAssessmentArr.length)
+                            context.commit('set_article_poster_assessment', articlePosterAssessmentArr[0]);
+                    }
 
                     if ( returnedAssessments.length && !context.rootState.pageDetails.articleId)
                         context.dispatch('pageDetails/getArticleByUrl', true , { root: true } );

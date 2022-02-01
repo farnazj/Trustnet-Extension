@@ -172,7 +172,8 @@ export default {
             infoSnackbarMessage: '',
             displayShareMenu: false,
             displayUserAssessmentMenu: false,
-            expanderIsDisplayed: true
+            expanderIsDisplayed: true,
+            keepAssessmentsOpen: false
         }
     },
     created() {
@@ -221,6 +222,8 @@ export default {
             return !Object.values(this.userAssessment).length;
         },
         assessmentsPaneIsExpanded: function() {
+
+            this.setPaneCloseTimeout();
             return this.isExpanded;
         },
         clientUrl: function() {
@@ -259,8 +262,18 @@ export default {
         toggleAssessments: function() {
             if (this.assessmentsPaneIsExpanded)
                 this.setVisibility(false);
-            else
+            else {
                 this.setVisibility(true);
+                this.keepAssessmentsOpen = true;
+            }
+                
+        },
+        setPaneCloseTimeout: function() {
+            let self = this;
+            if (this.isExpanded & !this.keepAssessmentsOpen)
+                window.setTimeout(() => {
+                    self.setVisibility(false);
+                }, 3000)
         },
         getSelectedUsernamesAndLists: function() {
 
