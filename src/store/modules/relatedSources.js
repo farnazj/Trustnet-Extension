@@ -43,8 +43,23 @@ export default {
     populate_followers: (state, sources) => {
         sources.sort(utils.compareSources);
         state.followers = sources;
-    }
+    },
+    add_source_to_list: (state, payload) => {
+      let list = payload.list; //one of followedSources, trustedSources, or followers
 
+      let lowIndex = 0, highIndex = list.length;
+
+      while (lowIndex < highIndex) {
+          let midIndex = (lowIndex + highIndex) >>> 1;
+          if (utils.compareSources(list[midIndex], payload.source) < 0 )
+            lowIndex = midIndex + 1;
+          else
+            highIndex = midIndex;
+      }
+      
+      let insertionIndex = lowIndex;
+      list.splice(insertionIndex, 0, payload.source);
+    }
   },
   actions: {
     fetchFollows: (context) => {
@@ -103,7 +118,19 @@ export default {
           reject();
         })
       })
+    },
+
+    /*
+    Called in the UnfollowedAssessors component, when the user follows a source
+    */
+    addSourceToFollows: (context, payload) => {
+      context.commit('add_source_to_list',  
+      {
+        source: payload,
+        list: context.state.followedSources
+      })
     }
 
   }
+  
 }

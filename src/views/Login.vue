@@ -103,7 +103,8 @@ export default {
       this.fetchPageAndUserCharacteristics()
       .then(() => {
         if (!this.isBlacklisted) {
-          this.getAllAssessments();
+          this.getPageAssessments();
+          this.getUnfollowedAssessors();
           this.setupLinkAssessments();
         }
         this.$router.push({ name: 'Home' });
@@ -122,7 +123,8 @@ export default {
       this.$router.push({ name: 'forgotPassword' });
     },
     ...mapActions('assessments', [
-      'getAllAssessments'
+      'getPageAssessments',
+      'getUnfollowedAssessors'
     ]),
     ...mapActions('linkAssessments', [
       'setupLinkAssessments'

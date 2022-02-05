@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import sourceServices from '@/services/sourceServices'
 import utils from '@/services/utils'
 
@@ -10,7 +11,9 @@ export default {
         postOwnerAssessment: {},
         historyVisibility: false,
         assessmentHistory: [],
-        historyOwner: {}
+        historyOwner: {},
+        unfollowedAssessorsOnPage: [],
+        unfollowedAssessorsVisibility: false
     },
     getters: {
 
@@ -91,27 +94,78 @@ export default {
         set_assessments(state, assessments) {
             state.assessments = assessments;
         },
+        prepend_assessments(state, payload) {
+           state.assessments[payload.credibility].unshift(payload.assessment);            
+        },
         set_user_assessment(state, assessment) {
             state.userAssessment = assessment;
         },
         set_article_poster_assessment(state, assessment) {
             state.postOwnerAssessment = assessment;
+        },
+        set_unfollowed_assessors_on_page(state, assessors) {
+            state.unfollowedAssessorsOnPage = assessors;
+        },
+        set_unfollowed_assessors_visibility(state, visibility) {
+            state.unfollowedAssessorsVisibility = visibility;
+        },
+        remove_unfollowed_assessor(state, id) {
+            let index = state.unfollowedAssessorsOnPage.map(el => el.id).indexOf(id);
+            state.unfollowedAssessorsOnPage.splice(index, 1);
         }
     },
     actions: {
 
-        getAllAssessments: (context) => {
+        getUnfollowedAssessors: (context) => {
             return new Promise((resolve, reject) => {
-            
                 let pageUrl = context.rootState.pageDetails.url;
 
-                Promise.all([browser.runtime.sendMessage({
-                    type: 'get_assessments',
+                browser.runtime.sendMessage({
+                    type: 'get_unfollowed_assessors',
                     data: {
                         headers: { 
                             urls: JSON.stringify([utils.extractHostname(pageUrl)])
-                            // excludeposter: true
                         }
+                    }
+                })
+                .then((assessors) => {
+                    if (assessors.length) {
+                        context.commit('set_unfollowed_assessors_on_page', assessors);
+                        context.dispatch('setUnfollowedAssessorsVisibility', true)
+                        .then(() => {
+                            context.dispatch('setVisibility', true)
+                            .then(() => {
+                                resolve();
+                            })
+                        })
+                    }
+                })
+                .catch((err) => {
+                    reject(err);
+                })
+            })
+        }, 
+
+        /*
+        get assessments either from all sources that the auth user should see assessments and questions 
+        from or from specified usernames.
+        */
+        getPageAssessments: (context, payload) => {
+            return new Promise((resolve, reject) => {
+            
+                let pageUrl = context.rootState.pageDetails.url;
+                let headers = {
+                    urls: JSON.stringify([utils.extractHostname(pageUrl)])
+                };
+
+                if (payload && payload.usernames)
+                    headers.usernames = JSON.stringify(payload.usernames);
+
+
+                Promise.all([ browser.runtime.sendMessage({
+                    type: 'get_assessments',
+                    data: {
+                        headers: headers
                     }
                 }),
                 /*
@@ -121,7 +175,7 @@ export default {
                 browser.runtime.sendMessage({
                     type: 'get_questions',
                     data: {
-                        headers: { urls: JSON.stringify([utils.extractHostname(pageUrl)]) }
+                        headers: headers
                     }
                 })])
                 .then(([postsWAssessments, postsWQuestions]) => {
@@ -129,10 +183,12 @@ export default {
                     let returnedQuestions = postsWQuestions.length ? postsWQuestions[0].PostAssessments : [];
                     returnedAssessments = returnedAssessments.concat(returnedQuestions);
 
-                    let userId = context.rootGetters['auth/user'].id;
-                    let userAssessmentArr = returnedAssessments.filter(el => el.version == 1 && el.SourceId == userId) ;
-                    if (userAssessmentArr.length)
-                        context.commit('set_user_assessment', userAssessmentArr[0]);
+                    if (!(payload && payload.usernames)) {
+                        let userId = context.rootGetters['auth/user'].id;
+                        let userAssessmentArr = returnedAssessments.filter(el => el.version == 1 && el.SourceId == userId) ;
+                        if (userAssessmentArr.length)
+                            context.commit('set_user_assessment', userAssessmentArr[0]);    
+                    }
                     
                     let post = postsWAssessments.length ? postsWAssessments[0] : postsWQuestions.length ? postsWQuestions[0] : null;
                     if (post) {
@@ -142,39 +198,43 @@ export default {
                             context.commit('set_article_poster_assessment', articlePosterAssessmentArr[0]);
                     }
 
-                    if ( returnedAssessments.length && !context.rootState.pageDetails.articleId)
+                    if (returnedAssessments.length && !context.rootState.pageDetails.articleId)
                         context.dispatch('pageDetails/getArticleByUrl', true , { root: true } );
 
                     context.dispatch('restructureAssessments', returnedAssessments)
                     .then((restructuredAssessments) => {
                         console.log('restructured assessments', restructuredAssessments)
-                        context.dispatch('sortAssessments', restructuredAssessments)
-                        .then((sortedAssessments) => {
-                            console.log('what are sorted assessments', sortedAssessments)
-                            context.commit('set_assessments', sortedAssessments);
 
-                            if (context.rootGetters['assessments/isNoSourceAssessmentNonEmpty'])
-                                context.commit('set_visibility', true);
-
-                            if (returnedAssessments.length) {
-                                let postId = postsWAssessments.length ? postsWAssessments[0].id : postsWQuestions[0].id
-
-                                browser.runtime.sendMessage({
-                                    type: 'log_interaction',
-                                    interaction: {
-                                        type: 'page_assessments', 
-                                        data: { 
-                                            pageURL: pageUrl,
-                                            pageFullURL: window.location.href,
-                                            assessments: JSON.stringify(context.state.assessments),
-                                            postId: postId
-                                        }
-                                    }
-                                })
+                        if (payload && payload.usernames) {
+                            for (let key in restructuredAssessments) {
+                                if (restructuredAssessments[key].length) {
+                                    context.commit('prepend_assessments', {
+                                        credibility: key,
+                                        assessment: restructuredAssessments[key][0]
+                                    })
+                                    context.dispatch('logAssessmentsViewing', { postId: post.id });
+                                    console.log('dare resolve mishe')
+                                    resolve();
+                                }
                             }
-                            
-                            resolve();
-                        })
+                        }
+                        else {
+                            context.dispatch('sortAssessments', restructuredAssessments)
+                            .then((sortedAssessments) => {
+                                console.log('what are sorted assessments', sortedAssessments)
+                                context.commit('set_assessments', sortedAssessments);    
+    
+                                if (context.rootGetters['assessments/isNoSourceAssessmentNonEmpty'])
+                                    context.commit('set_visibility', true);
+    
+                                if (returnedAssessments.length) {
+                                    context.dispatch('logAssessmentsViewing',  { postId: post.id })
+                                }
+                                
+                                resolve();
+                            })
+                        }
+                        
                     })
                 })
                 .catch(err => {
@@ -269,6 +329,33 @@ export default {
             })
         },
 
+        logAssessmentsViewing: (context, payload) => {
+
+            return new Promise((resolve, reject) => {
+                let pageUrl = context.rootState.pageDetails.url;
+
+                browser.runtime.sendMessage({
+                    type: 'log_interaction',
+                    interaction: {
+                        type: 'page_assessments', 
+                        data: { 
+                            pageURL: pageUrl,
+                            pageFullURL: window.location.href,
+                            assessments: JSON.stringify(context.state.assessments),
+                            postId: payload.postId
+                        }
+                    }
+                })
+                .then(() => {
+                    resolve();
+                })
+            })
+        },
+
+        removeUserFromUnfollowedAssessors: (context, payload) => {
+            context.commit('remove_unfollowed_assessor', payload);
+        },
+
         setVisibility: (context, payload) => {
             context.commit('set_visibility', payload);
         },
@@ -279,7 +366,11 @@ export default {
 
         populateAssessmentHistory: (context, payload) => {
             context.commit('populate_assessment_history', payload);
-        }   
+        },
+        
+        setUnfollowedAssessorsVisibility: (context, payload) => {
+            context.commit('set_unfollowed_assessors_visibility', payload)
+        }
     }
   }
   

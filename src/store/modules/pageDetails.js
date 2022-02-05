@@ -41,7 +41,7 @@ export default {
               .then(() => {
                 context.dispatch('linkAssessments/setupLinkAssessments', true, { root: true })
               });
-              context.dispatch('assessments/getAllAssessments', true, { root: true });
+              context.dispatch('assessments/getPageAssessments', true, { root: true });
               context.dispatch('assessments/getAuthUserPostAssessment', true, { root: true });
               console.log('getting assessments again as a result of url change');
             })

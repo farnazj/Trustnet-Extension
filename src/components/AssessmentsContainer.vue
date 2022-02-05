@@ -38,6 +38,12 @@
                         </v-alert>
 
 
+                        <v-expand-transition>
+                            <unfollowed-assessors></unfollowed-assessors>
+                        </v-expand-transition>
+
+                        <v-divider></v-divider>
+
                         <v-btn block elevation="1" plain  @click="toggleUserAssessmentDisplay">
                             Your assessment
                             <v-spacer></v-spacer>
@@ -145,6 +151,7 @@
 import innerAssessment from '@/components/InnerAssessment'
 import assessmentCollector from '@/components/AssessmentCollector'
 import sourceSelector from '@/components/SourceSelector'
+import unfollowedAssessors from '@/components/UnfollowedAssessors'
 import constants from '@/lib/constants'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { mdiChevronLeft, mdiChevronRight, mdiShare, mdiChevronDown, mdiChevronUp, mdiGavel, mdiClose } from '@mdi/js';
@@ -153,7 +160,8 @@ export default {
     components: {
         'inner-assessment': innerAssessment,
         'assessment-collector': assessmentCollector,
-        'source-selector': sourceSelector
+        'source-selector': sourceSelector,
+        'unfollowed-assessors': unfollowedAssessors
     },
     data () {
         return {

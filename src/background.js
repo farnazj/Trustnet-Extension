@@ -64,7 +64,15 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
       let authUsername = JSON.parse(localStorage.getItem('trustnetAuthToken')).userName;
       console.log(authUsername, 'auth user name is ')
-      relationServices.getFollowers({username: authUsername})
+      relationServices.getFollowers({ username: authUsername })
+      .then(response => {
+        resolve(response.data);
+      })
+    })
+  }
+  else if (request.type == 'follow_source') {
+    return new Promise((resolve, reject) => {
+      relationServices.follow(request.data.reqBody)
       .then(response => {
         resolve(response.data);
       })
@@ -82,7 +90,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     })
   }
   else if (request.type == 'set_preferences') {
-
     return new Promise((resolve, reject) => {
       preferencesServices.setPreferences(request.data.reqBody)
       .then(res => {
@@ -92,7 +99,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         reject({ message: err });
       })
     })
-    
   }
   else if (request.type == 'get_assessments') {
 
@@ -121,6 +127,17 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   else if (request.type == 'get_questions') {
     return new Promise((resolve, reject) => {
       assessmentServices.getQuestionsForURL(request.data.headers)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
+  else if (request.type == 'get_unfollowed_assessors') {
+    return new Promise((resolve, reject) => {
+      assessmentServices.getAssessmentsAndQuestionsFromStrangers(request.data.headers)
       .then(res => {
         resolve(res.data);
       })
@@ -206,6 +223,10 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         reject({ message: err });
       })
     })
+  }
+  else if (request.type == 'new_tab') {
+    console.log(request.data.url)
+    chrome.tabs.create({ url: request.data.url });
   }
 
 })

@@ -258,7 +258,7 @@ export default {
 
         this.postAuthUserAssessment(reqBody)
         .then(() => {
-          this.getAllAssessments()
+          this.getPageAssessments()
           .then(() => {
             self.disableAssess = false;
           })
@@ -276,7 +276,7 @@ export default {
     },
     ...mapActions('assessments', [
       'postAuthUserAssessment',
-      'getAllAssessments'
+      'getPageAssessments'
     ])
   },
   watch: {
