@@ -43,6 +43,13 @@ export default {
     })
   },
 
+  scheduleRedirects(reqBody) {
+    return Api().post('/urls/schedule-redirects', reqBody ,
+    {
+      withCredentials: true
+    })
+  },
+
   getAssessmentsAndQuestionsFromStrangers(headers) {
     return Api().get('/posts/unfollowed-assessors/urls', {
       withCredentials: true,

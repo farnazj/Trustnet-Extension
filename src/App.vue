@@ -28,7 +28,7 @@ export default {
         this.logout();
         this.$router.push({ name: 'Login' });
       }
-      else {        
+      else {
         this.fetchRelationships();
         this.fetchPageAndUserCharacteristics()
         .then(() => {

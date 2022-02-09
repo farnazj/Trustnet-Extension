@@ -100,7 +100,9 @@ export default {
     },
 
     /*
-    fetching followers is not used in the extension currently
+    Followers are used in the assessmentContainer component
+    where there is also a place for sharing the article with
+    one's followers
     */
     fetchFollowers: (context) => {
 

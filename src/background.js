@@ -157,6 +157,17 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       })
     })
   }
+  else if (request.type == 'schedule_redirects') {
+    return new Promise((resolve, reject) => {
+      assessmentServices.scheduleRedirects(request.data.reqBody)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(err => {
+        reject({ message: err });
+      })
+    })
+  }
   else if (request.type == 'get_redirects') {
     return new Promise((resolve, reject) => {
       assessmentServices.getRedirects(request.data.headers)

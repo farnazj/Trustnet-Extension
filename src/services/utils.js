@@ -1,6 +1,7 @@
 import store from '@/store'
 import consts from '@/lib/constants'
 const axios = require('axios');
+const tt = require('trusted-types');
 
 //function to sort sources by full name or username (for news publishing entities)
 function compareNames(a, b) {
@@ -263,60 +264,85 @@ function getAccuracyMapping(credibility) {
       return 'confirmed';
 }
 
-/*
-This function follows the trail of redirects given a link as a parameter. Although
-Axios should follow all redirects, we see that in practice it does not (e.g., a 
-shortened link on Twitter -> shortened link on Youtube -> full Youtube link. Axios
-stops at step 2). Therefore, this function recursively calls itself to fetch the next link
-*/
-async function followRedirects(link) {
-  let extractedURL;
-
-  return axios.get(link, { maxRedirects: 8 } ).then((response) => {
-   
-    /*
-    If ultimately, the returned response data is large (we set the threshold to be 4000 characters),
-    the entire page has been fetched and therefore, the target URL is the current link.
-    Else, a stringified HTML is returned which needs to be parsed and the URL fetched from it.
-    */
-    if (response.data.length <= 4000) {
-        const parser = new DOMParser();
-        const htmlDOM = parser.parseFromString(response.data, "text/xml");
-        const content = htmlDOM.getElementsByTagName("META")[0].getAttribute('content');
-        const URLIndex = content.indexOf('URL=');
-        extractedURL = content.substring( URLIndex + 4);
-
-        if (extractedURL == link)
-          return ({ type: 'completed redirect chain', link: extractedURL });
-        else 
-          return followRedirects(extractedURL);
-    }
-    else
-      return ({ type: 'entire page is fetched', link: link });
-  
+const escapeHTMLPolicy = tt.trustedTypes.createPolicy("forceInner", {
+  createHTML: (to_escape) => to_escape
 })
-.catch(err => {
-  if (err.response) {
-    if (err.response.status == 404)
-      return ({ type: 'error', detail: '404' });
-  }
-    /*
-    One occasion when err.request happens is when the browser encounters a
-    CORS issue. This e.g., happens on Facebook or Twitter where the initially
-    encountered links are shortened links from the Facebook/Twitter domain but the
-    target links belong to other domains which enforce the CORS policy.
-    */
-  else if (err.request) {
-    return ({ type: 'error', detail: 'CORS', link: link });
-  }
+
+async function followRedirects(link) {
+
+  if (link.includes('dl.acm.org'))
+    return new Promise((resolve, reject)=> resolve({ type: 'redirect chain not followed', link: link }));
   else {
-    console.log(err);
-    return ({ type: 'error', detail: 'Unknown' });
-  }
+    let extractedURL;
+
+    return fetch(link, { maxRedirects: 8 } ).then((response) => {
+     
+      /*
+      If ultimately, the returned response data is large (we set the threshold to be 4000 characters),
+      the entire page has been fetched and therefore, the target URL is the current link.
+      Else, a stringified HTML is returned which needs to be parsed and the URL fetched from it.
+      */
+      if (response.data && response.data.length <= 4000) {
+          const parser = new DOMParser();
+          const htmlDOM = parser.parseFromString(response.data, "text/xml");
+          const content = htmlDOM.getElementsByTagName("META")[0].getAttribute('content');
+          const URLIndex = content.indexOf('URL=');
+          extractedURL = content.substring( URLIndex + 4);
   
-});
+          if (extractedURL === link)
+            return ({ type: 'completed redirect chain', link: extractedURL });
+          else 
+            return followRedirects(extractedURL);
+      }
+      else {
+          if (window.location.hostname != 'news.google.com')
+              return ({ type: 'entire page is fetched', link: link });
+          else { 
+              /*
+              google news pages redirect to other pages in javascript. Below, the URL to which they redirect
+              is extracted out of the HTML page.
+              */
+              return response.text()
+              .then((textStream)=> {
+                let escapedHTML = escapeHTMLPolicy.createHTML(textStream);
+
+                const parser = new DOMParser();
+                const htmlDOM = parser.parseFromString(escapedHTML, "text/html");
+                extractedURL = [...htmlDOM.querySelectorAll("noscript a")].map(el => el.getAttribute('href'))[0];
+
+                if (extractedURL)
+                  return ({ type: 'URL extracted out of HTML', link: extractedURL });
+                else
+                  return ({ type: 'error', detail: 'non-static-resource' })
+              })
+          }
+      }
+    
+    })
+    .catch(err => {
+      if (err.response) {
+        if (err.response.status === 404)
+          return ({ type: 'error', detail: '404' });
+      }
+        /*
+        One occasion when err.request happens is when the browser encounters a
+        CORS issue. This e.g., happens on Facebook or Twitter where the initially
+        encountered links are shortened links from the Facebook/Twitter domain but the
+        target links belong to other domains which enforce the CORS policy.
+        */
+      else if (err.request) {
+        return ({ type: 'error', detail: 'CORS', link: link });
+      }
+      else {
+        console.log(err);
+        return ({ type: 'error', detail: 'Unknown' });
+      }
+      
+    });
+  }
 
 }
+
 
 function isValidHttpUrl(string) {
   let url;

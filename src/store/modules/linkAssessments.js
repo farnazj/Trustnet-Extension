@@ -1,7 +1,7 @@
 import domHelpers from "@/lib/domHelpers";
 import utils from '@/services/utils';
 import generalUtils from '@/lib/generalUtils';
-
+import consts from '@/lib/constants'
 /*
 This module is for fetching assessments and accuracy questions of all the links
 found on the current page.
@@ -123,10 +123,11 @@ export default {
                 scrolling). This means that even if there are newer assessments for such links, they will not
                 get updated.
                 */
-                let links = Array.from(new Set([...document.querySelectorAll('a')].map(el => 
-                    el.getAttribute('href')).filter(el => el && !['/', '#'].includes(el) && el.substring(0, 7) != 'mailto:' ).filter(el => 
+                let links = Array.from(new Set([...document.querySelectorAll('a')].filter(el => !el.parentNode.closest("[data-vuetify-trustnet]")).map(el => 
+                    el.getAttribute('href')).filter(el => el && !['/', '#'].includes(el) && el.substring(0, 7) != 'mailto:').filter(el => 
                         !previousLinksFoundOnPage.includes(el)
                     )));
+
 
                 console.log('raw links found', links)
 
@@ -155,20 +156,25 @@ export default {
                 
                 /*
                 Link sanitization. Relative links are made absolute by adding the protocol and the host name,
-                and the query parameters are stripped off (unless the first query parameters on certain websites
-                that distinguish a resource using query parameters)
+                and the query parameters are stripped off (except for the first query parameters on certain websites
+                such as Facebook and Youtube that distinguish a resource using query parameters)
                 After sanitization, some links may end up being the same. These are not filtered however, because
                 we want to know which raw link a sanitized link pertains to (they will both share the same index
-                in their corresponding arrays---links and sanitizedLinks).
+                in their corresponding arrays---links and sanitizedLinks). Later, when we fetch assessments for
+                the sanitized links, the indices of the sanitized and raw links being the same helps in determining
+                which raw links on the page to put the assessments next to.
                 */
                 let sanitizedLinks = links.map( (url, index) => {
-                        let sanitizedUrl = url;
-                        if (url[0] == '/' || url[0] == '?')
-                            sanitizedUrl = window.location.protocol + '//' + window.location.host + url;
-                        if (url[0] == '#')
-                            sanitizedUrl = utils.extractHostname(window.location.href, false) + url;
-    
-                        return utils.extractHostname(sanitizedUrl, false);
+                    
+                    let sanitizedUrl = url;
+                    if (sanitizedUrl[0] == '.')
+                        sanitizedUrl = sanitizedUrl.substring(1, sanitizedUrl.length)
+                    if (sanitizedUrl[0] == '/' || sanitizedUrl[0] == '?')
+                        sanitizedUrl = window.location.protocol + '//' + window.location.host + sanitizedUrl;
+                    if (sanitizedUrl[0] == '#')
+                        sanitizedUrl = utils.extractHostname(window.location.href, false) + sanitizedUrl;
+
+                    return utils.extractHostname(sanitizedUrl, false);
                 });
 
                 //remove invalid urls both from sanitizedLinks and raw links arrays
@@ -208,7 +214,7 @@ export default {
 
                             let reFormattedMappings = {};
                             for (let i = 0 ; i < serverResponse.length; i++) {
-                                if (serverResponse[i])
+                                if (serverResponse[i] && serverResponse[i] != 'failed')
                                     reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
                             }                        
                             Object.assign(serverSentMappings, reFormattedMappings);
@@ -232,16 +238,15 @@ export default {
                 .then( () => {
                     console.log('all server sent mappings are', serverSentMappings)
                     console.log('non-null server sent mappings', sanitizedLinks.filter((link, index) => 
-                    serverSentMappingsArr[index]
+                        serverSentMappingsArr[index] && serverSentMappingsArr[index] != 'failed'
                     ))
                     //The remainder of those sanitized links for which the server did not have mappings to their ultimate links
                     
                     let sanitizedLinksRemainder = sanitizedLinks.filter((link, index) => 
-                        !serverSentMappingsArr[index]
+                        !serverSentMappingsArr[index] && serverSentMappingsArr[index] != 'failed'
                     ).filter(url => utils.isValidHttpUrl(url));
 
                     console.log(`The sanitized links for which the server does not have mappings`, sanitizedLinksRemainder)
-                    //redirectedToSanitizedLinksMapping = Object.assign(redirectedToSanitizedLinksMapping, serverSentMappings);
                     Object.assign(redirectedToSanitizedLinksMapping, serverSentMappings);
     
                     let allLinksProms = []; 
@@ -250,8 +255,8 @@ export default {
                     will end up having the same value. But because when we insert assessments into the page, we look for the raw links,
                     we keep the mapping of both duplicate sanitized links to their corresponding raw links). But so that we do not
                     waste bandwidth and compute power on getting the tail of redirects or assessments for these duplicates, we create
-                    an object of unique sanitizedLinks with each key being a sanitized link and its corresponding value a boolean indicating
-                    whether the link has been visited yet, with visited meaning its trail of redirects have been followed
+                    an object of unique sanitized links with each key being a sanitized link and its corresponding value a boolean
+                    indicating whether the link has been visited yet, with visited meaning its trail of redirects have been followed
                     and its assessments have been fetched.
                     */
                     let uniqueSanitizedLinksVisited = Array.from(new Set(sanitizedLinksRemainder)).reduce((obj, x) => 
@@ -282,7 +287,7 @@ export default {
                                 if (uniqueSanitizedLinksVisited[link] == 0 ) {
                                     uniqueSanitizedLinksVisited[link] = 1;
                                     let iterationProm = utils.followRedirects(link).then((response) => {
-                                        // console.log('results of client following redirect trail', link, response, response.detail == 'CORS')
+                                    
                                         if (response.type == 'error') {
                                             if (response.detail == '404')
                                                 unavailableResources.push(link);
@@ -303,6 +308,7 @@ export default {
                                             }
                                             if (response.detail == 'Unknown')
                                                 CORSBlockedLinks.push(link);
+                                            
                                         }
                                         if (response.type != 'error')  {
                                             iterationMappings[utils.extractHostname(response.link)] = link;
@@ -342,7 +348,6 @@ export default {
 
                             i += 20;
                             let randomWaitTime = generalUtils.randomInteger(10, 70);
-                            console.log('what is the random wait time', randomWaitTime)
                             setTimeout(clientFollowRedirects(i), randomWaitTime);
                         }
                     }
@@ -351,9 +356,9 @@ export default {
                     clientFollowRedirects(i);
                   
                     /*
-                    Inform the server of the redirects that it did not know about so that it can store them.
-                    These mappings include redirectedToSanitizedLinksMapping but not the CORSBlockedLinks (since
-                    they will be explicitly followed by the server later and then stored) and the initial links need
+                    Inform the server of the redirects that it did not know about (and which were just fetched by the client)
+                    so that it can store them. These mappings include redirectedToSanitizedLinksMapping but not the CORSBlockedLinks
+                    (since they will be explicitly followed by the server later and then stored) and the initial links need
                     to be in sanitizedLinksRemainder (since sanitizedLinksRemainder is filtered to only include the links whose mapping
                     the server did not know)
                     */
@@ -361,7 +366,8 @@ export default {
                     .then(() => {
 
                         let mappingsToStore = Object.fromEntries(Object.entries(redirectedToSanitizedLinksMapping).filter( ([originLink, targetLink]) => 
-                            !CORSBlockedLinks.includes(originLink) && sanitizedLinksRemainder.includes(originLink)));
+                        !consts.DISALLOWED_DOMAINS.includes(window.location.hostname) &&
+                        !CORSBlockedLinks.includes(originLink) && sanitizedLinksRemainder.includes(originLink)));
 
                         if (Object.keys(mappingsToStore).length) {
                             
@@ -374,10 +380,10 @@ export default {
                                 }
                             })
                             .then(resp => {
-                                console.log('posted redirects to the server', resp)
+                                console.log('posted redirects to the server', resp);
                             })
                             .catch(error => {
-                                console.log('chi shod', error)
+                                console.log(`error encountered in posting redirects to be updated on the server ${error}`);
                             })
     
                         }
@@ -386,9 +392,11 @@ export default {
                    
                         /*
                         Once the redirects for all the sanitized links have been followed by the client, we send those
-                        that the client could not check because of CORS issues to the server so that it can follow their redirects and return
-                        the target links.
+                        that the client could not check because of CORS issues to the server so that it can follow their
+                        redirects and return the target links.
                         */
+                        let serverFollowedLinks = [];
+
                         for (let i = 0 ; i < CORSBlockedLinks.length ; i += 20) {
                             let linksFragment = CORSBlockedLinks.slice(i, i + 20);
                             allLinksProms.push(
@@ -410,10 +418,46 @@ export default {
                                     .then((restructuredAssessments) => {
                                         allLinksAssessments = Object.assign(allLinksAssessments, restructuredAssessments);
                                     })
-                                    
+
+                                    serverFollowedLinks.push(Object.values(urlMapping));
                                 })
                             )
                         }
+
+                        /*
+                        For those links whose trail of redircts the server failed to fetch as well, we send the mapping that
+                        the client has for them to the server. The server schedules to fetch them one last time and if it does
+                        not succeed, store the client-sent mapping for them.
+                        */
+                        let serverFailedLinks = CORSBlockedLinks.filter(x => !serverFollowedLinks.includes(x)); //links that the server failed to follow
+                        let failedMappingsToStore = {};
+
+                        let invereseLinkMapping = Object.keys(redirectedToSanitizedLinksMapping).reduce((ret, key) => {
+                            ret[redirectedToSanitizedLinksMapping[key]] = key;
+                            return ret;}, {});
+
+                        console.log('inverse link mapping (source to target) ', invereseLinkMapping)
+                        console.log('links that both the client and the server failed to fetch', serverFailedLinks)
+                        for (let link of serverFailedLinks) {
+                            if (link in invereseLinkMapping) //links that encountered CORS
+                                failedMappingsToStore[link] = invereseLinkMapping[link];
+                            else
+                                failedMappingsToStore[link] = 'failed';
+                        }
+
+                        console.log('links sent to server to schedule following redirects for, and later storing', failedMappingsToStore)
+
+                        if (Object.entries(failedMappingsToStore).length) {
+                            browser.runtime.sendMessage({
+                                type: 'schedule_redirects',
+                                data: {
+                                    reqBody: { 
+                                        urlMappings: failedMappingsToStore
+                                    }
+                                }
+                            })
+                        }
+
         
                         /*
                         Once the assessments for all the links have been fetched, they are committed to the state.
@@ -439,7 +483,7 @@ export default {
 
                 })
                 .catch(err => {
-                    console.log(err, 'whaaaat')
+                    console.log(`error encountered in fetching mappings of links ${err}`)
                 })
                
             })

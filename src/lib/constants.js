@@ -1,5 +1,5 @@
-const BASE_URL = `http://localhost:3000`;
-//const BASE_URL = `https://developer.trustnet.csail.mit.edu`
+//const BASE_URL = `http://localhost:3000`;
+const BASE_URL = `https://developer.trustnet.csail.mit.edu`
 //const CLIENT_URL = `http://localhost:8080`;
 const CLIENT_URL = `https://trustnet.csail.mit.edu`;
 
@@ -28,6 +28,13 @@ const GLOBAL_BLACKLISTED_DOMAINS = [
   'pnc.com'
 ]
 
+/*
+Domains whose redirects should not be followed
+*/
+const DISALLOWED_DOMAINS = [
+  'acm.dl.org'
+]
+
 export default {
   BASE_URL,
   CLIENT_URL,
@@ -38,5 +45,6 @@ export default {
   FINDING_TITLES_FUZZY_SCORE_THRESHOLD,
   IDENTIFYING_TITLES_FUZZY_SCORE_THRESHOLD,
   ACCURACY_CODES,
-  GLOBAL_BLACKLISTED_DOMAINS
+  GLOBAL_BLACKLISTED_DOMAINS,
+  DISALLOWED_DOMAINS
 }
