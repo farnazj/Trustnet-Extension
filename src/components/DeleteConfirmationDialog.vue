@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="visible" max-width="500px">
+  <v-dialog v-model="visible" max-width="500px" attach="div[data-vuetify-trustnet] .v-application">
     <v-card>
      <v-card-title class="headline">
      </v-card-title>

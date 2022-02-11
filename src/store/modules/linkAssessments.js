@@ -124,7 +124,7 @@ export default {
                 get updated.
                 */
                 let links = Array.from(new Set([...document.querySelectorAll('a')].filter(el => !el.parentNode.closest("[data-vuetify-trustnet]")).map(el => 
-                    el.getAttribute('href')).filter(el => el && !['/', '#'].includes(el) && el.substring(0, 7) != 'mailto:').filter(el => 
+                    el.getAttribute('href')).filter(el => el && !['/', '#'].includes(el) && el.substring(0, 7) != 'mailto:' && !el.includes('javascript:void(0)')).filter(el => 
                         !previousLinksFoundOnPage.includes(el)
                     )));
 
@@ -366,7 +366,7 @@ export default {
                     .then(() => {
 
                         let mappingsToStore = Object.fromEntries(Object.entries(redirectedToSanitizedLinksMapping).filter( ([originLink, targetLink]) => 
-                        !consts.DISALLOWED_DOMAINS.includes(window.location.hostname) &&
+                        !consts.DISALLOWED_DOMAINS.includes(utils.extractHostname(window.location.href), true) &&
                         !CORSBlockedLinks.includes(originLink) && sanitizedLinksRemainder.includes(originLink)));
 
                         if (Object.keys(mappingsToStore).length) {

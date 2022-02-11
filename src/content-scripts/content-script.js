@@ -26,13 +26,13 @@ browser.runtime.sendMessage({
     const container = document.createElement('div');
     container.setAttribute('data-vuetify-trustnet', '')
     const app = document.createElement('div');
-    app.setAttribute('id', 'vueApp');
+    app.setAttribute('id', 'trustnetApp');
     container.appendChild(app);
     document.body.prepend(container);
     
     /* eslint-disable no-new */
     new Vue({
-        el: '#vueApp',
+        el: '#trustnetApp',
         store,
         router,
         vuetify,

@@ -6,6 +6,7 @@
   "description": "Allows you to assess different articles as (in)accurate to help your friends and to also see the assessments that they provide.",
   "default_locale": "en",
   "permissions": [
+    "cookies"
   ],
   "icons": {
     "16": "icons/trustnet_48.png",

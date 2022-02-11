@@ -76,6 +76,7 @@ export default {
               }
           })
           .then(resp => {
+            console.log('in trustnet login', resp)
               const user = resp.data.user;
               context.commit('auth_success');
               context.dispatch('getUser')

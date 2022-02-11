@@ -275,7 +275,7 @@ async function followRedirects(link) {
   else {
     let extractedURL;
 
-    return fetch(link, { maxRedirects: 8 } ).then((response) => {
+    return axios.get(link, { maxRedirects: 8 } ).then((response) => {
      
       /*
       If ultimately, the returned response data is large (we set the threshold to be 4000 characters),
@@ -295,7 +295,7 @@ async function followRedirects(link) {
             return followRedirects(extractedURL);
       }
       else {
-          if (window.location.hostname != 'news.google.com')
+          if (!window.location.hostname.includes('news.google.com'))
               return ({ type: 'entire page is fetched', link: link });
           else { 
               /*

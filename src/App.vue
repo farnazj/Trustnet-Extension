@@ -29,6 +29,7 @@ export default {
         this.$router.push({ name: 'Login' });
       }
       else {
+        console.log('alan authUser chie', authUser)
         this.fetchRelationships();
         this.fetchPageAndUserCharacteristics()
         .then(() => {

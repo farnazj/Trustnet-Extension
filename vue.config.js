@@ -1,4 +1,5 @@
 const prefixer = require('postcss-prefix-selector');
+const ExtensionReloader  = require('webpack-extension-reloader');
 
 module.exports = {
   pages: {
@@ -30,6 +31,18 @@ module.exports = {
   },
   //for prefixing Vuetify classes so they don't pollute the global namespace
   chainWebpack: (config) => {
+
+    config.plugin('extension-reloader').tap( args => [{
+      port: 9091, // Which port use to create the server
+      reloadPage: true, // Force the reload of the page also
+      entries: { // The entries used for the content/background scripts or extension pages
+        background: 'background',
+        contentScript: [
+          'content-script'
+        ]
+      }
+    }])
+
     const sassRule = config.module.rule('sass');
     const sassNormalRule = sassRule.oneOfs.get('normal');
     // creating a new rule
@@ -63,7 +76,18 @@ module.exports = {
     vuetifyRule.uses.set('sass-loader', sassNormalRule.uses.get('sass-loader'));
   },
 
+  // configureWebpack: config => {
+  //   if (process.env.NODE_ENV === 'development') {
+  //     config.plugins[0].port = 9091;
+  //   } else {
+  //     // mutate for development...
+  //   }
+  // },
+
   transpileDependencies: [
     'vuetify'
-  ]
+  ],
+  devServer: {
+    port: 9091
+  }
 }

@@ -1,8 +1,8 @@
-[data-vuetify-trustnet] .v-application--wrap {
+.v-application--wrap {
     min-height: initial !important;
 }
 
-.fixed-sidebar {
+[data-vuetify-trustnet] .fixed-sidebar {
     position: fixed;
     width: 400px !important;
     right: 0px;
@@ -15,7 +15,7 @@
     max-height: 100vh;
 }
 
-.assessments-container {
+[data-vuetify-trustnet] .assessments-container {
     max-height: 99vh;
     position: fixed !important;
     right: 0px;
@@ -25,7 +25,7 @@
     width: initial !important;
 }
 
-.assessments-pane {
+[data-vuetify-trustnet] .assessments-pane {
     width: 400px !important;
 }
 
@@ -55,22 +55,22 @@
 /* .body-no-scroll {
     overflow: hidden !important;
 } */
-
+/* 
 .headline-clickable {
     cursor: pointer;
     background-color: #F0F4C3    ;
-}
+} */
 
-.new-alt-headline {
+/* [data-vuetify-trustnet] .new-alt-headline {
     cursor: pointer;
     text-decoration-style: dashed;
     text-decoration-line: underline;
     color: #9E9D24;
 }
 
-.headline-modified {
+[data-vuetify-trustnet] .headline-modified {
     font-size: 70%;
-}
+} */
 
 /* [data-vuetify] .v-badge__badge { */
     /* height: 10px !important;
@@ -81,8 +81,8 @@
 .interactable {
     cursor: pointer;
 }
-
-.rounded-edit-button {
+/* 
+[data-vuetify-trustnet] .rounded-edit-button {
     border-radius: 50%;
     display: inline-flex;
     justify-content: center;
@@ -92,15 +92,8 @@
     margin-left: 4px;
     cursor: pointer;
     box-shadow: 2px 2px 5px black
-}
+} */
 
-.title-background-light {
-    background-color: #F0F4C3;
-}
-
-.title-background-dark {
-    background-color: #AFB42B;
-}
 
 /* [data-vuetify] .v-badge__badge .v-icon {
     font-size: 17px !important;
