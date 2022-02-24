@@ -1,6 +1,6 @@
 <template>
 
-  <span v-on="clickEnabled ? { click: goToPage } : {}" :class="[clickEnabled ? 'cursor-pointer' : '', 'reset-font'] ">
+  <span v-on="clickEnabled ? { click: goToPage } : {}" :class="[clickEnabled ? 'interactable' : '', 'reset-font'] ">
     <!-- <v-badge v-if="isTrusted === true"
       overlap color="#DAA520" class="custom-badge" bottom content="T">
       <inner-avatar :user="user" :size="size ? size : avatarSize"></inner-avatar>
@@ -20,6 +20,7 @@
 <script>
 import innerAvatar from '@/components/InnerAvatar'
 import utils from '@/services/utils'
+import constants from '@/lib/constants'
 import { mdiShield } from '@mdi/js';
 
 export default {
@@ -57,7 +58,17 @@ export default {
   methods: {
     goToPage: function(event) {
       event.stopPropagation();
-      // this.$router.push({ name: 'profile', params: { username: this.user.userName } });
+      
+      browser.runtime.sendMessage({
+        type: 'log_interaction',
+        interaction: {
+            type: 'visit_profile', 
+            data: this.user.userName
+        }
+      });
+
+      let route = `${constants.CLIENT_URL}/profile/${this.user.userName}`;
+      window.open(route);
     }
   }
 

@@ -226,7 +226,7 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   else if (request.type == 'log_interaction') {
     return new Promise((resolve, reject) => {
       studyServices.logUserInteraction({...request.interaction, 
-        client: 'extension'})
+        client: 'trustnet-extension'})
       .then(res => {
         resolve(res);
       })
