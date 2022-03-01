@@ -179,7 +179,7 @@ export default {
             displayInfoSnackbar: false,
             infoSnackbarMessage: '',
             displayShareMenu: false,
-            displayUserAssessmentMenu: false,
+            displayUserAssessmentMenu: true,
             expanderIsDisplayed: true,
             keepAssessmentsOpen: false
         }
