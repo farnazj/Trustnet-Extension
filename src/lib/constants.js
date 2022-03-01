@@ -25,7 +25,8 @@ const GLOBAL_BLACKLISTED_DOMAINS = [
   'ups.com',
   'bankofamerica.com',
   'chase.com',
-  'pnc.com'
+  'pnc.com',
+  'betterment.com'
 ]
 
 /*
