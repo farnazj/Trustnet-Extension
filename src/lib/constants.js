@@ -36,6 +36,16 @@ const DISALLOWED_DOMAINS = [
   'acm.dl.org'
 ]
 
+/*
+Domains where a resource is identified using a query parameter
+*/
+const DOMAINS_WITH_QUERY_PARAMS = [
+  'facebook.com/photo/?fbid',
+  'facebook.com/watch',
+  'youtube.com/watch',
+  'news.ycombinator.com/item'
+]
+
 export default {
   BASE_URL,
   CLIENT_URL,
@@ -47,5 +57,6 @@ export default {
   IDENTIFYING_TITLES_FUZZY_SCORE_THRESHOLD,
   ACCURACY_CODES,
   GLOBAL_BLACKLISTED_DOMAINS,
-  DISALLOWED_DOMAINS
+  DISALLOWED_DOMAINS,
+  DOMAINS_WITH_QUERY_PARAMS
 }

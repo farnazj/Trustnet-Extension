@@ -54,7 +54,7 @@ export default {
       setUpPageUrl: function(context) {
         return new Promise((resolve, reject) => {
           let sanitizedUrl;
-          if ( ['facebook.com/photo/?fbid', 'facebook.com/watch', 'youtube.com/watch'].some(el => 
+          if ( constants.DOMAINS_WITH_QUERY_PARAMS.some(el => 
             window.location.href.includes(el)))
             sanitizedUrl = window.location.href.split('&')[0];
           else

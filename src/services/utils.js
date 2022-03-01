@@ -217,7 +217,7 @@ function extractHostname(url, removeProtocol) {
   //find & remove protocol (http, ftp, etc.) and get hostname
 
   let keepQueryParam = false;
-  if (['facebook.com/photo/?fbid', 'facebook.com/watch', 'youtube.com/watch'].some(el => 
+  if (consts.DOMAINS_WITH_QUERY_PARAMS.some(el => 
     url.includes(el)))
     keepQueryParam = true;
 

@@ -187,7 +187,7 @@ $background-grey= #d2dbe0;
 		width: 100%;
 		z-index: 1;
 		left: 0;
-		top: 0;
+		top: 4;
 		width: 5em;
 		line-height: 4.75em;
 		font-size: 0.2em;

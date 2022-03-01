@@ -32,6 +32,7 @@ module.exports = {
   //for prefixing Vuetify classes so they don't pollute the global namespace
   chainWebpack: (config) => {
 
+    ////this part needs to be commented when building the extension for production
     config.plugin('extension-reloader').tap( args => [{
       port: 9091, // Which port use to create the server
       reloadPage: true, // Force the reload of the page also
@@ -42,6 +43,7 @@ module.exports = {
         ]
       }
     }])
+    //
 
     const sassRule = config.module.rule('sass');
     const sassNormalRule = sassRule.oneOfs.get('normal');
