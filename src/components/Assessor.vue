@@ -1,6 +1,6 @@
 <template>
 
-  <div :class="['c100', valuePercentage, valueColor , { transitive: isTransitive }, 'assessor']">
+  <!-- <div :class="['c100', valuePercentage, valueColor , { transitive: isTransitive }, 'assessor']">
       <span v-if="isUserNonEmpty">
         <v-tooltip bottom open-delay="500" z-index="9999999999">
           <template v-slot:activator="{ on }">
@@ -20,7 +20,25 @@
         <div class="bar"></div>
         <div class="fill"></div>
       </div>
-  </div>
+  </div> -->
+
+	<v-progress-circular  :value="valuePercentage" :color="valueColor" class="assessor" :size="barSize" :width="barWidth">
+		<span v-if="isUserNonEmpty">
+			<v-tooltip bottom open-delay="500">
+				<template v-slot:activator="{ on }">
+					<span v-on="on">
+						<custom-avatar :user="user" :clickEnabled="true" :size="barSize - 2 * barWidth">
+						</custom-avatar>
+					</span>
+				</template>
+				<span>{{sourceDisplayName(user)}}</span>
+			</v-tooltip>
+		</span>
+		<span v-else>
+		<v-icon small>fas fa-user</v-icon>
+		</span>
+	
+	</v-progress-circular >
 
 </template>
 
@@ -43,7 +61,11 @@ export default {
     },
     credibilityValue: {
       type: Number
-    }
+    },
+	size: {
+		type: Number,
+		required: false
+	}
   },
   data: () => {
     return {
@@ -56,6 +78,15 @@ export default {
     isUserNonEmpty: function() {
       return Object.keys(this.user).length > 0;
     },
+	barWidth: function() {
+		return 4;
+	},
+	barSize: function() {
+		if (this.size)
+			return this.size;
+		else
+			return 36;
+	},
     valueColor: function() {
 		if (this.credibilityValue < 0)
 			return 'red lighten-2';
