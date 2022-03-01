@@ -108,21 +108,21 @@
 
 [data-vuetify-trustnet] .v-badge__badge .v-icon {
     font-size: 17px !important;
-    inset: calc(100% - 11px) auto auto calc(100% - 15px);
+    /* inset: calc(100% - 11px) auto auto calc(100% - 15px); */
     color: #827717  !important;
     height: 14px !important;
 }
 
-[data-vuetify-trustnet] .assessor .v-badge__badge .v-icon {
-inset: calc(100% - 14px) auto auto calc(100% - 13px); 
-}
+/* [data-vuetify-trustnet] .assessor .v-badge__badge  {
+     inset: calc(100% - 10px) auto auto calc(100% - 10px) !important;  
+} */
 
 [data-vuetify-trustnet] .v-chip__content .v-avatar {
-overflow: initial;
+    overflow: initial;
 }
 
 [data-vuetify-trustnet] .v-chip .v-badge__badge .v-icon {
-transform: scale(0.8);
+    transform: scale(0.8);
 }
 
 /* for removing the weird spacing inside the autocompletes which hold chips
