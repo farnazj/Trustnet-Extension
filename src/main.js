@@ -12,6 +12,6 @@ new Vue({
   store,
   vuetify,
   render: h => h(insertedApp)
-}).$mount('#app')
+}).$mount('#trustnetApp')
 
 router.replace('/');

@@ -1,4 +1,12 @@
-.v-application--wrap {
+
+[data-vuetify-trustnet] #app {
+    width: initial;
+    height: initial;
+    display: initial;
+}
+
+
+[data-vuetify-trustnet] .v-application--wrap {
     min-height: initial !important;
 }
 
