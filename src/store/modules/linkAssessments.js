@@ -215,8 +215,10 @@ export default {
                             let reFormattedMappings = {};
                             for (let i = 0 ; i < serverResponse.length; i++) {
                                 if (serverResponse[i] && serverResponse[i] != 'failed')
-                                    reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
-                            }                        
+                                    // reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
+                                    reFormattedMappings[serverResponse[i]] = iterationRequestedLinks[i];
+
+                                }                        
                             Object.assign(serverSentMappings, reFormattedMappings);
 
                             context.dispatch('getAndShowAssessments', {
@@ -280,8 +282,8 @@ export default {
                             let iterationAxiosProms = []; //Promises related to fetching the trail of redirects for this iteration of sanitized links
                             let iterationMappings = {};
                             let linksFragment = sanitizedLinksRemainder.slice(i, i + 20);
-                            console.log('client following redirects for slice', i)
-                            console.log('link fragment is ', linksFragment)
+                            // console.log('client following redirects for slice', i)
+                            // console.log('link fragment is ', linksFragment)
         
                             let linksFragmentUnvisited = linksFragment.filter((link) => {
                                 if (uniqueSanitizedLinksVisited[link] == 0 ) {
@@ -331,7 +333,7 @@ export default {
                             */
                             allLinksProms.push(
                                 Promise.allSettled(iterationAxiosProms)
-                                .then(() => {                                
+                                .then(() => {                            
                                     Object.assign(redirectedToSanitizedLinksMapping, iterationMappings);
     
                                     context.dispatch('getAndShowAssessments', {
@@ -365,7 +367,7 @@ export default {
                     Promise.allSettled(allAxiosProms)
                     .then(() => {
 
-                        let mappingsToStore = Object.fromEntries(Object.entries(redirectedToSanitizedLinksMapping).filter( ([originLink, targetLink]) => 
+                        let mappingsToStore = Object.fromEntries(Object.entries(redirectedToSanitizedLinksMapping).filter( ([targetLink, originLink]) => 
                         !consts.DISALLOWED_DOMAINS.includes(utils.extractHostname(window.location.href), true) &&
                         !CORSBlockedLinks.includes(originLink) && sanitizedLinksRemainder.includes(originLink)));
 
