@@ -349,7 +349,11 @@ export default {
                             )
 
                             i += 20;
-                            let randomWaitTime = generalUtils.randomInteger(10, 70);
+                            
+                            let maxTime = ['twitter.com'].some( siteUrl =>
+                                window.location.href.includes(siteUrl) ) ? 130 : 70;
+
+                            let randomWaitTime = generalUtils.randomInteger(10, maxTime);
                             setTimeout(clientFollowRedirects(i), randomWaitTime);
                         }
                     }

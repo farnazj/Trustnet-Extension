@@ -270,7 +270,8 @@ const escapeHTMLPolicy = tt.trustedTypes.createPolicy("forceInner", {
 
 async function followRedirects(link) {
 
-  if (link.includes('dl.acm.org'))
+  if ( ['dl.acm.org', 'kickstarter.com'].some(siteURL => {
+    link.includes(siteURL)}))
     return new Promise((resolve, reject)=> resolve({ type: 'redirect chain not followed', link: link }));
   else {
     let extractedURL;
