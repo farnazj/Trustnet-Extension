@@ -6,7 +6,8 @@ export default {
     state: {
       url: null,
       article: null,
-      isBlacklisted: false
+      isBlacklisted: false,
+      timeOpened: null
     },
     mutations: {
       set_url: (state, url) => {
@@ -18,6 +19,10 @@ export default {
       set_black_list_status: (state, status) => {
         state.isBlacklisted = status;
       },
+      set_time_opened: (state) => {
+        state.timeOpened = Date.now();
+        console.log('time opened', state.timeOpened)
+      }
     },
     actions: {
 
@@ -107,8 +112,14 @@ export default {
           context.commit('set_black_list_status', pageIsBlackListed);
           resolve();
         })
+      },
+
+      setTimeOpened: function (context) {
+        return new Promise((resolve, reject) => {
+          context.commit('set_time_opened');
+          resolve();
+        })
       }
-  
 
     }
   }

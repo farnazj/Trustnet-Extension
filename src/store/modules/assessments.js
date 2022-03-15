@@ -213,7 +213,6 @@ export default {
                                         assessment: restructuredAssessments[key][0]
                                     })
                                     context.dispatch('logAssessmentsViewing', { postId: post.id });
-                                    console.log('dare resolve mishe')
                                     resolve();
                                 }
                             }

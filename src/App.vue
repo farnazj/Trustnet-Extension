@@ -41,6 +41,8 @@ export default {
         })
         
       }
+      
+      this.setTimeOpened();
     });
   },
   computed: {
@@ -62,6 +64,9 @@ export default {
     ]),
     ...mapActions('linkAssessments', [
       'setupLinkAssessments'
+    ]),
+    ...mapActions('pageDetails', [
+    'setTimeOpened'
     ])
   },
   mixins: [setupHelpers]

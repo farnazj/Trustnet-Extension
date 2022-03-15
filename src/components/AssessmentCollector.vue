@@ -197,6 +197,11 @@ export default {
     ]),
     ...mapState('assessments', [
       'userAssessment'
+    ]),
+    ...mapState('pageDetails', [
+      'timeOpened',
+      'url'
+
     ])
   },
   methods: {
@@ -253,6 +258,19 @@ export default {
           reqBody.emailArbiters = this.emails;
           reqBody.sourceIsAnonymous = this.anonymous;
         }
+
+        browser.runtime.sendMessage({
+          type: 'log_interaction',
+          interaction: {
+              type: 'submit_assessment', 
+              data: { 
+                  pageURL: this.url,
+                  pageFullURL: window.location.href,
+                  assessment: reqBody,
+                  timeSpentOnPage: Date.now() - this.timeOpened
+              }
+          }
+        })
 
         let self = this;
 
