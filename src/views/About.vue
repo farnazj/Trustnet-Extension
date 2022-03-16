@@ -11,7 +11,7 @@
           This is a browser extension as part of a research project that allows you to assess different articles as accurate or inaccurate. Your assessments can help benefit those users who follow or trust you on <a :href="sourcesLink" class="ml-1 custom-link" target="_blank">{{siteName}}
           </a>. You too can benefit from the assessments provided by your sources, since their assessments of any webpage you visit will be loaded on the page.
           <br>
-          In addition to providing accuracy assessments, you can also inquire about the accuracy of an article. Your inquiries can be anonymous or tied to your name and by default, will surface to those you have marked as trustworthy on {{siteName}}. Alternatively, you can specify who you would like to ask about the accuracy of the article.
+          In addition to providing accuracy assessments, you can also inquire about the accuracy of an article. Your inquiries can be anonymous or tied to your name and by default, will surface to those you have marked as trustworthy on {{siteName}}. Alternatively, you can specify who you would like to ask about the accuracy of the content.
         </p>
         <p class="body-2">
           <span class="font-weight-bold">Why do I need to sign up on a platform called Trustnet?</span>

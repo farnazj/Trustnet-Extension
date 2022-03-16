@@ -69,7 +69,7 @@
                 </v-switch>
               </template>
 
-              <span> Your question will be surfaced to the sources you follow or trust even though they may not follow
+              <span > Your question will be surfaced to the sources you follow or trust even though they may not follow
                 or trust you. Choose if you want your name to be visible with your question.
                 Note that those who follow or trust you will see your name along with your question regardless.</span>
             </v-tooltip>
@@ -139,24 +139,24 @@ export default {
       */
       accuracyStatus: [
         {
-          label: 'This article is accurate',
+          label: 'This content is accurate',
           value: consts.ACCURACY_CODES.CONFIRMED + 2,
           color: 'green--text text--darken-2'
         },
         {
-          label: 'This article is inaccurate or misleading',
+          label: 'This content is inaccurate or misleading',
           value: consts.ACCURACY_CODES.REFUTED + 2,
           color: 'red--text text--accent-3'
         },
         {
-          label: 'I want to know about the accuracy of this article',
+          label: 'I want to know about the accuracy of this content',
           value: consts.ACCURACY_CODES.QUESTIONED + 2,
           color: 'amber--text text--darken-3'
         }
       ],
       accuracyRules: {
           selectRules: [
-            v => !!v || 'Assess the accuracy of the article'
+            v => !!v || 'Assess the accuracy of the content'
           ],
           bodyRules: [
             v => !!v || 'You should add your reasoning'

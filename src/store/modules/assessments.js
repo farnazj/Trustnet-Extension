@@ -79,7 +79,7 @@ export default {
             }
         },
         /*
-        determines if there are assessments by a source other than the original poster of the article
+        determines if there are assessments by a source other than the original poster of the content
         */
         isNoSourceAssessmentNonEmpty: function(state, getters, rootState, rootGetter) {
 

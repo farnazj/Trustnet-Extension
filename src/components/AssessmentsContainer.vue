@@ -93,7 +93,7 @@
                         <v-row align-center no-gutters v-if="isAssessmentNonEmpty" class="mt-3">
                               <v-col cols="12">
                                 <v-container fluid class="visit-container py-1 px-2">
-                                    <p class="body-2 mb-0 grey--text text--darken-2">Visit the article on 
+                                    <p class="body-2 mb-0 grey--text text--darken-2">Visit the content on 
                                         <a :href="`${clientUrl}/posts/${article.id}`" target="_blank">Trustnet</a>.</p>
                                 </v-container>
                             </v-col>
