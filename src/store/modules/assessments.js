@@ -273,6 +273,16 @@ export default {
                     }
         
                 })
+
+                /*
+                If an earlier version of a question had not been anonymous but the more recent ones are,
+                this case can happen that assessmentsBySource[sourceId] for that SourceId can have a history
+                property but not lastVersion. We remove this (the earlier versions) from the assessments.
+                */
+                for (const sourceId in assessmentsBySource) {
+                    if (!('lastVersion' in assessmentsBySource[sourceId]))
+                    delete assessmentsBySource[sourceId];
+                }
         
                 let sourcePromises = [];
             
