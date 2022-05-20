@@ -6,7 +6,7 @@ export default {
      user, { withCredentials: true })
    },
    signup (user) {
-     return Api().post('/signup',
+     return Api().post('/signup/connect',
        user, { withCredentials: true })
    },
    logout() {

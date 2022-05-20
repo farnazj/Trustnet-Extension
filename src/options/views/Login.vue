@@ -51,7 +51,7 @@
 
             <v-row justify="center" no-gutters>
               <v-card-actions>
-                <v-btn tabindex="4" depressed href="https://trustnet.csail.mit.edu/signup" target="_blank">Go to signup</v-btn>
+                <v-btn tabindex="4" depressed href="https://trustnet.csail.mit.edu/signup/connect" target="_blank">Go to signup</v-btn>
               </v-card-actions>
             </v-row>
 
