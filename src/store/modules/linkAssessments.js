@@ -169,6 +169,8 @@ export default {
                     let sanitizedUrl = url;
                     if (sanitizedUrl[0] == '.')
                         sanitizedUrl = sanitizedUrl.substring(1, sanitizedUrl.length)
+                    if (sanitizedUrl.substring(0, 5) == '//www')
+                        sanitizedUrl = window.location.protocol + sanitizedUrl;
                     if (sanitizedUrl[0] == '/' || sanitizedUrl[0] == '?')
                         sanitizedUrl = window.location.protocol + '//' + window.location.host + sanitizedUrl;
                     if (sanitizedUrl[0] == '#')
@@ -371,7 +373,13 @@ export default {
                     Promise.allSettled(allAxiosProms)
                     .then(() => {
 
-                        let mappingsToStore = Object.fromEntries(Object.entries(redirectedToSanitizedLinksMapping).filter( ([targetLink, originLink]) => 
+
+                        let invereseLinkMapping = Object.keys(redirectedToSanitizedLinksMapping).reduce((ret, key) => {
+                            ret[redirectedToSanitizedLinksMapping[key]] = key;
+                            return ret;}, {});
+                        console.log('inverse link mapping (source to target) ', invereseLinkMapping)
+
+                        let mappingsToStore = Object.fromEntries(Object.entries(invereseLinkMapping).filter( ([originLink, targetLink]) => 
                         !consts.DISALLOWED_DOMAINS.includes(utils.extractHostname(window.location.href), true) &&
                         !CORSBlockedLinks.includes(originLink) && sanitizedLinksRemainder.includes(originLink)));
 
@@ -438,11 +446,10 @@ export default {
                         let serverFailedLinks = CORSBlockedLinks.filter(x => !serverFollowedLinks.includes(x)); //links that the server failed to follow
                         let failedMappingsToStore = {};
 
-                        let invereseLinkMapping = Object.keys(redirectedToSanitizedLinksMapping).reduce((ret, key) => {
-                            ret[redirectedToSanitizedLinksMapping[key]] = key;
-                            return ret;}, {});
+                        // let invereseLinkMapping = Object.keys(redirectedToSanitizedLinksMapping).reduce((ret, key) => {
+                        //     ret[redirectedToSanitizedLinksMapping[key]] = key;
+                        //     return ret;}, {});
 
-                        console.log('inverse link mapping (source to target) ', invereseLinkMapping)
                         console.log('links that both the client and the server failed to fetch', serverFailedLinks)
                         for (let link of serverFailedLinks) {
                             if (link in invereseLinkMapping) //links that encountered CORS
