@@ -32,6 +32,7 @@ export default {
           const url = window.location.href;
           if (url !== lastUrl) {
             lastUrl = url;
+            console.log('url avaz shod')
             onUrlChange();
           }
         }).observe(document, { subtree: true, childList: true });
@@ -46,9 +47,19 @@ export default {
               .then(() => {
                 context.dispatch('linkAssessments/setupLinkAssessments', true, { root: true })
               });
-              context.dispatch('assessments/getPageAssessments', true, { root: true });
-              // context.dispatch('assessments/getAuthUserPostAssessment', true, { root: true });
-              console.log('getting assessments again as a result of url change');
+              
+              context.dispatch('assessments/clearAssessments', true, { root: true })
+              .then(() => {
+                context.dispatch('assessments/getPageAssessments', true, { root: true })
+                .then(() => {
+                  context.dispatch('assessments/setExpanderVisibility', true, { root: true })
+                  context.dispatch('assessments/setVisibility', true, { root: true })
+                })
+                // context.dispatch('assessments/getAuthUserPostAssessment', true, { root: true });
+                console.log('getting assessments again as a result of url change');
+              })
+
+           
             })
           
           });

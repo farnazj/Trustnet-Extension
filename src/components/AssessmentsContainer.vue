@@ -2,7 +2,7 @@
     
     <v-row no-gutters class="assessments-container">
 
-        <v-col cols="1" v-if="expanderIsDisplayed">
+        <v-col cols="1" v-if="AssessmentExpanderIsDisplayed">
             <v-row no-gutters>
                 <v-btn @click="toggleAssessments" 
                     x-small :color="handleBackgroundColor" class="expand-button" height="4vh">
@@ -180,7 +180,6 @@ export default {
             infoSnackbarMessage: '',
             displayShareMenu: false,
             displayUserAssessmentMenu: true,
-            expanderIsDisplayed: true,
             keepAssessmentsOpen: false
         }
     },
@@ -234,12 +233,22 @@ export default {
             this.setPaneCloseTimeout();
             return this.isExpanded;
         },
+        AssessmentExpanderIsDisplayed: {
+            get: function() {
+                return this.expanderIsDisplayed;
+            },
+            set: function(newValue) {
+                this.setExpanderVisibility(newValue);
+            }
+        },
+
         clientUrl: function() {
             return constants.CLIENT_URL;
         },
         ...mapState('assessments', [
             'assessments',
             'isExpanded',
+            'expanderIsDisplayed',
             'userAssessment'
         ]),
         ...mapState('pageDetails', [
@@ -325,7 +334,7 @@ export default {
         },
         
         hideExpander: function() {
-            this.expanderIsDisplayed = false;
+            this.setExpanderVisibility(false);
             if (this.assessmentsPaneIsExpanded)
                 this.setVisibility(false);
         },
@@ -334,7 +343,8 @@ export default {
             this.errorAlert = true;
         },
         ...mapActions('assessments', [
-            'setVisibility'
+            'setVisibility',
+            'setExpanderVisibility'
         ]),
         ...mapActions('boosts', [
             'boostArticle'

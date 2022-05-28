@@ -6,6 +6,7 @@ export default {
     namespaced: true,
     state: {
         isExpanded: false,
+        expanderIsDisplayed: true,
         assessments: {'confirmed': [], 'refuted': [], 'questioned': []},
         userAssessment: {},
         postOwnerAssessment: {},
@@ -90,6 +91,16 @@ export default {
     mutations: {
         set_visibility(state, visibility) {
             state.isExpanded = visibility;
+        },
+        set_expander_visibility(state, visibility) {
+            state.expanderIsDisplayed = visibility;
+        },
+        clear_assessments(state) {
+            state.assessments = {'confirmed': [], 'refuted': [], 'questioned': []};
+            state.userAssessment = {};
+            state.postOwnerAssessment = {};
+            state.unfollowedAssessorsOnPage = [];
+            state.unfollowedAssessorsVisibility = false;
         },
         set_assessments(state, assessments) {
             state.assessments = assessments;
@@ -368,6 +379,10 @@ export default {
         setVisibility: (context, payload) => {
             context.commit('set_visibility', payload);
         },
+
+        setExpanderVisibility: (context, payload) => {
+            context.commit('set_expander_visibility', payload);
+        },
       
         setHistoryVisibility: (context, payload) => {
             context.commit('set_history_visibility', payload);
@@ -378,8 +393,12 @@ export default {
         },
         
         setUnfollowedAssessorsVisibility: (context, payload) => {
-            context.commit('set_unfollowed_assessors_visibility', payload)
-        }
+            context.commit('set_unfollowed_assessors_visibility', payload);
+        },
+
+        clearAssessments: (context, payload) => {
+            context.commit('clear_assessments', payload);
+        },
     }
   }
   
