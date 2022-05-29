@@ -218,7 +218,7 @@ function extractHostname(url, removeProtocol) {
 
   let keepQueryParam = false;
   if (consts.DOMAINS_WITH_QUERY_PARAMS.some(el => 
-    url.includes(el)))
+    url.includes(el)) || (url.includes('facebook.com') && url.includes('comment_id') ))
     keepQueryParam = true;
 
   if (url.includes('https://l.facebook.com/l.php?'))
@@ -270,10 +270,14 @@ const escapeHTMLPolicy = tt.trustedTypes.createPolicy("forceInner", {
 
 async function followRedirects(link) {
 
-  if ( ['dl.acm.org', 'kickstarter.com', 'www.linkedin.com'].some(siteURL => {
-    link.includes(siteURL)}))
-    return new Promise((resolve, reject)=> resolve({ type: 'redirect chain not followed', link: link }));
-  else {
+  const twitterRegEx = /twitter.com\/[\S]*\/status/
+
+  if ( ['dl.acm.org', 'kickstarter.com', 'linkedin.com'].some(siteURL => {
+    link.includes(siteURL)}) || twitterRegEx.exec(link).index != -1) {
+      return new Promise((resolve, reject)=> resolve({ type: 'redirect chain not followed', link: link }));
+    }
+  else {      
+
     let extractedURL;
 
     return axios.get(link, { maxRedirects: 8 } ).then((response) => {

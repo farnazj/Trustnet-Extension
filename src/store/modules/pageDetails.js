@@ -32,7 +32,6 @@ export default {
           const url = window.location.href;
           if (url !== lastUrl) {
             lastUrl = url;
-            console.log('url avaz shod')
             onUrlChange();
           }
         }).observe(document, { subtree: true, childList: true });
@@ -70,12 +69,15 @@ export default {
       setUpPageUrl: function(context) {
         return new Promise((resolve, reject) => {
           let sanitizedUrl;
+
+          let pageRawURL = window.location.href;
+
           if ( constants.DOMAINS_WITH_QUERY_PARAMS.some(el => 
-            window.location.href.includes(el)))
-            sanitizedUrl = window.location.href.split('&')[0];
+            pageRawURL.includes(el)) || (pageRawURL.includes('facebook.com') && pageRawURL.includes('comment_id')))
+            sanitizedUrl = pageRawURL.split('&')[0];
           else
-            sanitizedUrl = window.location.href.split('?')[0]
-            
+            sanitizedUrl = pageRawURL.split('?')[0]
+          
           context.commit('set_url', sanitizedUrl);
           resolve();
         })
