@@ -271,9 +271,10 @@ const escapeHTMLPolicy = tt.trustedTypes.createPolicy("forceInner", {
 async function followRedirects(link) {
 
   const twitterRegEx = /twitter.com\/[\S]*\/status/
+  let regexIndex = twitterRegEx.exec(link) ? twitterRegEx.exec(link).index : false;
 
   if ( ['dl.acm.org', 'kickstarter.com', 'linkedin.com'].some(siteURL => {
-    link.includes(siteURL)}) || twitterRegEx.exec(link).index != -1) {
+    link.includes(siteURL)}) || regexIndex) {
       return new Promise((resolve, reject)=> resolve({ type: 'redirect chain not followed', link: link }));
     }
   else {      

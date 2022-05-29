@@ -42,7 +42,6 @@ This function changes the UI to signify assessed or questioned links
 function populateLinkAssessments (allLinksAssessments) {
 
     for (const link of Object.keys(allLinksAssessments)) {
-        console.log('inja', link, allLinksAssessments[link])
 
         if (allLinksAssessments[link].confirmed.length ||
             allLinksAssessments[link].refuted.length ||

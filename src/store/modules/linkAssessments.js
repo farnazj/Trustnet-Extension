@@ -318,7 +318,10 @@ export default {
                                             iterationMappings[utils.extractHostname(response.link)] = link;
                                         }
                                             
-                                    });
+                                    })
+                                    .catch(errchi => {
+                                        console.log('errchi', errchi)
+                                    })
                                     iterationAxiosProms.push(iterationProm);
                                     allAxiosProms.push(iterationProm);
         
@@ -518,6 +521,7 @@ export default {
                 })
                 .then((restructuredAssessments) => {
                     console.log('What assessments this round of api calls returned', restructuredAssessments);
+                    console.log('these assessments were for the following links:', data.linksFragmentUnvisited)
                     domHelpers.populateLinkAssessments(restructuredAssessments);
                     resolve(restructuredAssessments);
                 })
