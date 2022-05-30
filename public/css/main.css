@@ -14,7 +14,7 @@
     position: fixed;
     width: 400px !important;
     right: 0px;
-    z-index: 999999999;
+    z-index: 2147483647;
     overflow: auto;
     top: 0px;
 }
@@ -27,7 +27,7 @@
     max-height: 99vh;
     position: fixed !important;
     right: 0px;
-    z-index: 9999999999;
+    z-index: 2147483647;
     overflow: auto;
     top: 0px;
     width: initial !important;

@@ -2,7 +2,7 @@
     
     <v-row no-gutters class="assessments-container">
 
-        <v-col cols="1" v-if="AssessmentExpanderIsDisplayed">
+        <v-col :cols="assessmentsPaneIsExpanded ? 1 : 12" v-if="AssessmentExpanderIsDisplayed">
             <v-row no-gutters>
                 <v-btn @click="toggleAssessments" 
                     x-small :color="handleBackgroundColor" class="expand-button" height="4vh">
@@ -21,7 +21,7 @@
             </v-row>
         </v-col>
             
-        <v-col cols="11">
+        <v-col cols="11" v-if="assessmentsPaneIsExpanded">
             <v-expand-x-transition>
                 <v-container v-show="assessmentsPaneIsExpanded" fluid class="assessments-pane pa-0">
                     <v-card :color="containerBackgroundColor" raised elevation="3" class="assessments-container-card">
