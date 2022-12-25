@@ -33,16 +33,16 @@ module.exports = {
   chainWebpack: (config) => {
 
     ////this part needs to be commented when building the extension for production
-    config.plugin('extension-reloader').tap( args => [{
-      port: 9091, // Which port use to create the server
-      reloadPage: true, // Force the reload of the page also
-      entries: { // The entries used for the content/background scripts or extension pages
-        background: 'background',
-        contentScript: [
-          'content-script'
-        ]
-      }
-    }])
+    // config.plugin('extension-reloader').tap( args => [{
+    //   port: 9091, // Which port use to create the server
+    //   reloadPage: true, // Force the reload of the page also
+    //   entries: { // The entries used for the content/background scripts or extension pages
+    //     background: 'background',
+    //     contentScript: [
+    //       'content-script'
+    //     ]
+    //   }
+    // }])
     //
 
     const sassRule = config.module.rule('sass');
