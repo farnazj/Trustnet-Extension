@@ -63,7 +63,6 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   else if (request.type == 'get_followers') {
     return new Promise((resolve, reject) => {
       let authUsername = JSON.parse(localStorage.getItem('trustnetAuthToken')).userName;
-      console.log(authUsername, 'auth user name is ')
       relationServices.getFollowers({ username: authUsername })
       .then(response => {
         resolve(response.data);

@@ -212,6 +212,7 @@ export default {
                             }
                         })
                         .then((serverResponse) => {
+                            console.log('server response****', serverResponse)
                             serverSentMappingsArr = serverSentMappingsArr.concat(serverResponse);
 
                             let reFormattedMappings = {};
@@ -220,8 +221,12 @@ export default {
                                     // reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
                                     reFormattedMappings[serverResponse[i]] = iterationRequestedLinks[i];
 
+                                    // if (serverResponse[i] != iterationRequestedLinks[i])
+                                    //     reFormattedMappings[iterationRequestedLinks[i]] = iterationRequestedLinks[i];
                                 }                        
                             Object.assign(serverSentMappings, reFormattedMappings);
+
+                            console.log('reformatted mappings', reFormattedMappings)
 
                             context.dispatch('getAndShowAssessments', {
                                 linksFragmentUnvisited: Object.keys(reFormattedMappings),
@@ -307,7 +312,11 @@ export default {
                                             get 403 for example).
                                             */
                                             if (response.detail == 'CORS') {
-                                                iterationMappings[utils.extractHostname(response.link)] = link;
+                                                let targetResource = utils.extractHostname(response.link);
+                                                if (!( targetResource in iterationMappings))
+                                                    iterationMappings[targetResource] = [];
+
+                                                iterationMappings[targetResource].push(link);
                                                 CORSBlockedLinks.push(link);
                                             }
                                             if (response.detail == 'Unknown')
@@ -315,7 +324,11 @@ export default {
                                             
                                         }
                                         if (response.type != 'error')  {
-                                            iterationMappings[utils.extractHostname(response.link)] = link;
+                                            let targetResource = utils.extractHostname(response.link);
+                                                if (!( targetResource in iterationMappings))
+                                                    iterationMappings[targetResource] = [];
+
+                                            iterationMappings[targetResource].push(link);
                                         }
                                             
                                     })
@@ -376,7 +389,6 @@ export default {
                     Promise.allSettled(allAxiosProms)
                     .then(() => {
 
-
                         let invereseLinkMapping = Object.keys(redirectedToSanitizedLinksMapping).reduce((ret, key) => {
                             ret[redirectedToSanitizedLinksMapping[key]] = key;
                             return ret;}, {});
@@ -385,6 +397,9 @@ export default {
                         let mappingsToStore = Object.fromEntries(Object.entries(invereseLinkMapping).filter( ([originLink, targetLink]) => 
                         !consts.DISALLOWED_DOMAINS.includes(utils.extractHostname(window.location.href), true) &&
                         !CORSBlockedLinks.includes(originLink) && sanitizedLinksRemainder.includes(originLink)));
+
+                        // console.log('cors blocked links', CORSBlockedLinks)
+                        // console.log('mappings to store', mappingsToStore)
 
                         if (Object.keys(mappingsToStore).length) {
                             
@@ -414,6 +429,7 @@ export default {
                         */
                         let serverFollowedLinks = [];
 
+
                         for (let i = 0 ; i < CORSBlockedLinks.length ; i += 20) {
                             let linksFragment = CORSBlockedLinks.slice(i, i + 20);
                             allLinksProms.push(
@@ -426,6 +442,7 @@ export default {
                                     }
                                 })
                                 .then((urlMapping) => {
+
                                     context.dispatch('getAndShowAssessments', {
                                         linksFragmentUnvisited: Object.keys(urlMapping),
                                         redirectedToSanitizedLinksMapping: urlMapping,
@@ -603,29 +620,33 @@ export default {
                                     get all indices of post.url in sanitizedLinks (because sanitizedLinks can have duplicates)
                                     and using the indices, get their correponding raw links in the originalLinks array
                                     */
-                                    let clientSanitizedUrl;
+                                    let clientSanitizedUrls;
                                     
                                     if (post.url in urlMapping)
-                                        clientSanitizedUrl = urlMapping[post.url];
+                                        clientSanitizedUrls =  (typeof urlMapping[post.url] == 'object') ? urlMapping[post.url] : [urlMapping[post.url]];
                                     else {
                                         let altUrls = utils.constructAltURLs([post.url]);
                                         let altUrl = altUrls.filter(url => url in urlMapping)[0];
-                                        clientSanitizedUrl = urlMapping[altUrl];
+                                        clientSanitizedUrls = (typeof urlMapping[altUrl] == 'object') ? urlMapping[altUrl] : [urlMapping[altUrl]] ;
                                     }
                                         
                                     let protocolRemovedSanitizedLinks = sanitizedLinks.map(el => {
                                         return el.split('//')[1];
                                     });
-                                    let protocolRemovedClientSanitizedUrl = clientSanitizedUrl.split('//')[1];
+                                    let protocolRemovedClientSanitizedUrls = clientSanitizedUrls.map(el => el.split('//')[1]);
 
                                     let originalLinkIndices = [];
                                     let sanitizedLinkIndex = -1;
-                                    do {
-                                        sanitizedLinkIndex = protocolRemovedSanitizedLinks.indexOf(protocolRemovedClientSanitizedUrl, sanitizedLinkIndex + 1);
-                                        if (sanitizedLinkIndex != -1)
-                                            originalLinkIndices.push(sanitizedLinkIndex);
+
+                                    for (let protocolRemovedClientSanitizedUrl of protocolRemovedClientSanitizedUrls) {
+                                        do {
+                                            sanitizedLinkIndex = protocolRemovedSanitizedLinks.indexOf(protocolRemovedClientSanitizedUrl, sanitizedLinkIndex + 1);
+                                            if (sanitizedLinkIndex != -1)
+                                                originalLinkIndices.push(sanitizedLinkIndex);
+                                        }
+                                        while (sanitizedLinkIndex != -1); 
                                     }
-                                    while (sanitizedLinkIndex != -1); 
+                                    
 
                                     /*
                                     Each instance of the raw links will be a key in linkAssessments mapped to its assessments
