@@ -308,19 +308,19 @@ async function followRedirects(link) {
               google news pages redirect to other pages in javascript. Below, the URL to which they redirect
               is extracted out of the HTML page.
               */
-              return response.text()
-              .then((textStream)=> {
-                let escapedHTML = escapeHTMLPolicy.createHTML(textStream);
+              
+              let escapedHTML = escapeHTMLPolicy.createHTML(response.data);
 
-                const parser = new DOMParser();
-                const htmlDOM = parser.parseFromString(escapedHTML, "text/html");
-                extractedURL = [...htmlDOM.querySelectorAll("noscript a")].map(el => el.getAttribute('href'))[0];
+              const parser = new DOMParser();
+              const htmlDOM = parser.parseFromString(escapedHTML, "text/html");
 
-                if (extractedURL)
-                  return ({ type: 'URL extracted out of HTML', link: extractedURL });
-                else
-                  return ({ type: 'error', detail: 'non-static-resource' })
-              })
+              extractedURL = [...htmlDOM.querySelectorAll("noscript a")].map(el => el.getAttribute('href'))[0];
+
+              if (extractedURL)
+                return ({ type: 'URL extracted out of HTML', link: extractedURL });
+              else
+                return ({ type: 'error', detail: 'non-static-resource' });
+              
           }
       }
     
