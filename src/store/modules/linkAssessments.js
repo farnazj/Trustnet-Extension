@@ -217,16 +217,18 @@ export default {
 
                             let reFormattedMappings = {};
                             for (let i = 0 ; i < serverResponse.length; i++) {
-                                if (serverResponse[i] && serverResponse[i] != 'failed')
-                                    // reFormattedMappings[iterationRequestedLinks[i]] = serverResponse[i];
-                                    reFormattedMappings[serverResponse[i]] = iterationRequestedLinks[i];
+                                if (serverResponse[i] && serverResponse[i] != 'failed') {
 
-                                    // if (serverResponse[i] != iterationRequestedLinks[i])
-                                    //     reFormattedMappings[iterationRequestedLinks[i]] = iterationRequestedLinks[i];
+                                    if (!(serverResponse[i] in reFormattedMappings))
+                                    reFormattedMappings[serverResponse[i]] = [];
+                                
+                                    reFormattedMappings[serverResponse[i]].push(iterationRequestedLinks[i]);
+                                }
+
                                 }                        
                             Object.assign(serverSentMappings, reFormattedMappings);
 
-                            console.log('reformatted mappings', reFormattedMappings)
+                            // console.log('reformatted mappings', reFormattedMappings)
 
                             context.dispatch('getAndShowAssessments', {
                                 linksFragmentUnvisited: Object.keys(reFormattedMappings),
