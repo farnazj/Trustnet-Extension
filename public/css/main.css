@@ -172,6 +172,13 @@ These selectors have a high specificity and ensure that the fill will apply.*/
     right: 0px;
 }
 
+.overlay-accuracy-icon-shifted {
+    z-index: 20;
+    position: absolute;
+    bottom: -5px;
+    right: 20px;
+}
+
 *[trustnet-modified-link=true], *[trustnet-modified-question-link=true] {
     position: relative;
 }

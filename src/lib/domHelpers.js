@@ -134,13 +134,6 @@ function populateLinkAssessments (allLinksAssessments) {
                         linkEls.forEach(linkEl => {
                             if (!linkEl.getAttribute('trustnet-modified-link')) {
                                 
-                                // if (!linkEl.getAttribute('trustnet-modified-question-link')) {
-                                        
-                                    // [...linkEl.children].forEach(child => {
-                                    //     child.style.display = "inline";
-                                    // });
-                                // }
-
                                 if (specialStatus == 'inaccurate') {
                                     linkEl.setAttribute('inaccurate-link', true);
                                     [...linkEl.children].forEach(child => {
@@ -152,15 +145,20 @@ function populateLinkAssessments (allLinksAssessments) {
                                 let accuracyClass;
 
                                 if (isEmbedded(linkEl)) {
-                                    accuracyClass = 'inline-accuracy-icon';
                                     [...linkEl.children].forEach(child => {
                                         child.style.display = "inline";
                                     });
                                 }
                                 else {
-                                    accuracyClass = 'overlay-accuracy-icon';
                                     if (['inline', ''].includes(linkEl.style.display))
                                         linkEl.style.display = 'inline-block';
+                                }
+
+                                if (linkIsQuestioned) {
+                                    accuracyClass = 'overlay-accuracy-icon-shifted';
+                                }
+                                else {
+                                    accuracyClass = 'overlay-accuracy-icon';
                                 }
                                     
                                 iconToAddClone.classList.add(accuracyClass);
