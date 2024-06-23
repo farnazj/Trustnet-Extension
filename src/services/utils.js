@@ -274,7 +274,7 @@ async function followRedirects(link) {
   let regexIndex = twitterRegEx.exec(link) ? twitterRegEx.exec(link).index : false;
 
   if ( ['dl.acm.org', 'kickstarter.com', 'linkedin.com'].some(siteURL => {
-    link.includes(siteURL)}) || regexIndex) {
+    link.includes(siteURL)}) || regexIndex || window.location.href.includes('dl.acm.org')) {
       return new Promise((resolve, reject)=> resolve({ type: 'redirect chain not followed', link: link }));
     }
   else {      

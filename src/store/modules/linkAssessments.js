@@ -431,33 +431,36 @@ export default {
                         */
                         let serverFollowedLinks = [];
 
-
-                        for (let i = 0 ; i < CORSBlockedLinks.length ; i += 20) {
-                            let linksFragment = CORSBlockedLinks.slice(i, i + 20);
-                            allLinksProms.push(
-                                browser.runtime.sendMessage({
-                                    type: 'follow_redirects',
-                                    data: {
-                                        headers: { 
-                                            urls: JSON.stringify(linksFragment)
+                        if (!window.location.href.includes('dl.acm.org')) {
+                            for (let i = 0 ; i < CORSBlockedLinks.length ; i += 20) {
+                                let linksFragment = CORSBlockedLinks.slice(i, i + 20);
+                                allLinksProms.push(
+                                    browser.runtime.sendMessage({
+                                        type: 'follow_redirects',
+                                        data: {
+                                            headers: { 
+                                                urls: JSON.stringify(linksFragment),
+                                                originator: window.location.href
+                                            }
                                         }
-                                    }
-                                })
-                                .then((urlMapping) => {
-
-                                    context.dispatch('getAndShowAssessments', {
-                                        linksFragmentUnvisited: Object.keys(urlMapping),
-                                        redirectedToSanitizedLinksMapping: urlMapping,
-                                        sanitizedLinks: sanitizedLinks,
-                                        rawLinks: links
                                     })
-                                    .then((restructuredAssessments) => {
-                                        allLinksAssessments = Object.assign(allLinksAssessments, restructuredAssessments);
-                                    })
+                                    .then((urlMapping) => {
 
-                                    serverFollowedLinks.push(Object.values(urlMapping));
-                                })
-                            )
+                                        context.dispatch('getAndShowAssessments', {
+                                            linksFragmentUnvisited: Object.keys(urlMapping),
+                                            redirectedToSanitizedLinksMapping: urlMapping,
+                                            sanitizedLinks: sanitizedLinks,
+                                            rawLinks: links
+                                        })
+                                        .then((restructuredAssessments) => {
+                                            allLinksAssessments = Object.assign(allLinksAssessments, restructuredAssessments);
+                                        })
+
+                                        serverFollowedLinks.push(Object.values(urlMapping));
+                                    })
+                                )
+                            }
+
                         }
 
                         /*
@@ -482,12 +485,13 @@ export default {
 
                         console.log('links sent to server to schedule following redirects for, and later storing', failedMappingsToStore)
 
-                        if (Object.entries(failedMappingsToStore).length) {
+                        if (Object.entries(failedMappingsToStore).length && !window.location.href.includes('dl.acm.org')) {
                             browser.runtime.sendMessage({
                                 type: 'schedule_redirects',
                                 data: {
                                     reqBody: { 
-                                        urlMappings: failedMappingsToStore
+                                        urlMappings: failedMappingsToStore,
+                                        originator: window.location.href
                                     }
                                 }
                             })
