@@ -17,8 +17,9 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return new Promise((resolve, reject) => {
       authServices.login(request.data.reqBody)
       .then(res => {
-        localStorage.setItem('trustnetAuthToken', JSON.stringify(res.data.user));
-        resolve(res)
+        browser.storage.local.set({ 'trustnetAuthToken': res.data.user }).then(() => {
+          resolve(res)
+        });
       })
       .catch(err => {
         console.log(err.response.data.message)
@@ -31,8 +32,9 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
       authServices.logout()
         .then(res => {
-          localStorage.removeItem('trustnetAuthToken');
-          resolve(res)
+          browser.storage.local.remove('trustnetAuthToken').then(() => {
+            resolve(res)
+          });
         })
         .catch(err => {
           reject({message: err});
@@ -41,7 +43,11 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
   else if (request.type == 'get_user') {
     return new Promise((resolve, reject) => {
-      resolve(JSON.parse(localStorage.getItem('trustnetAuthToken')));
+      browser.storage.local.get('trustnetAuthToken').then(({
+        trustnetAuthToken
+      }) => {
+        resolve(trustnetAuthToken);
+      })
     })
   }
   else if (request.type == 'get_follows') {
@@ -62,10 +68,12 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
   else if (request.type == 'get_followers') {
     return new Promise((resolve, reject) => {
-      let authUsername = JSON.parse(localStorage.getItem('trustnetAuthToken')).userName;
-      relationServices.getFollowers({ username: authUsername })
-      .then(response => {
-        resolve(response.data);
+      browser.storage.local.get('trustnetAuthToken').then(({trustnetAuthToken}) => {
+        let authUsername = trustnetAuthToken.userName;
+        relationServices.getFollowers({ username: authUsername })
+        .then(response => {
+          resolve(response.data);
+        })
       })
     })
   }

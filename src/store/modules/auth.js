@@ -3,7 +3,7 @@ export default {
   namespaced: true,
   state: {
     status: '',
-    token: JSON.parse(localStorage.getItem('trustnetAuthToken')) || ''
+    token: ''
   },
   getters: {
     isLoggedIn: (state) => {
@@ -17,7 +17,11 @@ export default {
       if (Object.entries(state.token).length)
           return state.token;
       else {
-          return JSON.parse(localStorage.getItem('trustnetAuthToken'));
+          return new Promise((resolve, reject) => {
+            browser.storage.local.get('trustnetAuthToken').then(({trustnetAuthToken}) => {
+              resolve(trustnetAuthToken);
+            })
+          })
       }
     }
   },
@@ -37,11 +41,11 @@ export default {
     logout(state) {
       state.status = '';
       state.token = '';
-      localStorage.removeItem('trustnetAuthToken');
+      browser.storage.local.remove('trustnetAuthToken');
     },
 
     update_user(state, user) {
-      localStorage.setItem('trustnetAuthToken', JSON.stringify(user));
+      browser.storage.local.set({trustnetAuthToken: user});
       state.token = Object.assign({}, user);
     }
   },
@@ -65,7 +69,7 @@ export default {
        })
       })
     },
-    
+
     login: (context, user) => {
       return new Promise((resolve, reject) => {
           context.commit('auth_request')
@@ -81,7 +85,7 @@ export default {
               context.commit('auth_success');
               context.dispatch('getUser')
               .then(() => {
-                resolve(resp);    
+                resolve(resp);
               })
           })
           .catch(err => {
@@ -105,7 +109,7 @@ export default {
         .catch(err => {
             reject(err);
         })
-        
+
       })
     }
 

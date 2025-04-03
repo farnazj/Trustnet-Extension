@@ -44,16 +44,20 @@ const router = new VueRouter({
   mode: 'abstract'
 })
 
-router.beforeEach((to, from, next) => {
-  console.log('router from where to where', to, from, store.getters['auth/isLoggedIn'], JSON.stringify(localStorage.getItem('trustnetAuthToken')))
-  if(to.matched.some(record => record.meta.requiresAuth)) {
-    if (localStorage.getItem('trustnetAuthToken')) {
+router.beforeEach(async (to, from, next) => {
+
+  const {trustnetAuthToken} = await browser.storage.local.get('trustnetAuthToken');
+
+  console.log('router from where to where', to, from, store.getters['auth/isLoggedIn'], trustnetAuthToken);
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (trustnetAuthToken) {
       next();
       window.scrollTo(0, 0);
       return;
-    }
-    else
+    } else {
       next('/login');
+    }
   } else {
     next();
   }
