@@ -1,11 +1,12 @@
 {
-  "manifest_version": 2,
-  "version": "0.0.0.2",
+  "manifest_version": 3,
+  "version": "0.0.0.3",
   "name": "Trustnet",
   "homepage_url": "https://github.com/farnazj/Replace-Previews/tree/add-assessments",
   "description": "Allows you to assess different articles as (in)accurate to help your friends and to also see the assessments that they provide.",
   "default_locale": "en",
   "permissions": [
+    "storage"
   ],
   "icons": {
     "16": "icons/trustnet_48.png",
@@ -13,10 +14,7 @@
     "128": "icons/trustnet_128.png"
   },
   "background": {
-    "scripts": [
-      "js/background.js"
-    ],
-    "persistent": false
+    "service_worker": "js/background.js"
   },
   "content_scripts": [
     {
@@ -31,7 +29,7 @@
       "css": ["css/main.css"]
     }
   ],
-  "browser_action": {
+  "action": {
     "default_title": "Trustnet",
     "default_icon": {
       "19": "icons/trustnet_67.png",
@@ -39,7 +37,6 @@
     }
   },
   "options_ui": {
-    "page": "options.html",
-    "browser_style": true
+    "page": "options.html"
   }
 }
